@@ -63,6 +63,21 @@ function App() {
     setter(String(Math.max(0, numValue)));
   };
 
+  const handleRandomStats = () => {
+    // Skill: random 1-6 + 6
+    const skillRoll = Math.floor(Math.random() * 6) + 1;
+    setSkill(String(skillRoll + 6));
+
+    // Health: two random 1-6, sum them, then + 12
+    const healthRoll1 = Math.floor(Math.random() * 6) + 1;
+    const healthRoll2 = Math.floor(Math.random() * 6) + 1;
+    setHealth(String(healthRoll1 + healthRoll2 + 12));
+
+    // Luck: random 1-6 + 6
+    const luckRoll = Math.floor(Math.random() * 6) + 1;
+    setLuck(String(luckRoll + 6));
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'default');
   }, []);
@@ -229,6 +244,16 @@ function App() {
                     }
                     placeholder={t('placeholders.luck')}
                   />
+                </div>
+                <div className="d-flex justify-content-center mt-3">
+                  <button
+                    type="button"
+                    className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                    onClick={handleRandomStats}
+                  >
+                    {t('buttons.randomStats')}
+                    <Icon path={mdiDice3} size={1} />
+                  </button>
                 </div>
               </div>
             </section>

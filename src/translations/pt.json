@@ -31,5 +31,8 @@
     "testYourLuck": "Testar a sorte",
     "rollDie": "Lançar dado",
     "rollDice": "Lançar dados"
+  },
+  "buttons": {
+    "randomStats": "Aleatório"
   }
 }
