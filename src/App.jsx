@@ -99,8 +99,8 @@ function App() {
             </a>
             <div className="position-relative language-selector">
               <div
-                className="d-flex align-items-center gap-1"
-                style={{ cursor: 'pointer' }}
+                className="d-flex align-items-center"
+                style={{ cursor: 'pointer', gap: '0.125rem' }}
                 onClick={handleLanguageIconClick}
               >
                 <Icon path={mdiWebBox} size={1} className="text-white" />
