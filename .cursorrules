@@ -1,0 +1,7 @@
+# Commit Conventions
+
+When committing changes:
+- Only commit changes made by the current agent (not changes from other agents)
+- Use conventional commits format (e.g., `feat:`, `fix:`, `refactor:`, `style:`, `docs:`, `chore:`, etc.)
+- Commit messages must be lowercase
+- Commit messages must be 80 characters or less
