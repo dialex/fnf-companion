@@ -29,3 +29,76 @@
   padding: 20px;
   min-height: 200px;
 }
+
+.field-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.field-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.field-label {
+  font-weight: 500;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.field-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: #4a4a4a;
+}
+
+.number-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.number-input {
+  flex: 1;
+}
+
+.number-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.number-btn {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  width: 24px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.number-btn:hover {
+  background: #e0e0e0;
+}
+
+.number-btn:active {
+  background: #d0d0d0;
+}

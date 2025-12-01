@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [skill, setSkill] = useState('');
+  const [health, setHealth] = useState('');
+  const [luck, setLuck] = useState('');
+
+  const increment = (setter, current) => {
+    const value = parseInt(current) || 0;
+    setter(String(value + 1));
+  };
+
+  const decrement = (setter, current) => {
+    const value = parseInt(current) || 0;
+    setter(String(Math.max(0, value - 1)));
+  };
   return (
     <div className="min-h-screen bg-beige">
       <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
@@ -27,7 +40,104 @@ function App() {
               <h2 className="section-title">CHARACTER</h2>
             </div>
             <div className="section-content">
-              {/* Character fields will be added in Step 4 */}
+              <div className="field-group">
+                <div className="field-icon">🛡️</div>
+                <label className="field-label">Name</label>
+                <input type="text" className="field-input" placeholder="Name" />
+              </div>
+              <div className="field-group">
+                <div className="field-icon">⚔️</div>
+                <label className="field-label">Skill</label>
+                <div className="number-input-wrapper">
+                  <input
+                    type="number"
+                    className="field-input number-input"
+                    placeholder="Skill"
+                    value={skill}
+                    onChange={(e) => setSkill(e.target.value)}
+                  />
+                  <div className="number-controls">
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Increment"
+                      onClick={() => increment(setSkill, skill)}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Decrement"
+                      onClick={() => decrement(setSkill, skill)}
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="field-group">
+                <div className="field-icon">❤️</div>
+                <label className="field-label">Health</label>
+                <div className="number-input-wrapper">
+                  <input
+                    type="number"
+                    className="field-input number-input"
+                    placeholder="Health"
+                    value={health}
+                    onChange={(e) => setHealth(e.target.value)}
+                  />
+                  <div className="number-controls">
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Increment"
+                      onClick={() => increment(setHealth, health)}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Decrement"
+                      onClick={() => decrement(setHealth, health)}
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="field-group">
+                <div className="field-icon">🍀</div>
+                <label className="field-label">Luck</label>
+                <div className="number-input-wrapper">
+                  <input
+                    type="number"
+                    className="field-input number-input"
+                    placeholder="Luck"
+                    value={luck}
+                    onChange={(e) => setLuck(e.target.value)}
+                  />
+                  <div className="number-controls">
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Increment"
+                      onClick={() => increment(setLuck, luck)}
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className="number-btn"
+                      aria-label="Decrement"
+                      onClick={() => decrement(setLuck, luck)}
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
           <section id="inventory" className="section-container">
