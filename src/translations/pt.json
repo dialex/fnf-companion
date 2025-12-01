@@ -9,7 +9,7 @@
   "sections": {
     "character": "Personagem",
     "consumables": "Consumíveis",
-    "diceRolls": "Lançamentos de Dados",
+    "diceRolls": "Lançamentos",
     "inventory": "Inventário",
     "map": "Mapa",
     "fight": "Combate"
@@ -29,8 +29,8 @@
   },
   "dice": {
     "testYourLuck": "Testar a sorte",
-    "rollDie": "Lançar dado",
-    "rollDice": "Lançar dados"
+    "rollDie": "Lançar",
+    "rollDice": "Lançar"
   },
   "buttons": {
     "randomStats": "Aleatório"

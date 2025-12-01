@@ -29,8 +29,8 @@
   },
   "dice": {
     "testYourLuck": "Test your luck",
-    "rollDie": "Roll die",
-    "rollDice": "Roll dice"
+    "rollDie": "Roll",
+    "rollDice": "Roll"
   },
   "buttons": {
     "randomStats": "Randomize"
