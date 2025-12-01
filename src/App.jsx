@@ -9,6 +9,7 @@ import {
   mdiCloverOutline,
   mdiHandCoin,
   mdiFoodApple,
+  mdiSilverwareForkKnife,
   mdiDice3,
   mdiDiceMultiple,
   mdiWebBox,
@@ -390,8 +391,13 @@ function App() {
                         parseInt(meals) <= 0 ||
                         (maxHealth !== null && parseInt(health) >= maxHealth)
                       }
+                      style={{
+                        minWidth: 'auto',
+                        width: 'auto',
+                        padding: '0.5rem',
+                      }}
                     >
-                      <Icon path={mdiFoodApple} size={1} />
+                      <Icon path={mdiSilverwareForkKnife} size={1} />
                     </button>
                   </div>
                 </div>
