@@ -45,95 +45,35 @@ function App() {
               <div className="field-group">
                 <div className="field-icon">⚔️</div>
                 <label className="content field-label">Skill</label>
-                <div className="number-input-wrapper">
-                  <input
-                    type="number"
-                    className="content field-input number-input"
-                    value={skill}
-                    onChange={(e) => setSkill(e.target.value)}
-                    placeholder="1 die + 6"
-                  />
-                  <div className="number-controls">
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Increment"
-                      onClick={() => increment(setSkill, skill)}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Decrement"
-                      onClick={() => decrement(setSkill, skill)}
-                    >
-                      ▼
-                    </button>
-                  </div>
-                </div>
+                <input
+                  type="number"
+                  className="content field-input"
+                  value={skill}
+                  onChange={(e) => setSkill(e.target.value)}
+                  placeholder="1 die + 6"
+                />
               </div>
               <div className="field-group">
                 <div className="field-icon">❤️</div>
                 <label className="content field-label">Health</label>
-                <div className="number-input-wrapper">
-                  <input
-                    type="number"
-                    className="content field-input number-input"
-                    value={health}
-                    onChange={(e) => setHealth(e.target.value)}
-                    placeholder="2 dice + 12"
-                  />
-                  <div className="number-controls">
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Increment"
-                      onClick={() => increment(setHealth, health)}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Decrement"
-                      onClick={() => decrement(setHealth, health)}
-                    >
-                      ▼
-                    </button>
-                  </div>
-                </div>
+                <input
+                  type="number"
+                  className="content field-input"
+                  value={health}
+                  onChange={(e) => setHealth(e.target.value)}
+                  placeholder="2 dice + 12"
+                />
               </div>
               <div className="field-group">
                 <div className="field-icon">🍀</div>
                 <label className="content field-label">Luck</label>
-                <div className="number-input-wrapper">
-                  <input
-                    type="number"
-                    className="content field-input number-input"
-                    value={luck}
-                    onChange={(e) => setLuck(e.target.value)}
-                    placeholder="One die plus six"
-                  />
-                  <div className="number-controls">
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Increment"
-                      onClick={() => increment(setLuck, luck)}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      className="content number-btn"
-                      aria-label="Decrement"
-                      onClick={() => decrement(setLuck, luck)}
-                    >
-                      ▼
-                    </button>
-                  </div>
-                </div>
+                <input
+                  type="number"
+                  className="content field-input"
+                  value={luck}
+                  onChange={(e) => setLuck(e.target.value)}
+                  placeholder="1 die + 6"
+                />
               </div>
             </div>
           </section>
