@@ -6,15 +6,6 @@ function App() {
   const [health, setHealth] = useState('');
   const [luck, setLuck] = useState('');
 
-  const increment = (setter, current) => {
-    const value = parseInt(current) || 0;
-    setter(String(value + 1));
-  };
-
-  const decrement = (setter, current) => {
-    const value = parseInt(current) || 0;
-    setter(String(Math.max(0, value - 1)));
-  };
   return (
     <div className="min-h-screen bg-beige">
       <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
@@ -60,6 +51,7 @@ function App() {
                     className="content field-input number-input"
                     value={skill}
                     onChange={(e) => setSkill(e.target.value)}
+                    placeholder="1 die + 6"
                   />
                   <div className="number-controls">
                     <button
@@ -90,6 +82,7 @@ function App() {
                     className="content field-input number-input"
                     value={health}
                     onChange={(e) => setHealth(e.target.value)}
+                    placeholder="2 dice + 12"
                   />
                   <div className="number-controls">
                     <button
@@ -120,6 +113,7 @@ function App() {
                     className="content field-input number-input"
                     value={luck}
                     onChange={(e) => setLuck(e.target.value)}
+                    placeholder="One die plus six"
                   />
                   <div className="number-controls">
                     <button
