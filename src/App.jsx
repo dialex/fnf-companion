@@ -153,8 +153,11 @@ function App() {
         </div>
       </header>
       <main className="container mx-auto px-4 py-5">
-        <div className="row g-4 mb-4">
-          <section id="character" className="col-12 col-md-4 section-container">
+        <div className="row gx-3 mb-4">
+          <section
+            id="character"
+            className="col-12 col-md-4 section-container mb-4"
+          >
             <div className="section-header">
               <h2 className="heading section-title">
                 {name.trim().length > 0 ? name : t('sections.character')}
@@ -229,7 +232,7 @@ function App() {
           </section>
           <section
             id="consumables"
-            className="col-12 col-md-4 section-container"
+            className="col-12 col-md-4 section-container mb-4"
           >
             <div className="section-header">
               <h2 className="heading section-title">
@@ -271,7 +274,7 @@ function App() {
           </section>
           <section
             id="dice-rolls"
-            className="col-12 col-md-4 section-container"
+            className="col-12 col-md-4 section-container mb-4"
           >
             <div className="section-header">
               <h2 className="heading section-title">
@@ -279,14 +282,32 @@ function App() {
               </h2>
             </div>
             <div className="section-content">
-              <button type="button" className="btn btn-secondary">
-                test
-              </button>
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex justify-content-center">
+                  <button type="button" className="btn btn-primary">
+                    {t('dice.testYourLuck')}
+                  </button>
+                </div>
+                <div className="d-flex gap-2">
+                  <button type="button" className="btn btn-light flex-fill">
+                    {t('dice.roll1')}
+                  </button>
+                  <button type="button" className="btn btn-light flex-fill">
+                    {t('dice.roll2')}
+                  </button>
+                </div>
+                <div style={{ minHeight: '100px' }}>
+                  {/* Dice roll results will be displayed here */}
+                </div>
+              </div>
             </div>
           </section>
         </div>
-        <div className="row g-4 mb-4">
-          <section id="inventory" className="col-12 col-md-6 section-container">
+        <div className="row gx-3 mb-4">
+          <section
+            id="inventory"
+            className="col-12 col-md-6 section-container mb-4"
+          >
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.inventory')}
@@ -302,7 +323,10 @@ function App() {
               />
             </div>
           </section>
-          <section id="map" className="col-12 col-md-6 section-container">
+          <section
+            id="map"
+            className="col-12 col-md-6 section-container mb-4 px-2"
+          >
             <div className="section-header">
               <h2 className="heading section-title">{t('sections.map')}</h2>
             </div>
@@ -310,7 +334,7 @@ function App() {
           </section>
         </div>
         <div className="row g-4">
-          <section id="fight" className="col-12 section-container">
+          <section id="fight" className="col-12 section-container mb-4">
             <div className="section-header">
               <h2 className="heading section-title">{t('sections.fight')}</h2>
             </div>
