@@ -1,10 +1,29 @@
-.app {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+.bg-beige {
+  background-color: #f5f1e8;
 }
 
-.app h1 {
-  color: #333;
-  text-align: center;
+.section-container {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  background-color: #4a4a4a;
+  padding: 12px 16px;
+}
+
+.section-title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.section-content {
+  padding: 20px;
+  min-height: 200px;
 }
