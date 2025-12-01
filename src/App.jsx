@@ -44,10 +44,7 @@ function App() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        showLanguageSelect &&
-        !event.target.closest('.language-selector')
-      ) {
+      if (showLanguageSelect && !event.target.closest('.language-selector')) {
         setShowLanguageSelect(false);
       }
     };
@@ -142,7 +139,11 @@ function App() {
                       }}
                       onClick={() => handleLanguageChange(lang)}
                     >
-                      {lang === 'en' ? 'English' : lang === 'pt' ? 'Português' : lang.toUpperCase()}
+                      {lang === 'en'
+                        ? 'English'
+                        : lang === 'pt'
+                          ? 'Português'
+                          : lang.toUpperCase()}
                     </button>
                   ))}
                 </div>
@@ -226,7 +227,10 @@ function App() {
               </div>
             </div>
           </section>
-          <section id="consumables" className="col-12 col-md-4 section-container">
+          <section
+            id="consumables"
+            className="col-12 col-md-4 section-container"
+          >
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.consumables')}
@@ -265,7 +269,10 @@ function App() {
               </div>
             </div>
           </section>
-          <section id="dice-rolls" className="col-12 col-md-4 section-container">
+          <section
+            id="dice-rolls"
+            className="col-12 col-md-4 section-container"
+          >
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.diceRolls')}
