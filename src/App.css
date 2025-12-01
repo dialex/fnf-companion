@@ -16,11 +16,13 @@
 
 .section-title {
   font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   color: white;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   margin: 0;
+  font-style: italic;
 }
 
 .section-content {

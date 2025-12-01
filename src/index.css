@@ -4,4 +4,25 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Ensure all text except section titles uses clean sans-serif */
+h1,
+h2:not(.section-title),
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+input,
+textarea,
+label,
+button {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
 }
