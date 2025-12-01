@@ -11,6 +11,7 @@ import {
   mdiFoodApple,
   mdiDiceMultiple,
 } from '@mdi/js';
+import { t } from './translations';
 import './App.css';
 
 function App() {
@@ -32,20 +33,20 @@ function App() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Icon path={mdiBookAccount} size={1.5} className="text-white" />
-            <h1 className="heading text-3xl">Fight & Fantasy Companion</h1>
+            <h1 className="heading text-3xl">{t('app.title')}</h1>
           </div>
           <nav className="flex gap-6">
             <a
               href="#character"
               className="content hover:text-yellow-400 transition"
             >
-              Character
+              {t('navigation.character')}
             </a>
             <a
               href="#inventory"
               className="content hover:text-yellow-400 transition"
             >
-              Inventory
+              {t('navigation.inventory')}
             </a>
           </nav>
         </div>
@@ -55,7 +56,7 @@ function App() {
           <section id="character" className="section-container">
             <div className="section-header">
               <h2 className="heading section-title">
-                {name.trim().length > 0 ? name : 'Character'}
+                {name.trim().length > 0 ? name : t('sections.character')}
               </h2>
             </div>
             <div className="section-content">
@@ -63,7 +64,9 @@ function App() {
                 <div className="field-icon">
                   <Icon path={mdiAccount} size={1} />
                 </div>
-                <label className="content field-label">Name</label>
+                <label className="content field-label">
+                  {t('fields.name')}
+                </label>
                 <input
                   type="text"
                   className="content field-input"
@@ -75,21 +78,25 @@ function App() {
                 <div className="field-icon">
                   <Icon path={mdiSword} size={1} />
                 </div>
-                <label className="content field-label">Skill</label>
+                <label className="content field-label">
+                  {t('fields.skill')}
+                </label>
                 <input
                   type="number"
                   className="content field-input"
                   min="0"
                   value={skill}
                   onChange={(e) => handleNumberChange(setSkill, e.target.value)}
-                  placeholder="1 die + 6"
+                  placeholder={t('placeholders.skill')}
                 />
               </div>
               <div className="field-group">
                 <div className="field-icon">
                   <Icon path={mdiHeart} size={1} />
                 </div>
-                <label className="content field-label">Health</label>
+                <label className="content field-label">
+                  {t('fields.health')}
+                </label>
                 <input
                   type="number"
                   className="content field-input"
@@ -98,35 +105,41 @@ function App() {
                   onChange={(e) =>
                     handleNumberChange(setHealth, e.target.value)
                   }
-                  placeholder="2 dice + 12"
+                  placeholder={t('placeholders.health')}
                 />
               </div>
               <div className="field-group">
                 <div className="field-icon">
                   <Icon path={mdiClover} size={1} />
                 </div>
-                <label className="content field-label">Luck</label>
+                <label className="content field-label">
+                  {t('fields.luck')}
+                </label>
                 <input
                   type="number"
                   className="content field-input"
                   min="0"
                   value={luck}
                   onChange={(e) => handleNumberChange(setLuck, e.target.value)}
-                  placeholder="1 die + 6"
+                  placeholder={t('placeholders.luck')}
                 />
               </div>
             </div>
           </section>
           <section id="consumables" className="section-container">
             <div className="section-header">
-              <h2 className="heading section-title">Consumables</h2>
+              <h2 className="heading section-title">
+                {t('sections.consumables')}
+              </h2>
             </div>
             <div className="section-content">
               <div className="field-group">
                 <div className="field-icon">
                   <Icon path={mdiHandCoin} size={1} />
                 </div>
-                <label className="content field-label">Coins</label>
+                <label className="content field-label">
+                  {t('fields.coins')}
+                </label>
                 <input
                   type="number"
                   className="content field-input"
@@ -139,7 +152,9 @@ function App() {
                 <div className="field-icon">
                   <Icon path={mdiFoodApple} size={1} />
                 </div>
-                <label className="content field-label">Meals</label>
+                <label className="content field-label">
+                  {t('fields.meals')}
+                </label>
                 <input
                   type="number"
                   className="content field-input"
@@ -152,7 +167,9 @@ function App() {
           </section>
           <section id="dice-rolls" className="section-container">
             <div className="section-header">
-              <h2 className="heading section-title">Dice Rolls</h2>
+              <h2 className="heading section-title">
+                {t('sections.diceRolls')}
+              </h2>
             </div>
             <div className="section-content">
               <div className="dice-buttons">
@@ -161,21 +178,21 @@ function App() {
                   className="content dice-btn"
                   onClick={() => {}}
                 >
-                  Test your luck
+                  {t('dice.testYourLuck')}
                 </button>
                 <button
                   type="button"
                   className="content dice-btn"
                   onClick={() => {}}
                 >
-                  Roll 1
+                  {t('dice.roll1')}
                 </button>
                 <button
                   type="button"
                   className="content dice-btn"
                   onClick={() => {}}
                 >
-                  Roll 2
+                  {t('dice.roll2')}
                 </button>
               </div>
             </div>

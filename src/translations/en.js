@@ -1,0 +1,32 @@
+export default {
+  app: {
+    title: 'Fight & Fantasy Companion',
+  },
+  navigation: {
+    character: 'Character',
+    inventory: 'Inventory',
+  },
+  sections: {
+    character: 'Character',
+    consumables: 'Consumables',
+    diceRolls: 'Dice Rolls',
+  },
+  fields: {
+    name: 'Name',
+    skill: 'Skill',
+    health: 'Health',
+    luck: 'Luck',
+    coins: 'Coins',
+    meals: 'Meals',
+  },
+  placeholders: {
+    skill: '1 die + 6',
+    health: '2 dice + 12',
+    luck: '1 die + 6',
+  },
+  dice: {
+    testYourLuck: 'Test your luck',
+    roll1: 'Roll die',
+    roll2: 'Roll dice',
+  },
+};
