@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [name, setName] = useState('');
   const [skill, setSkill] = useState('');
   const [health, setHealth] = useState('');
   const [luck, setLuck] = useState('');
+
+  const handleNumberChange = (setter, value) => {
+    const numValue = parseInt(value) || 0;
+    setter(String(Math.max(0, numValue)));
+  };
 
   return (
     <div className="min-h-screen bg-beige">
@@ -34,13 +40,20 @@ function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <section id="character" className="section-container">
             <div className="section-header">
-              <h2 className="heading section-title">Character</h2>
+              <h2 className="heading section-title">
+                {name.trim().length > 0 ? name : 'Character'}
+              </h2>
             </div>
             <div className="section-content">
               <div className="field-group">
                 <div className="field-icon">🛡️</div>
                 <label className="content field-label">Name</label>
-                <input type="text" className="content field-input" />
+                <input
+                  type="text"
+                  className="content field-input"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="field-group">
                 <div className="field-icon">⚔️</div>
@@ -48,8 +61,9 @@ function App() {
                 <input
                   type="number"
                   className="content field-input"
+                  min="0"
                   value={skill}
-                  onChange={(e) => setSkill(e.target.value)}
+                  onChange={(e) => handleNumberChange(setSkill, e.target.value)}
                   placeholder="1 die + 6"
                 />
               </div>
@@ -59,8 +73,11 @@ function App() {
                 <input
                   type="number"
                   className="content field-input"
+                  min="0"
                   value={health}
-                  onChange={(e) => setHealth(e.target.value)}
+                  onChange={(e) =>
+                    handleNumberChange(setHealth, e.target.value)
+                  }
                   placeholder="2 dice + 12"
                 />
               </div>
@@ -70,8 +87,9 @@ function App() {
                 <input
                   type="number"
                   className="content field-input"
+                  min="0"
                   value={luck}
-                  onChange={(e) => setLuck(e.target.value)}
+                  onChange={(e) => handleNumberChange(setLuck, e.target.value)}
                   placeholder="1 die + 6"
                 />
               </div>
