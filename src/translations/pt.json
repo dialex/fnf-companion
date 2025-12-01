@@ -4,7 +4,11 @@
   },
   "navigation": {
     "character": "Personagem",
-    "inventory": "Inventário"
+    "consumables": "Consumíveis",
+    "diceRolls": "Lançamentos",
+    "inventory": "Inventário",
+    "map": "Mapa",
+    "fight": "Combate"
   },
   "sections": {
     "character": "Personagem",

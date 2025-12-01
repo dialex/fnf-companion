@@ -4,12 +4,16 @@
   },
   "navigation": {
     "character": "Character",
-    "inventory": "Inventory"
+    "consumables": "Consumables",
+    "diceRolls": "Dice rolls",
+    "inventory": "Inventory",
+    "map": "Map",
+    "fight": "Fight"
   },
   "sections": {
     "character": "Character",
     "consumables": "Consumables",
-    "diceRolls": "Dice Rolls",
+    "diceRolls": "Dice rolls",
     "inventory": "Inventory",
     "map": "Map",
     "fight": "Fight"
