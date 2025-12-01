@@ -1,7 +1,7 @@
-import en from './en.js';
+import enTranslations from './en.json';
 
 const translations = {
-  en,
+  en: enTranslations,
 };
 
 let currentLanguage = 'en';
