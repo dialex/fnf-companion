@@ -9,7 +9,9 @@
   "sections": {
     "character": "Personagem",
     "consumables": "Consumíveis",
-    "diceRolls": "Lançamentos de Dados"
+    "diceRolls": "Lançamentos de Dados",
+    "inventory": "Inventário",
+    "fight": "Combate"
   },
   "fields": {
     "name": "Nome",

@@ -9,7 +9,9 @@
   "sections": {
     "character": "Character",
     "consumables": "Consumables",
-    "diceRolls": "Dice Rolls"
+    "diceRolls": "Dice Rolls",
+    "inventory": "Inventory",
+    "fight": "Fight"
   },
   "fields": {
     "name": "Name",

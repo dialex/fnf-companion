@@ -26,6 +26,7 @@ function App() {
   const [luck, setLuck] = useState('');
   const [coins, setCoins] = useState('0');
   const [meals, setMeals] = useState('0');
+  const [inventory, setInventory] = useState('');
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
 
   const handleLanguageChange = (e) => {
@@ -39,9 +40,16 @@ function App() {
     setter(String(Math.max(0, numValue)));
   };
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'default');
+  }, []);
+
   return (
     <div className="min-h-screen bg-beige">
-      <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
+      <header
+        className="sticky top-0 z-50 text-white shadow-md"
+        style={{ backgroundColor: 'var(--header-bg)' }}
+      >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Icon path={mdiBookAccount} size={1.5} className="text-white" />
@@ -218,6 +226,40 @@ function App() {
                   {t('dice.roll2')}
                 </button>
               </div>
+            </div>
+          </section>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <section id="inventory" className="section-container">
+            <div className="section-header">
+              <h2 className="heading section-title">
+                {t('sections.inventory')}
+              </h2>
+            </div>
+            <div className="section-content">
+              <textarea
+                className="content field-input"
+                value={inventory}
+                onChange={(e) => setInventory(e.target.value)}
+                rows={10}
+                style={{ resize: 'vertical', minHeight: '200px' }}
+              />
+            </div>
+          </section>
+          <section className="section-container">
+            <div className="section-header">
+              <h2 className="heading section-title"></h2>
+            </div>
+            <div className="section-content">{/* Empty section */}</div>
+          </section>
+        </div>
+        <div className="grid grid-cols-1 gap-6 mt-6">
+          <section id="fight" className="section-container">
+            <div className="section-header">
+              <h2 className="heading section-title">{t('sections.fight')}</h2>
+            </div>
+            <div className="section-content">
+              {/* Fight section - empty for now */}
             </div>
           </section>
         </div>
