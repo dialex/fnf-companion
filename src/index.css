@@ -1,5 +1,18 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* Direct override for btn-primary */
+.btn-primary {
+  background-color: #007e6e !important;
+  border-color: #007e6e !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #006b5f !important;
+  border-color: #006b5f !important;
+}
+
 /* Content font - Caudex, 10% smaller than base */
 .content {
   font-family: 'Caudex', serif;
