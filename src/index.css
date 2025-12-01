@@ -27,6 +27,11 @@
   font-weight: normal;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 body {
   font-family: 'Caudex', serif;
   font-size: 1.38rem;

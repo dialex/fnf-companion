@@ -6,7 +6,6 @@ import {
   mdiHeart,
   mdiAccount,
   mdiClover,
-  mdiCloverOutline,
   mdiHandCoin,
   mdiFoodApple,
   mdiSilverwareForkKnife,
@@ -155,6 +154,24 @@ function App() {
               {t('navigation.character')}
             </a>
             <a
+              href="#consumables"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
+            >
+              {t('navigation.consumables')}
+            </a>
+            <a
+              href="#dice-rolls"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
+            >
+              {t('navigation.diceRolls')}
+            </a>
+            <a
               href="#inventory"
               className="content text-white text-decoration-none"
               style={{ transition: 'color 0.2s' }}
@@ -162,6 +179,24 @@ function App() {
               onMouseLeave={(e) => (e.target.style.color = 'white')}
             >
               {t('navigation.inventory')}
+            </a>
+            <a
+              href="#map"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
+            >
+              {t('navigation.map')}
+            </a>
+            <a
+              href="#fight"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
+            >
+              {t('navigation.fight')}
             </a>
             <div className="position-relative language-selector">
               <div
@@ -419,7 +454,7 @@ function App() {
                       className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
                     >
                       {t('dice.testYourLuck')}
-                      <Icon path={mdiCloverOutline} size={1} />
+                      <Icon path={mdiClover} size={1} />
                     </button>
                   </div>
                   <div className="d-flex gap-2 justify-content-center">
