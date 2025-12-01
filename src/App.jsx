@@ -63,6 +63,15 @@ function App() {
     setter(String(Math.max(0, numValue)));
   };
 
+  const handleConsumeMeal = () => {
+    const currentMeals = parseInt(meals) || 0;
+    if (currentMeals > 0) {
+      setMeals(String(currentMeals - 1));
+      const currentHealth = parseInt(health) || 0;
+      setHealth(String(currentHealth + 4));
+    }
+  };
+
   const handleRandomStats = () => {
     // Skill: random 1-6 + 6
     const skillRoll = Math.floor(Math.random() * 6) + 1;
@@ -290,15 +299,25 @@ function App() {
                   <label className="content field-label">
                     {t('fields.meals')}
                   </label>
-                  <input
-                    type="number"
-                    className="content field-input form-control"
-                    min="0"
-                    value={meals}
-                    onChange={(e) =>
-                      handleNumberChange(setMeals, e.target.value)
-                    }
-                  />
+                  <div className="input-group" style={{ flex: 1 }}>
+                    <input
+                      type="number"
+                      className="content field-input form-control"
+                      min="0"
+                      value={meals}
+                      onChange={(e) =>
+                        handleNumberChange(setMeals, e.target.value)
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleConsumeMeal}
+                      disabled={parseInt(meals) <= 0}
+                    >
+                      <Icon path={mdiFoodApple} size={1} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
