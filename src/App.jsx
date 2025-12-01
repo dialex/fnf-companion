@@ -7,6 +7,9 @@ import {
   mdiLeadPencil,
   mdiAccount,
   mdiClover,
+  mdiHandCoin,
+  mdiFoodApple,
+  mdiDiceMultiple,
 } from '@mdi/js';
 import './App.css';
 
@@ -15,6 +18,8 @@ function App() {
   const [skill, setSkill] = useState('');
   const [health, setHealth] = useState('');
   const [luck, setLuck] = useState('');
+  const [coins, setCoins] = useState('0');
+  const [meals, setMeals] = useState('0');
 
   const handleNumberChange = (setter, value) => {
     const numValue = parseInt(value) || 0;
@@ -46,7 +51,7 @@ function App() {
         </div>
       </header>
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <section id="character" className="section-container">
             <div className="section-header">
               <h2 className="heading section-title">
@@ -112,12 +117,67 @@ function App() {
               </div>
             </div>
           </section>
-          <section id="inventory" className="section-container">
+          <section id="consumables" className="section-container">
             <div className="section-header">
-              <h2 className="heading section-title">Inventory</h2>
+              <h2 className="heading section-title">Consumables</h2>
             </div>
             <div className="section-content">
-              {/* Inventory fields will be added in Step 5 */}
+              <div className="field-group">
+                <div className="field-icon">
+                  <Icon path={mdiHandCoin} size={1} />
+                </div>
+                <label className="content field-label">Coins</label>
+                <input
+                  type="number"
+                  className="content field-input"
+                  min="0"
+                  value={coins}
+                  onChange={(e) => handleNumberChange(setCoins, e.target.value)}
+                />
+              </div>
+              <div className="field-group">
+                <div className="field-icon">
+                  <Icon path={mdiFoodApple} size={1} />
+                </div>
+                <label className="content field-label">Meals</label>
+                <input
+                  type="number"
+                  className="content field-input"
+                  min="0"
+                  value={meals}
+                  onChange={(e) => handleNumberChange(setMeals, e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+          <section id="dice-rolls" className="section-container">
+            <div className="section-header">
+              <h2 className="heading section-title">Dice Rolls</h2>
+            </div>
+            <div className="section-content">
+              <div className="dice-buttons">
+                <button
+                  type="button"
+                  className="content dice-btn"
+                  onClick={() => {}}
+                >
+                  Test your luck
+                </button>
+                <button
+                  type="button"
+                  className="content dice-btn"
+                  onClick={() => {}}
+                >
+                  Roll 1
+                </button>
+                <button
+                  type="button"
+                  className="content dice-btn"
+                  onClick={() => {}}
+                >
+                  Roll 2
+                </button>
+              </div>
             </div>
           </section>
         </div>

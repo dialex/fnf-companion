@@ -57,3 +57,29 @@
   outline: none;
   border-color: #4a4a4a;
 }
+
+.dice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dice-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #4a4a4a;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1.15rem;
+}
+
+.dice-btn:hover {
+  background: #5a5a5a;
+}
+
+.dice-btn:active {
+  background: #3a3a3a;
+}
