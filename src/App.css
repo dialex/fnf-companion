@@ -51,14 +51,16 @@
 .field-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   margin-bottom: 16px;
 }
 
 .field-icon {
   font-size: 1.94rem;
   width: 2.38rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
