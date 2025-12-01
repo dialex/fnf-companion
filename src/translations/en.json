@@ -11,6 +11,7 @@
     "consumables": "Consumables",
     "diceRolls": "Dice Rolls",
     "inventory": "Inventory",
+    "map": "Map",
     "fight": "Fight"
   },
   "fields": {

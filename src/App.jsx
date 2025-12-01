@@ -206,21 +206,21 @@ function App() {
               <div className="dice-buttons">
                 <button
                   type="button"
-                  className="content dice-btn"
+                  className="btn btn-block content"
                   onClick={() => {}}
                 >
                   {t('dice.testYourLuck')}
                 </button>
                 <button
                   type="button"
-                  className="content dice-btn"
+                  className="btn btn-block content"
                   onClick={() => {}}
                 >
                   {t('dice.roll1')}
                 </button>
                 <button
                   type="button"
-                  className="content dice-btn"
+                  className="btn btn-block content"
                   onClick={() => {}}
                 >
                   {t('dice.roll2')}
@@ -246,11 +246,11 @@ function App() {
               />
             </div>
           </section>
-          <section className="section-container">
+          <section id="map" className="section-container">
             <div className="section-header">
-              <h2 className="heading section-title"></h2>
+              <h2 className="heading section-title">{t('sections.map')}</h2>
             </div>
-            <div className="section-content">{/* Empty section */}</div>
+            <div className="section-content">{/* Map section */}</div>
           </section>
         </div>
         <div className="grid grid-cols-1 gap-6 mt-6">
