@@ -1,22 +1,37 @@
+/* Theme CSS Variables */
+:root[data-theme='default'] {
+  --bg-primary: #f5f1e8;
+  --header-bg: #1a2f3f;
+  --section-header-bg: #6b6259;
+  --section-bg: white;
+  --button-bg: #d9d9d9;
+  --button-hover: #c9c9c9;
+  --button-active: #b9b9b9;
+  --text-primary: #333;
+  --text-white: white;
+  --border-color: #ddd;
+  --border-focus: #877b6f;
+}
+
 .bg-beige {
-  background-color: #f5f1e8;
+  background-color: var(--bg-primary);
 }
 
 .section-container {
-  background: white;
+  background: var(--section-bg);
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
-  background-color: #4a4a4a;
+  background-color: var(--section-header-bg);
   padding: 12px 16px;
 }
 
 .section-title {
   font-size: 1.94rem;
-  color: white;
+  color: var(--text-white);
   margin: 0;
 }
 
@@ -48,14 +63,15 @@
 .field-input {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 0.25rem;
   font-size: 1.25rem;
+  color: var(--text-primary);
 }
 
 .field-input:focus {
   outline: none;
-  border-color: #4a4a4a;
+  border-color: var(--border-focus);
 }
 
 .dice-buttons {
@@ -67,8 +83,8 @@
 .dice-btn {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: #4a4a4a;
-  color: white;
+  background: var(--button-bg);
+  color: var(--text-white);
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -77,9 +93,16 @@
 }
 
 .dice-btn:hover {
-  background: #5a5a5a;
+  background: var(--button-hover);
 }
 
 .dice-btn:active {
-  background: #3a3a3a;
+  background: var(--button-active);
+}
+
+textarea.field-input {
+  width: 100%;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 200px;
 }
