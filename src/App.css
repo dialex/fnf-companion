@@ -22,7 +22,6 @@
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
 }
 
 .section-header {
@@ -35,6 +34,7 @@
   padding-left: 36px;
   padding-right: 36px;
   width: calc(100% + 40px);
+  box-sizing: border-box;
 }
 
 .section-title {

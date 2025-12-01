@@ -152,186 +152,189 @@ function App() {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-5">
-        <div className="row gx-3 mb-4">
-          <section
-            id="character"
-            className="col-12 col-md-4 section-container mb-4"
-          >
-            <div className="section-header">
-              <h2 className="heading section-title">
-                {name.trim().length > 0 ? name : t('sections.character')}
-              </h2>
-            </div>
-            <div className="section-content">
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiAccount} size={1} />
-                </div>
-                <label className="content field-label">
-                  {t('fields.name')}
-                </label>
-                <input
-                  type="text"
-                  className="content field-input form-control"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+      <main className="container mx-auto py-5">
+        <div className="row gx-4 mb-4">
+          <div className="col-12 col-md-4">
+            <section id="character" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">
+                  {name.trim().length > 0 ? name : t('sections.character')}
+                </h2>
               </div>
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiSword} size={1} />
+              <div className="section-content">
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiAccount} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.name')}
+                  </label>
+                  <input
+                    type="text"
+                    className="content field-input form-control"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
-                <label className="content field-label">
-                  {t('fields.skill')}
-                </label>
-                <input
-                  type="number"
-                  className="content field-input form-control"
-                  min="0"
-                  value={skill}
-                  onChange={(e) => handleNumberChange(setSkill, e.target.value)}
-                  placeholder={t('placeholders.skill')}
-                />
-              </div>
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiHeart} size={1} />
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiSword} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.skill')}
+                  </label>
+                  <input
+                    type="number"
+                    className="content field-input form-control"
+                    min="0"
+                    value={skill}
+                    onChange={(e) =>
+                      handleNumberChange(setSkill, e.target.value)
+                    }
+                    placeholder={t('placeholders.skill')}
+                  />
                 </div>
-                <label className="content field-label">
-                  {t('fields.health')}
-                </label>
-                <input
-                  type="number"
-                  className="content field-input form-control"
-                  min="0"
-                  value={health}
-                  onChange={(e) =>
-                    handleNumberChange(setHealth, e.target.value)
-                  }
-                  placeholder={t('placeholders.health')}
-                />
-              </div>
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiClover} size={1} />
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiHeart} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.health')}
+                  </label>
+                  <input
+                    type="number"
+                    className="content field-input form-control"
+                    min="0"
+                    value={health}
+                    onChange={(e) =>
+                      handleNumberChange(setHealth, e.target.value)
+                    }
+                    placeholder={t('placeholders.health')}
+                  />
                 </div>
-                <label className="content field-label">
-                  {t('fields.luck')}
-                </label>
-                <input
-                  type="number"
-                  className="content field-input form-control"
-                  min="0"
-                  value={luck}
-                  onChange={(e) => handleNumberChange(setLuck, e.target.value)}
-                  placeholder={t('placeholders.luck')}
-                />
-              </div>
-            </div>
-          </section>
-          <section
-            id="consumables"
-            className="col-12 col-md-4 section-container mb-4"
-          >
-            <div className="section-header">
-              <h2 className="heading section-title">
-                {t('sections.consumables')}
-              </h2>
-            </div>
-            <div className="section-content">
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiHandCoin} size={1} />
-                </div>
-                <label className="content field-label">
-                  {t('fields.coins')}
-                </label>
-                <input
-                  type="number"
-                  className="content field-input form-control"
-                  min="0"
-                  value={coins}
-                  onChange={(e) => handleNumberChange(setCoins, e.target.value)}
-                />
-              </div>
-              <div className="field-group">
-                <div className="field-icon">
-                  <Icon path={mdiFoodApple} size={1} />
-                </div>
-                <label className="content field-label">
-                  {t('fields.meals')}
-                </label>
-                <input
-                  type="number"
-                  className="content field-input form-control"
-                  min="0"
-                  value={meals}
-                  onChange={(e) => handleNumberChange(setMeals, e.target.value)}
-                />
-              </div>
-            </div>
-          </section>
-          <section
-            id="dice-rolls"
-            className="col-12 col-md-4 section-container mb-4"
-          >
-            <div className="section-header">
-              <h2 className="heading section-title">
-                {t('sections.diceRolls')}
-              </h2>
-            </div>
-            <div className="section-content">
-              <div className="d-flex flex-column gap-3">
-                <div className="d-flex justify-content-center">
-                  <button type="button" className="btn btn-primary">
-                    {t('dice.testYourLuck')}
-                  </button>
-                </div>
-                <div className="d-flex gap-2">
-                  <button type="button" className="btn btn-light flex-fill">
-                    {t('dice.roll1')}
-                  </button>
-                  <button type="button" className="btn btn-light flex-fill">
-                    {t('dice.roll2')}
-                  </button>
-                </div>
-                <div style={{ minHeight: '100px' }}>
-                  {/* Dice roll results will be displayed here */}
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiClover} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.luck')}
+                  </label>
+                  <input
+                    type="number"
+                    className="content field-input form-control"
+                    min="0"
+                    value={luck}
+                    onChange={(e) =>
+                      handleNumberChange(setLuck, e.target.value)
+                    }
+                    placeholder={t('placeholders.luck')}
+                  />
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
+          <div className="col-12 col-md-4">
+            <section id="consumables" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">
+                  {t('sections.consumables')}
+                </h2>
+              </div>
+              <div className="section-content">
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiHandCoin} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.coins')}
+                  </label>
+                  <input
+                    type="number"
+                    className="content field-input form-control"
+                    min="0"
+                    value={coins}
+                    onChange={(e) =>
+                      handleNumberChange(setCoins, e.target.value)
+                    }
+                  />
+                </div>
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiFoodApple} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('fields.meals')}
+                  </label>
+                  <input
+                    type="number"
+                    className="content field-input form-control"
+                    min="0"
+                    value={meals}
+                    onChange={(e) =>
+                      handleNumberChange(setMeals, e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+          <div className="col-12 col-md-4">
+            <section id="dice-rolls" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">
+                  {t('sections.diceRolls')}
+                </h2>
+              </div>
+              <div className="section-content">
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-center">
+                    <button type="button" className="btn btn-primary">
+                      {t('dice.testYourLuck')}
+                    </button>
+                  </div>
+                  <div className="d-flex gap-2">
+                    <button type="button" className="btn btn-light flex-fill">
+                      {t('dice.roll1')}
+                    </button>
+                    <button type="button" className="btn btn-light flex-fill">
+                      {t('dice.roll2')}
+                    </button>
+                  </div>
+                  <div style={{ minHeight: '100px' }}>
+                    {/* Dice roll results will be displayed here */}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
-        <div className="row gx-3 mb-4">
-          <section
-            id="inventory"
-            className="col-12 col-md-6 section-container mb-4"
-          >
-            <div className="section-header">
-              <h2 className="heading section-title">
-                {t('sections.inventory')}
-              </h2>
-            </div>
-            <div className="section-content">
-              <textarea
-                className="content field-input form-control"
-                value={inventory}
-                onChange={(e) => setInventory(e.target.value)}
-                rows={10}
-                style={{ resize: 'vertical', minHeight: '200px' }}
-              />
-            </div>
-          </section>
-          <section
-            id="map"
-            className="col-12 col-md-6 section-container mb-4 px-2"
-          >
-            <div className="section-header">
-              <h2 className="heading section-title">{t('sections.map')}</h2>
-            </div>
-            <div className="section-content">{/* Map section */}</div>
-          </section>
+        <div className="row gx-4 mb-4">
+          <div className="col-12 col-md-6">
+            <section id="inventory" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">
+                  {t('sections.inventory')}
+                </h2>
+              </div>
+              <div className="section-content">
+                <textarea
+                  className="content field-input form-control"
+                  value={inventory}
+                  onChange={(e) => setInventory(e.target.value)}
+                  rows={10}
+                  style={{ resize: 'vertical', minHeight: '200px' }}
+                />
+              </div>
+            </section>
+          </div>
+          <div className="col-12 col-md-6">
+            <section id="map" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">{t('sections.map')}</h2>
+              </div>
+              <div className="section-content">{/* Map section */}</div>
+            </section>
+          </div>
         </div>
         <div className="row g-4">
           <section id="fight" className="col-12 section-container mb-4">
