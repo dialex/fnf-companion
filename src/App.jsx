@@ -152,10 +152,10 @@ function App() {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto py-5">
+      <main className="container mx-auto py-4">
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
-            <section id="character" className="section-container mb-4">
+            <section id="character" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title">
                   {name.trim().length > 0 ? name : t('sections.character')}
@@ -234,7 +234,7 @@ function App() {
             </section>
           </div>
           <div className="col-12 col-md-4">
-            <section id="consumables" className="section-container mb-4">
+            <section id="consumables" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title">
                   {t('sections.consumables')}
@@ -279,7 +279,7 @@ function App() {
             </section>
           </div>
           <div className="col-12 col-md-4">
-            <section id="dice-rolls" className="section-container mb-4">
+            <section id="dice-rolls" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title">
                   {t('sections.diceRolls')}
@@ -310,7 +310,7 @@ function App() {
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-6">
-            <section id="inventory" className="section-container mb-4">
+            <section id="inventory" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title">
                   {t('sections.inventory')}
@@ -328,7 +328,7 @@ function App() {
             </section>
           </div>
           <div className="col-12 col-md-6">
-            <section id="map" className="section-container mb-4">
+            <section id="map" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title">{t('sections.map')}</h2>
               </div>
@@ -336,15 +336,17 @@ function App() {
             </section>
           </div>
         </div>
-        <div className="row g-4">
-          <section id="fight" className="col-12 section-container mb-4">
-            <div className="section-header">
-              <h2 className="heading section-title">{t('sections.fight')}</h2>
-            </div>
-            <div className="section-content">
-              {/* Fight section - empty for now */}
-            </div>
-          </section>
+        <div className="row gx-4 mb-4">
+          <div className="col-12">
+            <section id="fight" className="section-container mb-4 h-100">
+              <div className="section-header">
+                <h2 className="heading section-title">{t('sections.fight')}</h2>
+              </div>
+              <div className="section-content">
+                {/* Fight section - empty for now */}
+              </div>
+            </section>
+          </div>
         </div>
       </main>
     </div>
