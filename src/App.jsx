@@ -1,4 +1,13 @@
 import React, { useState } from 'react';
+import Icon from '@mdi/react';
+import {
+  mdiBookAccount,
+  mdiSword,
+  mdiHeart,
+  mdiLeadPencil,
+  mdiAccount,
+  mdiClover,
+} from '@mdi/js';
 import './App.css';
 
 function App() {
@@ -17,7 +26,7 @@ function App() {
       <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">⚔️</span>
+            <Icon path={mdiBookAccount} size={1.5} className="text-white" />
             <h1 className="heading text-3xl">Fight & Fantasy Companion</h1>
           </div>
           <nav className="flex gap-6">
@@ -46,7 +55,9 @@ function App() {
             </div>
             <div className="section-content">
               <div className="field-group">
-                <div className="field-icon">🛡️</div>
+                <div className="field-icon">
+                  <Icon path={mdiAccount} size={1} />
+                </div>
                 <label className="content field-label">Name</label>
                 <input
                   type="text"
@@ -56,7 +67,9 @@ function App() {
                 />
               </div>
               <div className="field-group">
-                <div className="field-icon">⚔️</div>
+                <div className="field-icon">
+                  <Icon path={mdiSword} size={1} />
+                </div>
                 <label className="content field-label">Skill</label>
                 <input
                   type="number"
@@ -68,7 +81,9 @@ function App() {
                 />
               </div>
               <div className="field-group">
-                <div className="field-icon">❤️</div>
+                <div className="field-icon">
+                  <Icon path={mdiHeart} size={1} />
+                </div>
                 <label className="content field-label">Health</label>
                 <input
                   type="number"
@@ -82,7 +97,9 @@ function App() {
                 />
               </div>
               <div className="field-group">
-                <div className="field-icon">🍀</div>
+                <div className="field-icon">
+                  <Icon path={mdiClover} size={1} />
+                </div>
                 <label className="content field-label">Luck</label>
                 <input
                   type="number"
