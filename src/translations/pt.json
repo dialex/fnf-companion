@@ -29,7 +29,7 @@
   },
   "dice": {
     "testYourLuck": "Testar a sorte",
-    "roll1": "Lançar dado",
-    "roll2": "Lançar dados"
+    "rollDie": "Lançar dado",
+    "rollDice": "Lançar dados"
   }
 }

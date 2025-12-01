@@ -29,7 +29,7 @@
   },
   "dice": {
     "testYourLuck": "Test your luck",
-    "roll1": "Roll die",
-    "roll2": "Roll dice"
+    "rollDie": "Roll die",
+    "rollDice": "Roll dice"
   }
 }

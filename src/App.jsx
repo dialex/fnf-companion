@@ -9,6 +9,7 @@ import {
   mdiClover,
   mdiHandCoin,
   mdiFoodApple,
+  mdiDice3,
   mdiDiceMultiple,
   mdiWebBox,
   mdiChevronDown,
@@ -292,12 +293,20 @@ function App() {
                       {t('dice.testYourLuck')}
                     </button>
                   </div>
-                  <div className="d-flex gap-2">
-                    <button type="button" className="btn btn-light flex-fill">
-                      {t('dice.roll1')}
+                  <div className="d-flex gap-2 justify-content-center">
+                    <button
+                      type="button"
+                      className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                    >
+                      {t('dice.rollDie')}
+                      <Icon path={mdiDice3} size={1} />
                     </button>
-                    <button type="button" className="btn btn-light flex-fill">
-                      {t('dice.roll2')}
+                    <button
+                      type="button"
+                      className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                    >
+                      {t('dice.rollDice')}
+                      <Icon path={mdiDiceMultiple} size={1} />
                     </button>
                   </div>
                   <div style={{ minHeight: '100px' }}>
