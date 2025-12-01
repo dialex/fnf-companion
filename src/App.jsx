@@ -11,6 +11,7 @@ import {
   mdiFoodApple,
   mdiDiceMultiple,
   mdiWebBox,
+  mdiChevronDown,
 } from '@mdi/js';
 import {
   t,
@@ -29,12 +30,36 @@ function App() {
   const [meals, setMeals] = useState('0');
   const [inventory, setInventory] = useState('');
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
+  const [showLanguageSelect, setShowLanguageSelect] = useState(false);
 
-  const handleLanguageChange = (e) => {
-    const newLang = e.target.value;
-    setLanguage(newLang);
-    setCurrentLang(newLang);
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    setCurrentLang(lang);
+    setShowLanguageSelect(false);
   };
+
+  const handleLanguageIconClick = () => {
+    setShowLanguageSelect(!showLanguageSelect);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showLanguageSelect &&
+        !event.target.closest('.language-selector')
+      ) {
+        setShowLanguageSelect(false);
+      }
+    };
+
+    if (showLanguageSelect) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLanguageSelect]);
 
   const handleNumberChange = (setter, value) => {
     const numValue = parseInt(value) || 0;
@@ -53,7 +78,7 @@ function App() {
       >
         <div className="container mx-auto px-4 py-3 d-flex align-items-center justify-content-between">
           <div className="d-flex align-items-center gap-3">
-            <Icon path={mdiBookAccount} size={1.5} className="text-white" />
+            <Icon path={mdiBookAccount} size={2} className="text-white" />
             <h1 className="heading fs-1">{t('app.title')}</h1>
           </div>
           <nav className="d-flex align-items-center gap-4">
@@ -75,26 +100,59 @@ function App() {
             >
               {t('navigation.inventory')}
             </a>
-            <div className="d-flex align-items-center gap-2">
-              <Icon path={mdiWebBox} size={1} className="text-white" />
-              <select
-                value={currentLang}
-                onChange={handleLanguageChange}
-                className="form-select content"
-                style={{ width: 'auto' }}
+            <div className="position-relative language-selector">
+              <div
+                className="d-flex align-items-center gap-1"
+                style={{ cursor: 'pointer' }}
+                onClick={handleLanguageIconClick}
               >
-                {getAvailableLanguages().map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang.toUpperCase()}
-                  </option>
-                ))}
-              </select>
+                <Icon path={mdiWebBox} size={1} className="text-white" />
+                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
+              </div>
+              {showLanguageSelect && (
+                <div
+                  className="position-absolute"
+                  style={{
+                    top: '100%',
+                    right: 0,
+                    marginTop: '0.5rem',
+                    minWidth: '120px',
+                    zIndex: 1060,
+                    backgroundColor: 'white',
+                    borderRadius: '0.25rem',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {getAvailableLanguages().map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      className="content w-100 text-start border-0 bg-transparent px-3 py-2"
+                      style={{
+                        cursor: 'pointer',
+                        color: '#333',
+                        transition: 'background-color 0.2s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#f8f9fa';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                      onClick={() => handleLanguageChange(lang)}
+                    >
+                      {lang === 'en' ? 'English' : lang === 'pt' ? 'Português' : lang.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </nav>
         </div>
       </header>
       <main className="container mx-auto px-4 py-5">
-        <div className="row g-4">
+        <div className="row g-4 mb-4">
           <section id="character" className="col-12 col-md-4 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
@@ -220,7 +278,7 @@ function App() {
             </div>
           </section>
         </div>
-        <div className="row g-4 mt-4">
+        <div className="row g-4 mb-4">
           <section id="inventory" className="col-12 col-md-6 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
@@ -244,7 +302,7 @@ function App() {
             <div className="section-content">{/* Map section */}</div>
           </section>
         </div>
-        <div className="row g-4 mt-4">
+        <div className="row g-4">
           <section id="fight" className="col-12 section-container">
             <div className="section-header">
               <h2 className="heading section-title">{t('sections.fight')}</h2>
