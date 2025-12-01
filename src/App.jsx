@@ -27,7 +27,7 @@ function App() {
   const [health, setHealth] = useState('');
   const [luck, setLuck] = useState('');
   const [coins, setCoins] = useState('0');
-  const [meals, setMeals] = useState('0');
+  const [meals, setMeals] = useState('10');
   const [inventory, setInventory] = useState('');
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
