@@ -1,0 +1,32 @@
+{
+  "app": {
+    "title": "Aventuras Fantásticas"
+  },
+  "navigation": {
+    "character": "Personagem",
+    "inventory": "Inventário"
+  },
+  "sections": {
+    "character": "Personagem",
+    "consumables": "Consumíveis",
+    "diceRolls": "Lançamentos de Dados"
+  },
+  "fields": {
+    "name": "Nome",
+    "skill": "Perícia",
+    "health": "Força",
+    "luck": "Sorte",
+    "coins": "Moedas",
+    "meals": "Refeições"
+  },
+  "placeholders": {
+    "skill": "1 dado + 6",
+    "health": "2 dados + 12",
+    "luck": "1 dado + 6"
+  },
+  "dice": {
+    "testYourLuck": "Testar a sorte",
+    "roll1": "Lançar dado",
+    "roll2": "Lançar dados"
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiBookAccount,
@@ -11,7 +11,12 @@ import {
   mdiFoodApple,
   mdiDiceMultiple,
 } from '@mdi/js';
-import { t } from './translations';
+import {
+  t,
+  setLanguage,
+  getCurrentLanguage,
+  getAvailableLanguages,
+} from './translations';
 import './App.css';
 
 function App() {
@@ -21,6 +26,13 @@ function App() {
   const [luck, setLuck] = useState('');
   const [coins, setCoins] = useState('0');
   const [meals, setMeals] = useState('0');
+  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
+
+  const handleLanguageChange = (e) => {
+    const newLang = e.target.value;
+    setLanguage(newLang);
+    setCurrentLang(newLang);
+  };
 
   const handleNumberChange = (setter, value) => {
     const numValue = parseInt(value) || 0;
@@ -35,7 +47,7 @@ function App() {
             <Icon path={mdiBookAccount} size={1.5} className="text-white" />
             <h1 className="heading text-3xl">{t('app.title')}</h1>
           </div>
-          <nav className="flex gap-6">
+          <nav className="flex items-center gap-6">
             <a
               href="#character"
               className="content hover:text-yellow-400 transition"
@@ -48,6 +60,17 @@ function App() {
             >
               {t('navigation.inventory')}
             </a>
+            <select
+              value={currentLang}
+              onChange={handleLanguageChange}
+              className="content bg-gray-700 text-white border border-gray-600 rounded px-3 py-1 cursor-pointer hover:bg-gray-600 transition"
+            >
+              {getAvailableLanguages().map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang.toUpperCase()}
+                </option>
+              ))}
+            </select>
           </nav>
         </div>
       </header>
