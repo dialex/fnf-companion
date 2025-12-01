@@ -1,28 +1,21 @@
 @import 'tailwindcss';
 
-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
-  font-size: 14px;
+/* Content font - Caudex, 10% smaller than base */
+.content {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
   line-height: 1.5;
 }
 
-/* Ensure all text except section titles uses clean sans-serif */
-h1,
-h2:not(.section-title),
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-a,
-input,
-textarea,
-label,
-button {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
+/* Heading font - Pirata One */
+.heading {
+  font-family: 'Pirata One', cursive;
+  font-weight: normal;
+}
+
+body {
+  font-family: 'Caudex', serif;
+  font-size: 1.38rem;
+  line-height: 1.5;
 }

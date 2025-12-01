@@ -20,14 +20,20 @@ function App() {
       <header className="sticky top-0 z-50 bg-gray-800 text-white shadow-md">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">⚔️</span>
-            <h1 className="text-xl font-semibold">Fight & Fantasy Companion</h1>
+            <span className="text-3xl">⚔️</span>
+            <h1 className="heading text-3xl">Fight & Fantasy Companion</h1>
           </div>
           <nav className="flex gap-6">
-            <a href="#character" className="hover:text-yellow-400 transition">
+            <a
+              href="#character"
+              className="content hover:text-yellow-400 transition"
+            >
               Character
             </a>
-            <a href="#inventory" className="hover:text-yellow-400 transition">
+            <a
+              href="#inventory"
+              className="content hover:text-yellow-400 transition"
+            >
               Inventory
             </a>
           </nav>
@@ -37,29 +43,28 @@ function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <section id="character" className="section-container">
             <div className="section-header">
-              <h2 className="section-title">CHARACTER</h2>
+              <h2 className="heading section-title">Character</h2>
             </div>
             <div className="section-content">
               <div className="field-group">
                 <div className="field-icon">🛡️</div>
-                <label className="field-label">Name</label>
-                <input type="text" className="field-input" placeholder="Name" />
+                <label className="content field-label">Name</label>
+                <input type="text" className="content field-input" />
               </div>
               <div className="field-group">
                 <div className="field-icon">⚔️</div>
-                <label className="field-label">Skill</label>
+                <label className="content field-label">Skill</label>
                 <div className="number-input-wrapper">
                   <input
                     type="number"
-                    className="field-input number-input"
-                    placeholder="Skill"
+                    className="content field-input number-input"
                     value={skill}
                     onChange={(e) => setSkill(e.target.value)}
                   />
                   <div className="number-controls">
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Increment"
                       onClick={() => increment(setSkill, skill)}
                     >
@@ -67,7 +72,7 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Decrement"
                       onClick={() => decrement(setSkill, skill)}
                     >
@@ -78,19 +83,18 @@ function App() {
               </div>
               <div className="field-group">
                 <div className="field-icon">❤️</div>
-                <label className="field-label">Health</label>
+                <label className="content field-label">Health</label>
                 <div className="number-input-wrapper">
                   <input
                     type="number"
-                    className="field-input number-input"
-                    placeholder="Health"
+                    className="content field-input number-input"
                     value={health}
                     onChange={(e) => setHealth(e.target.value)}
                   />
                   <div className="number-controls">
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Increment"
                       onClick={() => increment(setHealth, health)}
                     >
@@ -98,7 +102,7 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Decrement"
                       onClick={() => decrement(setHealth, health)}
                     >
@@ -109,19 +113,18 @@ function App() {
               </div>
               <div className="field-group">
                 <div className="field-icon">🍀</div>
-                <label className="field-label">Luck</label>
+                <label className="content field-label">Luck</label>
                 <div className="number-input-wrapper">
                   <input
                     type="number"
-                    className="field-input number-input"
-                    placeholder="Luck"
+                    className="content field-input number-input"
                     value={luck}
                     onChange={(e) => setLuck(e.target.value)}
                   />
                   <div className="number-controls">
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Increment"
                       onClick={() => increment(setLuck, luck)}
                     >
@@ -129,7 +132,7 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      className="number-btn"
+                      className="content number-btn"
                       aria-label="Decrement"
                       onClick={() => decrement(setLuck, luck)}
                     >
@@ -142,7 +145,7 @@ function App() {
           </section>
           <section id="inventory" className="section-container">
             <div className="section-header">
-              <h2 className="section-title">INVENTORY</h2>
+              <h2 className="heading section-title">Inventory</h2>
             </div>
             <div className="section-content">
               {/* Inventory fields will be added in Step 5 */}
