@@ -32,7 +32,6 @@ function App() {
   const [coins, setCoins] = useState('0');
   const [meals, setMeals] = useState('10');
   const [inventory, setInventory] = useState('');
-  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [maxSkill, setMaxSkill] = useState(null);
@@ -41,7 +40,6 @@ function App() {
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
-    setCurrentLang(lang);
     setShowLanguageSelect(false);
   };
 
