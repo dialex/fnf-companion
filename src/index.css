@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* Content font - Caudex, 10% smaller than base */
 .content {

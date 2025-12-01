@@ -46,35 +46,42 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-beige">
+    <div className="min-vh-100 bg-beige">
       <header
-        className="sticky top-0 z-50 text-white shadow-md"
-        style={{ backgroundColor: 'var(--header-bg)' }}
+        className="sticky-top text-white shadow"
+        style={{ backgroundColor: 'var(--header-bg)', zIndex: 1050 }}
       >
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="container mx-auto px-4 py-3 d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center gap-3">
             <Icon path={mdiBookAccount} size={1.5} className="text-white" />
-            <h1 className="heading text-3xl">{t('app.title')}</h1>
+            <h1 className="heading fs-1">{t('app.title')}</h1>
           </div>
-          <nav className="flex items-center gap-6">
+          <nav className="d-flex align-items-center gap-4">
             <a
               href="#character"
-              className="content hover:text-yellow-400 transition"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
             >
               {t('navigation.character')}
             </a>
             <a
               href="#inventory"
-              className="content hover:text-yellow-400 transition"
+              className="content text-white text-decoration-none"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+              onMouseLeave={(e) => (e.target.style.color = 'white')}
             >
               {t('navigation.inventory')}
             </a>
-            <div className="flex items-center gap-1">
+            <div className="d-flex align-items-center gap-2">
               <Icon path={mdiWebBox} size={1} className="text-white" />
               <select
                 value={currentLang}
                 onChange={handleLanguageChange}
-                className="select select-bordered content"
+                className="form-select content"
+                style={{ width: 'auto' }}
               >
                 {getAvailableLanguages().map((lang) => (
                   <option key={lang} value={lang}>
@@ -86,9 +93,9 @@ function App() {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <section id="character" className="section-container">
+      <main className="container mx-auto px-4 py-5">
+        <div className="row g-4">
+          <section id="character" className="col-12 col-md-4 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
                 {name.trim().length > 0 ? name : t('sections.character')}
@@ -104,7 +111,7 @@ function App() {
                 </label>
                 <input
                   type="text"
-                  className="content field-input"
+                  className="content field-input form-control"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -118,7 +125,7 @@ function App() {
                 </label>
                 <input
                   type="number"
-                  className="content field-input"
+                  className="content field-input form-control"
                   min="0"
                   value={skill}
                   onChange={(e) => handleNumberChange(setSkill, e.target.value)}
@@ -134,7 +141,7 @@ function App() {
                 </label>
                 <input
                   type="number"
-                  className="content field-input"
+                  className="content field-input form-control"
                   min="0"
                   value={health}
                   onChange={(e) =>
@@ -152,7 +159,7 @@ function App() {
                 </label>
                 <input
                   type="number"
-                  className="content field-input"
+                  className="content field-input form-control"
                   min="0"
                   value={luck}
                   onChange={(e) => handleNumberChange(setLuck, e.target.value)}
@@ -161,7 +168,7 @@ function App() {
               </div>
             </div>
           </section>
-          <section id="consumables" className="section-container">
+          <section id="consumables" className="col-12 col-md-4 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.consumables')}
@@ -177,7 +184,7 @@ function App() {
                 </label>
                 <input
                   type="number"
-                  className="content field-input"
+                  className="content field-input form-control"
                   min="0"
                   value={coins}
                   onChange={(e) => handleNumberChange(setCoins, e.target.value)}
@@ -192,7 +199,7 @@ function App() {
                 </label>
                 <input
                   type="number"
-                  className="content field-input"
+                  className="content field-input form-control"
                   min="0"
                   value={meals}
                   onChange={(e) => handleNumberChange(setMeals, e.target.value)}
@@ -200,21 +207,21 @@ function App() {
               </div>
             </div>
           </section>
-          <section id="dice-rolls" className="section-container">
+          <section id="dice-rolls" className="col-12 col-md-4 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.diceRolls')}
               </h2>
             </div>
             <div className="section-content">
-              <button type="button" className="btn">
+              <button type="button" className="btn btn-secondary">
                 test
               </button>
             </div>
           </section>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <section id="inventory" className="section-container">
+        <div className="row g-4 mt-4">
+          <section id="inventory" className="col-12 col-md-6 section-container">
             <div className="section-header">
               <h2 className="heading section-title">
                 {t('sections.inventory')}
@@ -222,7 +229,7 @@ function App() {
             </div>
             <div className="section-content">
               <textarea
-                className="content field-input"
+                className="content field-input form-control"
                 value={inventory}
                 onChange={(e) => setInventory(e.target.value)}
                 rows={10}
@@ -230,15 +237,15 @@ function App() {
               />
             </div>
           </section>
-          <section id="map" className="section-container">
+          <section id="map" className="col-12 col-md-6 section-container">
             <div className="section-header">
               <h2 className="heading section-title">{t('sections.map')}</h2>
             </div>
             <div className="section-content">{/* Map section */}</div>
           </section>
         </div>
-        <div className="grid grid-cols-1 gap-6 mt-6">
-          <section id="fight" className="section-container">
+        <div className="row g-4 mt-4">
+          <section id="fight" className="col-12 section-container">
             <div className="section-header">
               <h2 className="heading section-title">{t('sections.fight')}</h2>
             </div>
