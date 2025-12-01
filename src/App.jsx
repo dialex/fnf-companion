@@ -75,6 +75,15 @@ function App() {
   const handleConsumeMeal = () => {
     const currentMeals = parseInt(meals) || 0;
     if (currentMeals > 0) {
+      // Play eat sound
+      const audio = new Audio(
+        `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
+      );
+      audio.play().catch((error) => {
+        // Silently handle audio play errors (e.g., user hasn't interacted yet)
+        console.warn('Could not play audio:', error);
+      });
+
       setMeals(String(currentMeals - 1));
       const currentHealth = parseInt(health) || 0;
       const newHealth = currentHealth + 4;
@@ -406,7 +415,7 @@ function App() {
                       className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
                     >
                       {t('dice.testYourLuck')}
-                      <Icon path={mdiClover} size={1} />
+                      <Icon path={mdiCloverOutline} size={1} />
                     </button>
                   </div>
                   <div className="d-flex gap-2 justify-content-center">
