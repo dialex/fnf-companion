@@ -33,6 +33,8 @@
     "rollDice": "Lançar"
   },
   "buttons": {
-    "randomStats": "Aleatório"
+    "randomStats": "Aleatório",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear"
   }
 }

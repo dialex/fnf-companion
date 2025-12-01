@@ -33,6 +33,8 @@
     "rollDice": "Roll"
   },
   "buttons": {
-    "randomStats": "Randomize"
+    "randomStats": "Randomize",
+    "lock": "Lock",
+    "unlock": "Unlock"
   }
 }

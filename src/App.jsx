@@ -6,12 +6,15 @@ import {
   mdiHeart,
   mdiAccount,
   mdiClover,
+  mdiCloverOutline,
   mdiHandCoin,
   mdiFoodApple,
   mdiDice3,
   mdiDiceMultiple,
   mdiWebBox,
   mdiChevronDown,
+  mdiLock,
+  mdiLockOpenVariant,
 } from '@mdi/js';
 import {
   t,
@@ -31,6 +34,10 @@ function App() {
   const [inventory, setInventory] = useState('');
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [maxSkill, setMaxSkill] = useState(null);
+  const [maxHealth, setMaxHealth] = useState(null);
+  const [maxLuck, setMaxLuck] = useState(null);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -58,9 +65,11 @@ function App() {
     };
   }, [showLanguageSelect]);
 
-  const handleNumberChange = (setter, value) => {
+  const handleNumberChange = (setter, value, maxValue) => {
     const numValue = parseInt(value) || 0;
-    setter(String(Math.max(0, numValue)));
+    const clampedValue =
+      maxValue !== null ? Math.min(numValue, maxValue) : numValue;
+    setter(String(Math.max(0, clampedValue)));
   };
 
   const handleConsumeMeal = () => {
@@ -68,23 +77,48 @@ function App() {
     if (currentMeals > 0) {
       setMeals(String(currentMeals - 1));
       const currentHealth = parseInt(health) || 0;
-      setHealth(String(currentHealth + 4));
+      const newHealth = currentHealth + 4;
+      setHealth(
+        String(maxHealth !== null ? Math.min(newHealth, maxHealth) : newHealth)
+      );
     }
   };
 
   const handleRandomStats = () => {
     // Skill: random 1-6 + 6
     const skillRoll = Math.floor(Math.random() * 6) + 1;
-    setSkill(String(skillRoll + 6));
+    const newSkill = skillRoll + 6;
+    setSkill(
+      String(maxSkill !== null ? Math.min(newSkill, maxSkill) : newSkill)
+    );
 
     // Health: two random 1-6, sum them, then + 12
     const healthRoll1 = Math.floor(Math.random() * 6) + 1;
     const healthRoll2 = Math.floor(Math.random() * 6) + 1;
-    setHealth(String(healthRoll1 + healthRoll2 + 12));
+    const newHealth = healthRoll1 + healthRoll2 + 12;
+    setHealth(
+      String(maxHealth !== null ? Math.min(newHealth, maxHealth) : newHealth)
+    );
 
     // Luck: random 1-6 + 6
     const luckRoll = Math.floor(Math.random() * 6) + 1;
-    setLuck(String(luckRoll + 6));
+    const newLuck = luckRoll + 6;
+    setLuck(String(maxLuck !== null ? Math.min(newLuck, maxLuck) : newLuck));
+  };
+
+  const handleToggleLock = () => {
+    if (!isLocked) {
+      // Lock: set max values to current values
+      setMaxSkill(parseInt(skill) || null);
+      setMaxHealth(parseInt(health) || null);
+      setMaxLuck(parseInt(luck) || null);
+    } else {
+      // Unlock: clear max values
+      setMaxSkill(null);
+      setMaxHealth(null);
+      setMaxLuck(null);
+    }
+    setIsLocked(!isLocked);
   };
 
   useEffect(() => {
@@ -207,16 +241,23 @@ function App() {
                   <label className="content field-label">
                     {t('fields.skill')}
                   </label>
-                  <input
-                    type="number"
-                    className="content field-input form-control"
-                    min="0"
-                    value={skill}
-                    onChange={(e) =>
-                      handleNumberChange(setSkill, e.target.value)
-                    }
-                    placeholder={t('placeholders.skill')}
-                  />
+                  <div className="input-group" style={{ flex: 1 }}>
+                    {maxSkill !== null && (
+                      <span className="input-group-text bg-secondary text-white">
+                        {maxSkill}
+                      </span>
+                    )}
+                    <input
+                      type="number"
+                      className="content field-input form-control"
+                      min="0"
+                      value={skill}
+                      onChange={(e) =>
+                        handleNumberChange(setSkill, e.target.value, maxSkill)
+                      }
+                      placeholder={t('placeholders.skill')}
+                    />
+                  </div>
                 </div>
                 <div className="field-group">
                   <div className="field-icon">
@@ -225,16 +266,23 @@ function App() {
                   <label className="content field-label">
                     {t('fields.health')}
                   </label>
-                  <input
-                    type="number"
-                    className="content field-input form-control"
-                    min="0"
-                    value={health}
-                    onChange={(e) =>
-                      handleNumberChange(setHealth, e.target.value)
-                    }
-                    placeholder={t('placeholders.health')}
-                  />
+                  <div className="input-group" style={{ flex: 1 }}>
+                    {maxHealth !== null && (
+                      <span className="input-group-text bg-secondary text-white">
+                        {maxHealth}
+                      </span>
+                    )}
+                    <input
+                      type="number"
+                      className="content field-input form-control"
+                      min="0"
+                      value={health}
+                      onChange={(e) =>
+                        handleNumberChange(setHealth, e.target.value, maxHealth)
+                      }
+                      placeholder={t('placeholders.health')}
+                    />
+                  </div>
                 </div>
                 <div className="field-group">
                   <div className="field-icon">
@@ -243,18 +291,25 @@ function App() {
                   <label className="content field-label">
                     {t('fields.luck')}
                   </label>
-                  <input
-                    type="number"
-                    className="content field-input form-control"
-                    min="0"
-                    value={luck}
-                    onChange={(e) =>
-                      handleNumberChange(setLuck, e.target.value)
-                    }
-                    placeholder={t('placeholders.luck')}
-                  />
+                  <div className="input-group" style={{ flex: 1 }}>
+                    {maxLuck !== null && (
+                      <span className="input-group-text bg-secondary text-white">
+                        {maxLuck}
+                      </span>
+                    )}
+                    <input
+                      type="number"
+                      className="content field-input form-control"
+                      min="0"
+                      value={luck}
+                      onChange={(e) =>
+                        handleNumberChange(setLuck, e.target.value, maxLuck)
+                      }
+                      placeholder={t('placeholders.luck')}
+                    />
+                  </div>
                 </div>
-                <div className="d-flex justify-content-center mt-3">
+                <div className="d-flex justify-content-center gap-2 mt-3">
                   <button
                     type="button"
                     className="btn btn-light d-flex align-items-center justify-content-center gap-2"
@@ -262,6 +317,17 @@ function App() {
                   >
                     {t('buttons.randomStats')}
                     <Icon path={mdiDice3} size={1} />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                    onClick={handleToggleLock}
+                  >
+                    {isLocked ? t('buttons.unlock') : t('buttons.lock')}
+                    <Icon
+                      path={isLocked ? mdiLockOpenVariant : mdiLock}
+                      size={1}
+                    />
                   </button>
                 </div>
               </div>
@@ -313,7 +379,10 @@ function App() {
                       type="button"
                       className="btn btn-primary"
                       onClick={handleConsumeMeal}
-                      disabled={parseInt(meals) <= 0}
+                      disabled={
+                        parseInt(meals) <= 0 ||
+                        (maxHealth !== null && parseInt(health) >= maxHealth)
+                      }
                     >
                       <Icon path={mdiFoodApple} size={1} />
                     </button>
