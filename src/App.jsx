@@ -10,6 +10,7 @@ import {
   mdiHandCoin,
   mdiFoodApple,
   mdiDiceMultiple,
+  mdiWebBox,
 } from '@mdi/js';
 import {
   t,
@@ -68,17 +69,20 @@ function App() {
             >
               {t('navigation.inventory')}
             </a>
-            <select
-              value={currentLang}
-              onChange={handleLanguageChange}
-              className="content bg-gray-700 text-white border border-gray-600 rounded px-3 py-1 cursor-pointer hover:bg-gray-600 transition"
-            >
-              {getAvailableLanguages().map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang.toUpperCase()}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center gap-1">
+              <Icon path={mdiWebBox} size={1} className="text-white" />
+              <select
+                value={currentLang}
+                onChange={handleLanguageChange}
+                className="select select-bordered content"
+              >
+                {getAvailableLanguages().map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
           </nav>
         </div>
       </header>
@@ -203,29 +207,9 @@ function App() {
               </h2>
             </div>
             <div className="section-content">
-              <div className="dice-buttons">
-                <button
-                  type="button"
-                  className="btn btn-block content"
-                  onClick={() => {}}
-                >
-                  {t('dice.testYourLuck')}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-block content"
-                  onClick={() => {}}
-                >
-                  {t('dice.roll1')}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-block content"
-                  onClick={() => {}}
-                >
-                  {t('dice.roll2')}
-                </button>
-              </div>
+              <button type="button" className="btn">
+                test
+              </button>
             </div>
           </section>
         </div>
