@@ -1,14 +1,17 @@
 # Commit Conventions
 
 When committing changes:
+
 - Only commit changes made by the current agent (not changes from other agents)
 - Use conventional commits format (e.g., `feat:`, `fix:`, `refactor:`, `style:`, `docs:`, `chore:`, etc.)
 - Commit messages must be lowercase
 - Commit messages must be 80 characters or less
+- If the user types just "c", it means "commit" - proceed with committing changes
 
 # Translation Requirements
 
 When adding user-facing text:
+
 - ALL user-facing text must be added to the translations file (`src/translations/en.json`)
 - The same key must be added to the Portuguese translation file (`src/translations/pt.json`) with the Portuguese translation
 - Use the `t()` function from `./translations` to display translated text in components
