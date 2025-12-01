@@ -4,7 +4,6 @@ import {
   mdiBookAccount,
   mdiSword,
   mdiHeart,
-  mdiLeadPencil,
   mdiAccount,
   mdiClover,
   mdiHandCoin,
@@ -289,8 +288,12 @@ function App() {
               <div className="section-content">
                 <div className="d-flex flex-column gap-3">
                   <div className="d-flex justify-content-center">
-                    <button type="button" className="btn btn-primary">
+                    <button
+                      type="button"
+                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                    >
                       {t('dice.testYourLuck')}
+                      <Icon path={mdiClover} size={1} />
                     </button>
                   </div>
                   <div className="d-flex gap-2 justify-content-center">
