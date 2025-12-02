@@ -1,0 +1,41 @@
+- Section consumables
+  - Text field for item + Number field for cost + Button to Buy
+  - When clicked, adds item to Inventory (adds to bottom) and subtracts cost from gold
+  - If gold is not enough Buy is disabled
+- Implement logic of test your luck
+  - show the dice result
+  - display the outcome banner
+  - -1 to total luck
+  - if luck is 0, button is disabled
+- Implement logic of roll die
+  - Display result using icons
+  - Use primary color
+- Implement logic of roll dice
+  - Display result using icons
+  - Use primary color
+- Add section for notes
+- Auto-save state to local storage on every change, with debounce
+- Add Game section
+  - Allows to manually save game to file
+  - Display notif when game is saved
+  - Load game from file
+  - Display notif when game is loaded
+- Soundboard
+  - Ambience (will loop)
+  - Battle (will loop)
+  - Victory (will auto-play once)
+  - Defeat (will auto-play once)
+  - URL from youtube
+  - Control volume
+  - Play pause restart
+- Map
+  - Number field + Add button or enter
+  - Separate buttons: Died ⚰️ + Question 🤷 + Good 🟢 + Bad 🔴 + Star ⭐️
+    - Adds an icon, or unicode to the log
+    - Sequence of numbers are labels →
+    - 123 → ⚰️ → ...
+    - 123 🟢 → 456 → ...
+- Fix resolution
+  - Fix mobile header size
+  - Change app name to be shorter
+  - Collapse menu items into hamburger menu
