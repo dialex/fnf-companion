@@ -1,4 +1,3 @@
-- Support restore potions, from v2 of the books
 - Map
   - Number field + Add button or enter
   - Separate buttons: Died ⚰️ + Question 🤷 + Good 🟢 + Bad 🔴 + Star ⭐️

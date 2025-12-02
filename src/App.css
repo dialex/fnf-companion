@@ -213,6 +213,30 @@ textarea.field-input.notes-handwritten {
   appearance: textfield;
 }
 
+/* Trail section styles */
+.trail-input {
+  width: 3.5rem !important; /* just enough for 3 digits */
+  text-align: center;
+  padding: 0.5rem !important;
+}
+
+.trail-input::-webkit-outer-spin-button,
+.trail-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.trail-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.trail-sequence {
+  min-height: 3rem;
+  width: 100%;
+}
+
 /* Inventory badge - top right corner */
 .inventory-badge {
   position: absolute;

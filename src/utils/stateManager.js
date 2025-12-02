@@ -58,6 +58,9 @@ export const getDefaultState = () => ({
     testSkillResult: null,
     diceRollingType: null,
   },
+  trail: {
+    sequence: [1], // Always starts with 1
+  },
 });
 
 /**
@@ -90,6 +93,10 @@ export const loadState = () => {
     diceRolls: {
       ...defaultState.diceRolls,
       ...(savedState.diceRolls || {}),
+    },
+    trail: {
+      ...defaultState.trail,
+      ...(savedState.trail || {}),
     },
     metadata: {
       ...defaultState.metadata,
@@ -184,6 +191,9 @@ export const buildStateObject = (stateValues) => {
       testSkillResult: stateValues.testSkillResult ?? null,
       diceRollingType: stateValues.diceRollingType ?? null,
     },
+    trail: {
+      sequence: stateValues.trailSequence || [1],
+    },
   };
 };
 
@@ -269,5 +279,16 @@ export const applyLoadedState = (savedState, setters) => {
       setters.setTestSkillResult(dice.testSkillResult);
     if (dice.diceRollingType !== undefined)
       setters.setDiceRollingType(dice.diceRollingType);
+  }
+
+  // Restore trail state
+  if (savedState.trail && savedState.trail.sequence) {
+    // Ensure sequence always starts with 1
+    const sequence = savedState.trail.sequence;
+    if (sequence.length === 0 || sequence[0] !== 1) {
+      setters.setTrailSequence([1, ...sequence.filter((n) => n !== 1)]);
+    } else {
+      setters.setTrailSequence(sequence);
+    }
   }
 };

@@ -51,6 +51,10 @@ function App() {
   const [inventory, setInventory] = useState('');
   const [notes, setNotes] = useState('');
 
+  // Trail state
+  const [trailSequence, setTrailSequence] = useState([1]);
+  const [trailInput, setTrailInput] = useState('');
+
   // Fight state
   const [monsterSkill, setMonsterSkill] = useState('');
   const [monsterHealth, setMonsterHealth] = useState('');
@@ -128,6 +132,7 @@ function App() {
         setIsTestingLuck,
         setTestSkillResult,
         setDiceRollingType,
+        setTrailSequence,
       });
     }
 
@@ -179,6 +184,7 @@ function App() {
       isTestingLuck,
       testSkillResult,
       diceRollingType,
+      trailSequence,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -248,6 +254,27 @@ function App() {
         return updated;
       });
     }, 2200);
+  };
+
+  // Trail handlers
+  const handleTrailSubmit = () => {
+    const num = parseInt(trailInput);
+    if (isNaN(num) || num < 1 || num > 400) {
+      return;
+    }
+
+    // Add number to sequence
+    setTrailSequence((prev) => [...prev, num]);
+    // Clear input
+    setTrailInput('');
+  };
+
+  const handleTrailTest = () => {
+    // Generate 20 random numbers between 1 and 400
+    const randomNumbers = Array.from({ length: 20 }, () =>
+      Math.floor(Math.random() * 400) + 1
+    );
+    setTrailSequence((prev) => [...prev, ...randomNumbers]);
   };
 
   // Character handlers
@@ -379,6 +406,8 @@ function App() {
     setIsTestingLuck(false);
     setTestSkillResult(null);
     setDiceRollingType(null);
+    setTrailSequence([1]);
+    setTrailInput('');
   };
 
   const handlePurchase = () => {
@@ -838,6 +867,7 @@ function App() {
           testSkillResult,
           diceRollingType,
         },
+        trailSequence,
       };
       saveStateToStorage(stateToSave);
     };
@@ -881,6 +911,7 @@ function App() {
     isTestingLuck,
     testSkillResult,
     diceRollingType,
+    trailSequence,
   ]);
 
   return (
@@ -890,7 +921,7 @@ function App() {
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <section id="game" className="section-container mb-4">
-              <div className="section-header">
+            <div className="section-header">
                 <h2 className="heading section-title">{t('sections.game')}</h2>
               </div>
               <div className="section-content" style={{ minHeight: 'auto' }}>
@@ -906,7 +937,7 @@ function App() {
               </div>
             </section>
           </div>
-        </div>
+                </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <CharacterSection
@@ -927,8 +958,8 @@ function App() {
               onRandomStats={handleRandomStatsWithAnimation}
               onToggleLock={handleToggleLock}
               onNumberChange={handleNumberChange}
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-md-4">
             <ConsumablesSection
               coins={coins}
@@ -955,7 +986,7 @@ function App() {
               onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
             />
-          </div>
+                </div>
           <div className="col-12 col-md-4">
             <DiceRollsSection
               skill={skill}
@@ -970,20 +1001,26 @@ function App() {
               onTestYourSkill={handleTestYourSkill}
               onRollDie={handleRollDie}
               onRollDice={handleRollDice}
-            />
-          </div>
-        </div>
+                />
+              </div>
+            </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <InventorySection
               inventory={inventory}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-md-8">
-            <MapSection />
-          </div>
+            <MapSection
+              trailSequence={trailSequence}
+              trailInput={trailInput}
+              onTrailInputChange={setTrailInput}
+              onTrailSubmit={handleTrailSubmit}
+              onTrailTest={handleTrailTest}
+                />
+              </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
@@ -1012,13 +1049,13 @@ function App() {
               onFight={handleFight}
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
-            />
-          </div>
+              />
+            </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection notes={notes} onNotesChange={setNotes} />
-          </div>
+            </div>
         </div>
       </main>
     </div>
