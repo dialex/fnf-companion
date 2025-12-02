@@ -32,11 +32,14 @@
     "luck": "1 dado + 6"
   },
   "dice": {
-    "testYourLuck": "Testar a sorte",
+    "testYourLuck": "Testar sorte",
+    "testYourSkill": "Testar perícia",
     "rollDie": "Lançar",
     "rollDice": "Lançar",
     "youWereLucky": "Tiveste sorte!",
-    "youWereUnlucky": "Tiveste azar..."
+    "youWereUnlucky": "Tiveste azar...",
+    "youPassedTheTest": "Passaste!",
+    "youFailedTheTest": "Falhaste..."
   },
   "buttons": {
     "randomStats": "Aleatório",

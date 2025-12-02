@@ -32,11 +32,14 @@
     "luck": "1 die + 6"
   },
   "dice": {
-    "testYourLuck": "Test your luck",
+    "testYourLuck": "Test luck",
+    "testYourSkill": "Test skill",
     "rollDie": "Roll",
     "rollDice": "Roll",
     "youWereLucky": "You were lucky!",
-    "youWereUnlucky": "Tough luck..."
+    "youWereUnlucky": "Tough luck...",
+    "youPassedTheTest": "You passed!",
+    "youFailedTheTest": "You failed..."
   },
   "buttons": {
     "randomStats": "Randomize",

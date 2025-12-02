@@ -48,6 +48,7 @@ function App() {
   const [rollDiceResults, setRollDiceResults] = useState(null);
   const [testLuckResult, setTestLuckResult] = useState(null);
   const [isTestingLuck, setIsTestingLuck] = useState(false);
+  const [testSkillResult, setTestSkillResult] = useState(null);
   const [diceRollingType, setDiceRollingType] = useState(null);
   const [fieldBadges, setFieldBadges] = useState({});
 
@@ -195,6 +196,7 @@ function App() {
     setRollDieResult(null);
     setRollDiceResults(null);
     setTestLuckResult(null);
+    setTestSkillResult(null);
 
     // After animation, roll dice and show result
     setTimeout(() => {
@@ -230,6 +232,41 @@ function App() {
 
       // Stop animation
       setIsTestingLuck(false);
+      setDiceRollingType(null);
+    }, 1000);
+  };
+
+  const handleTestYourSkill = () => {
+    const currentSkill = parseInt(skill) || 0;
+    if (currentSkill <= 0 || diceRollingType !== null) return;
+
+    // Start animation in results area
+    setDiceRollingType('testSkill');
+
+    // Clear other results
+    setRollDieResult(null);
+    setRollDiceResults(null);
+    setTestLuckResult(null);
+    setTestSkillResult(null);
+
+    // After animation, roll dice and show result
+    setTimeout(() => {
+      // Roll two dice
+      const roll1 = Math.floor(Math.random() * 6) + 1;
+      const roll2 = Math.floor(Math.random() * 6) + 1;
+      const sum = roll1 + roll2;
+
+      // Check if passed (sum <= skill)
+      const passed = sum <= currentSkill;
+
+      // Set result
+      setTestSkillResult({
+        roll1,
+        roll2,
+        passed,
+      });
+
+      // Stop animation
       setDiceRollingType(null);
     }, 1000);
   };
@@ -630,10 +667,10 @@ function App() {
               </div>
               <div className="section-content">
                 <div className="d-flex flex-column gap-3">
-                  <div className="d-flex justify-content-center">
+                  <div className="d-flex gap-2 justify-content-center">
                     <button
                       type="button"
-                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                      className="btn btn-secondary d-flex align-items-center justify-content-center gap-2"
                       onClick={handleTestYourLuck}
                       disabled={
                         !luck ||
@@ -645,6 +682,19 @@ function App() {
                       {t('dice.testYourLuck')}
                       <Icon path={mdiClover} size={1} />
                     </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary d-flex align-items-center justify-content-center gap-2"
+                      onClick={handleTestYourSkill}
+                      disabled={
+                        !skill ||
+                        parseInt(skill) <= 0 ||
+                        diceRollingType !== null
+                      }
+                    >
+                      {t('dice.testYourSkill')}
+                      <Icon path={mdiSword} size={1} />
+                    </button>
                   </div>
                   <div className="d-flex gap-2 justify-content-center">
                     <button
@@ -655,6 +705,7 @@ function App() {
                         setDiceRollingType('rollDie');
                         // Clear other results
                         setTestLuckResult(null);
+                        setTestSkillResult(null);
                         setRollDiceResults(null);
                         setRollDieResult(null);
                         setTimeout(() => {
@@ -676,6 +727,7 @@ function App() {
                         setDiceRollingType('rollDice');
                         // Clear other results
                         setTestLuckResult(null);
+                        setTestSkillResult(null);
                         setRollDieResult(null);
                         setRollDiceResults(null);
                         setTimeout(() => {
@@ -692,8 +744,8 @@ function App() {
                     </button>
                   </div>
                   <div
-                    className="d-flex flex-column justify-content-center align-items-center gap-3"
-                    style={{ minHeight: '100px' }}
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ minHeight: '100px', gap: '5px' }}
                   >
                     {diceRollingType === 'rollDie' && (
                       <Icon
@@ -704,6 +756,28 @@ function App() {
                       />
                     )}
                     {diceRollingType === 'rollDice' && (
+                      <div className="d-flex align-items-center gap-2">
+                        <Icon
+                          path={mdiDice3}
+                          size={3}
+                          className="dice-rolling"
+                          style={{
+                            color: '#007e6e',
+                            animationDuration: '0.3s',
+                          }}
+                        />
+                        <Icon
+                          path={mdiDice3}
+                          size={3}
+                          className="dice-rolling"
+                          style={{
+                            color: '#007e6e',
+                            animationDuration: '0.3s',
+                          }}
+                        />
+                      </div>
+                    )}
+                    {diceRollingType === 'testSkill' && (
                       <div className="d-flex align-items-center gap-2">
                         <Icon
                           path={mdiDice3}
@@ -746,6 +820,34 @@ function App() {
                           }}
                         />
                       </div>
+                    )}
+                    {testSkillResult && diceRollingType === null && (
+                      <>
+                        <div
+                          className={`alert content ${
+                            testSkillResult.passed
+                              ? 'alert-success'
+                              : 'alert-danger'
+                          } mb-0`}
+                          role="alert"
+                        >
+                          {testSkillResult.passed
+                            ? t('dice.youPassedTheTest')
+                            : t('dice.youFailedTheTest')}
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          <Icon
+                            path={getDiceIcon(testSkillResult.roll1)}
+                            size={3}
+                            style={{ color: '#007e6e' }}
+                          />
+                          <Icon
+                            path={getDiceIcon(testSkillResult.roll2)}
+                            size={3}
+                            style={{ color: '#007e6e' }}
+                          />
+                        </div>
+                      </>
                     )}
                     {testLuckResult && diceRollingType === null && (
                       <>
