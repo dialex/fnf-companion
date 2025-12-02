@@ -1,6 +1,3 @@
-- Implement fight section
-  - Red vs Green dice
-  - Keep log of monsters beaten (graveyard)
 - Refactor, each section should have it's own file, and one for the homepage that composes all of them. Each section knows how to display itself and contains its logic
 - Auto-save state to local storage on every change, with debounce
 - Add Game section
