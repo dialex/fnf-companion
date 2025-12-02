@@ -70,12 +70,6 @@ export default function MapSection({
     };
   }, [displaySequence]);
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      onTrailSubmit();
-    }
-  };
-
   const handleInputChange = (e) => {
     const value = e.target.value;
     // Only allow numbers, up to 3 digits
@@ -85,10 +79,23 @@ export default function MapSection({
   };
 
   const handleKeyDown = (e) => {
+    // Handle Enter key to submit
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onTrailSubmit();
+      return;
+    }
     // Prevent non-numeric keys (except backspace, delete, arrow keys, etc.)
     if (
       !/[0-9]/.test(e.key) &&
-      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+      ![
+        'Backspace',
+        'Delete',
+        'ArrowLeft',
+        'ArrowRight',
+        'Tab',
+        'Enter',
+      ].includes(e.key)
     ) {
       e.preventDefault();
     }
@@ -116,7 +123,6 @@ export default function MapSection({
               max="400"
               value={trailInput}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
               onKeyDown={handleKeyDown}
             />
             <button
