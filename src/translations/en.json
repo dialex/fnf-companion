@@ -34,7 +34,9 @@
   "dice": {
     "testYourLuck": "Test your luck",
     "rollDie": "Roll",
-    "rollDice": "Roll"
+    "rollDice": "Roll",
+    "youWereLucky": "You were lucky!",
+    "youWereUnlucky": "Tough luck..."
   },
   "buttons": {
     "randomStats": "Randomize",

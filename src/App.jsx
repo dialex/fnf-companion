@@ -46,6 +46,8 @@ function App() {
   const [rollingButton, setRollingButton] = useState(null);
   const [rollDieResult, setRollDieResult] = useState(null);
   const [rollDiceResults, setRollDiceResults] = useState(null);
+  const [testLuckResult, setTestLuckResult] = useState(null);
+  const [isTestingLuck, setIsTestingLuck] = useState(false);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -135,6 +137,62 @@ function App() {
       setMaxLuck(null);
     }
     setIsLocked(!isLocked);
+  };
+
+  const getDiceIcon = (value) => {
+    switch (value) {
+      case 1:
+        return mdiDice1;
+      case 2:
+        return mdiDice2;
+      case 3:
+        return mdiDice3;
+      case 4:
+        return mdiDice4;
+      case 5:
+        return mdiDice5;
+      case 6:
+        return mdiDice6;
+      default:
+        return mdiDice1;
+    }
+  };
+
+  const handleTestYourLuck = () => {
+    const currentLuck = parseInt(luck) || 0;
+    if (currentLuck <= 0 || isTestingLuck) return;
+
+    // Start animation
+    setIsTestingLuck(true);
+
+    // Clear other results
+    setRollDieResult(null);
+    setRollDiceResults(null);
+
+    // After animation, roll dice and show result
+    setTimeout(() => {
+      // Roll two dice
+      const roll1 = Math.floor(Math.random() * 6) + 1;
+      const roll2 = Math.floor(Math.random() * 6) + 1;
+      const sum = roll1 + roll2;
+
+      // Check if lucky (sum <= luck)
+      const isLucky = sum <= currentLuck;
+
+      // Set result
+      setTestLuckResult({
+        roll1,
+        roll2,
+        isLucky,
+      });
+
+      // Decrease luck by 1
+      const newLuck = Math.max(0, currentLuck - 1);
+      setLuck(String(newLuck));
+
+      // Reset icon back to clover
+      setIsTestingLuck(false);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -513,9 +571,18 @@ function App() {
                     <button
                       type="button"
                       className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                      onClick={handleTestYourLuck}
+                      disabled={!luck || parseInt(luck) <= 0 || isTestingLuck}
                     >
                       {t('dice.testYourLuck')}
-                      <Icon path={mdiClover} size={1} />
+                      <Icon
+                        path={isTestingLuck ? mdiDice3 : mdiClover}
+                        size={1}
+                        className={isTestingLuck ? 'dice-rolling' : ''}
+                        style={
+                          isTestingLuck ? { animationDuration: '0.3s' } : {}
+                        }
+                      />
                     </button>
                   </div>
                   <div className="d-flex gap-2 justify-content-center">
@@ -525,10 +592,12 @@ function App() {
                       onClick={() => {
                         if (rollingButton !== null) return;
                         setRollingButton('rollDie');
+                        // Clear other results
+                        setTestLuckResult(null);
+                        setRollDiceResults(null);
                         setTimeout(() => {
                           const result = Math.floor(Math.random() * 6) + 1;
                           setRollDieResult(result);
-                          setRollDiceResults(null);
                           setRollingButton(null);
                         }, 1000);
                       }}
@@ -554,11 +623,13 @@ function App() {
                       onClick={() => {
                         if (rollingButton !== null) return;
                         setRollingButton('rollDice');
+                        // Clear other results
+                        setTestLuckResult(null);
+                        setRollDieResult(null);
                         setTimeout(() => {
                           const result1 = Math.floor(Math.random() * 6) + 1;
                           const result2 = Math.floor(Math.random() * 6) + 1;
                           setRollDiceResults([result1, result2]);
-                          setRollDieResult(null);
                           setRollingButton(null);
                         }, 1000);
                       }}
@@ -580,24 +651,40 @@ function App() {
                     </button>
                   </div>
                   <div
-                    className="d-flex justify-content-center align-items-center"
+                    className="d-flex flex-column justify-content-center align-items-center gap-3"
                     style={{ minHeight: '100px' }}
                   >
+                    {testLuckResult && (
+                      <>
+                        <div
+                          className={`alert content ${
+                            testLuckResult.isLucky
+                              ? 'alert-success'
+                              : 'alert-danger'
+                          } mb-0`}
+                          role="alert"
+                        >
+                          {testLuckResult.isLucky
+                            ? t('dice.youWereLucky')
+                            : t('dice.youWereUnlucky')}
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          <Icon
+                            path={getDiceIcon(testLuckResult.roll1)}
+                            size={3}
+                            style={{ color: '#007e6e' }}
+                          />
+                          <Icon
+                            path={getDiceIcon(testLuckResult.roll2)}
+                            size={3}
+                            style={{ color: '#007e6e' }}
+                          />
+                        </div>
+                      </>
+                    )}
                     {rollDieResult && (
                       <Icon
-                        path={
-                          rollDieResult === 1
-                            ? mdiDice1
-                            : rollDieResult === 2
-                              ? mdiDice2
-                              : rollDieResult === 3
-                                ? mdiDice3
-                                : rollDieResult === 4
-                                  ? mdiDice4
-                                  : rollDieResult === 5
-                                    ? mdiDice5
-                                    : mdiDice6
-                        }
+                        path={getDiceIcon(rollDieResult)}
                         size={3}
                         style={{ color: '#007e6e' }}
                       />

@@ -34,7 +34,9 @@
   "dice": {
     "testYourLuck": "Testar a sorte",
     "rollDie": "Lançar",
-    "rollDice": "Lançar"
+    "rollDice": "Lançar",
+    "youWereLucky": "Tiveste sorte!",
+    "youWereUnlucky": "Tiveste azar..."
   },
   "buttons": {
     "randomStats": "Aleatório",
