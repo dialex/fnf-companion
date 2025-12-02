@@ -8,7 +8,8 @@
     "diceRolls": "Dice rolls",
     "inventory": "Inventory",
     "map": "Map",
-    "fight": "Fight"
+    "fight": "Fight",
+    "notes": "Notes"
   },
   "sections": {
     "character": "Character",
@@ -16,7 +17,8 @@
     "diceRolls": "Dice rolls",
     "inventory": "Inventory",
     "map": "Map",
-    "fight": "Fight"
+    "fight": "Fight",
+    "notes": "Notes"
   },
   "fields": {
     "name": "Name",
@@ -45,5 +47,8 @@
     "randomStats": "Randomize",
     "lock": "Lock",
     "unlock": "Unlock"
+  },
+  "inventory": {
+    "label": "You carry in your backpack..."
   }
 }

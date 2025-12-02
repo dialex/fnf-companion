@@ -1,4 +1,3 @@
-- Add section for notes
 - Section consumables
   - Text field for item + Number field for cost + Button to Buy
   - When clicked, adds item to Inventory (adds to bottom) and subtracts cost from gold

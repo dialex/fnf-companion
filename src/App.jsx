@@ -20,6 +20,10 @@ import {
   mdiChevronDown,
   mdiLock,
   mdiLockOpenVariant,
+  mdiBagPersonal,
+  mdiMap,
+  mdiSwordCross,
+  mdiLeadPencil,
 } from '@mdi/js';
 import {
   t,
@@ -37,6 +41,7 @@ function App() {
   const [coins, setCoins] = useState('0');
   const [meals, setMeals] = useState('10');
   const [inventory, setInventory] = useState('');
+  const [notes, setNotes] = useState('');
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -375,6 +380,16 @@ function App() {
                 onClick={() => setNavbarExpanded(false)}
               >
                 {t('navigation.fight')}
+              </a>
+              <a
+                href="#notes"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.notes')}
               </a>
               <div className="position-relative language-selector">
                 <div
@@ -946,7 +961,8 @@ function App() {
           <div className="col-12 col-md-6">
             <section id="inventory" className="section-container mb-4 h-100">
               <div className="section-header">
-                <h2 className="heading section-title">
+                <h2 className="heading section-title d-flex align-items-center gap-2">
+                  <Icon path={mdiBagPersonal} size={1} />
                   {t('sections.inventory')}
                 </h2>
               </div>
@@ -964,7 +980,10 @@ function App() {
           <div className="col-12 col-md-6">
             <section id="map" className="section-container mb-4 h-100">
               <div className="section-header">
-                <h2 className="heading section-title">{t('sections.map')}</h2>
+                <h2 className="heading section-title d-flex align-items-center gap-2">
+                  <Icon path={mdiMap} size={1} />
+                  {t('sections.map')}
+                </h2>
               </div>
               <div className="section-content">{/* Map section */}</div>
             </section>
@@ -974,10 +993,34 @@ function App() {
           <div className="col-12">
             <section id="fight" className="section-container mb-4 h-100">
               <div className="section-header">
-                <h2 className="heading section-title">{t('sections.fight')}</h2>
+                <h2 className="heading section-title d-flex align-items-center gap-2">
+                  <Icon path={mdiSwordCross} size={1} />
+                  {t('sections.fight')}
+                </h2>
               </div>
               <div className="section-content">
                 {/* Fight section - empty for now */}
+              </div>
+            </section>
+          </div>
+        </div>
+        <div className="row gx-4 mb-4">
+          <div className="col-12">
+            <section id="notes" className="section-container mb-4 h-100">
+              <div className="section-header">
+                <h2 className="heading section-title d-flex align-items-center gap-2">
+                  <Icon path={mdiLeadPencil} size={1} />
+                  {t('sections.notes')}
+                </h2>
+              </div>
+              <div className="section-content">
+                <textarea
+                  className="content field-input form-control"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={10}
+                  style={{ resize: 'vertical', minHeight: '200px' }}
+                />
               </div>
             </section>
           </div>

@@ -8,7 +8,8 @@
     "diceRolls": "Lançamentos",
     "inventory": "Inventário",
     "map": "Mapa",
-    "fight": "Combate"
+    "fight": "Combate",
+    "notes": "Notas"
   },
   "sections": {
     "character": "Personagem",
@@ -16,7 +17,8 @@
     "diceRolls": "Lançamentos",
     "inventory": "Inventário",
     "map": "Mapa",
-    "fight": "Combate"
+    "fight": "Combate",
+    "notes": "Notas"
   },
   "fields": {
     "name": "Nome",
@@ -45,5 +47,8 @@
     "randomStats": "Aleatório",
     "lock": "Bloquear",
     "unlock": "Desbloquear"
+  },
+  "inventory": {
+    "label": "Carregas na tua mochila..."
   }
 }
