@@ -4,24 +4,25 @@ A companion website while you play Fight & Fantasy books.
 
 ## Features
 
+- Create your character
+- Track your consumables
+- Perform luck and skill tests
+- Manage your inventory
+- Record your trail
+- Easily fight monsters
+
+And even more advanced features
+
 - Works offline
-- Save/load game state
-- Character sheet management
-- Inventory tracking
-- Dice rolling
-- Combat scenarios
-- Notes section
-- YouTube soundboard
+- Save, load and share savegames
+- 
 
 ## Development
-
-### Prerequisites
-
-- Node.js 18+ and npm
 
 ### Setup
 
 ```bash
+# Ensure you have Node 18+
 npm install
 ```
 
@@ -47,8 +48,4 @@ npm run preview
 
 ## Deployment
 
-This project is automatically deployed to GitHub Pages when changes are pushed to the `main` branch via GitHub Actions.
-
-Make sure to enable GitHub Pages in your repository settings:
-1. Go to Settings → Pages
-2. Source: GitHub Actions
+This project is automatically deployed to GitHub Pages when changes are pushed to the `main` branch via GitHub Actions. [Live here.](https://dialex.github.io/fnf-companion/)

@@ -1407,7 +1407,7 @@ function App() {
           </div>
         </div>
         <div className="row gx-4 mb-4">
-          <div className="col-12 col-md-6">
+          <div className="col-12 col-md-4">
             <section id="inventory" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title d-flex align-items-center gap-2">
@@ -1415,14 +1415,25 @@ function App() {
                   {t('sections.inventory')}
                 </h2>
               </div>
-              <div className="section-content">
-                <div style={{ position: 'relative' }}>
+              <div className="section-content d-flex flex-column">
+                <div
+                  style={{
+                    position: 'relative',
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: 0,
+                  }}
+                >
                   <textarea
                     className="content field-input form-control"
                     value={inventory}
                     onChange={(e) => setInventory(e.target.value)}
-                    rows={10}
-                    style={{ resize: 'vertical', minHeight: '200px' }}
+                    style={{
+                      resize: 'vertical',
+                      height: '100%',
+                      minHeight: '200px',
+                    }}
                   />
                   {fieldBadges.inventory && (
                     <span
@@ -1440,7 +1451,7 @@ function App() {
               </div>
             </section>
           </div>
-          <div className="col-12 col-md-6">
+          <div className="col-12 col-md-8">
             <section id="map" className="section-container mb-4 h-100">
               <div className="section-header">
                 <h2 className="heading section-title d-flex align-items-center gap-2">
