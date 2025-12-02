@@ -398,23 +398,13 @@ function App() {
           resultType = 'heroWins';
           resultMessage = t('fight.attackWin');
           newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
-          fightEnded = checkFightEnd(currentHealth, newMonsterHealth);
-          if (!fightEnded) {
-            shouldShowUseLuck = true;
-          }
         } else {
           resultType = 'monsterWins';
           resultMessage = t('fight.attackLoss');
           newHealth = Math.max(0, currentHealth - 2);
-          fightEnded = checkFightEnd(newHealth, currentMonsterHealth);
         }
 
-        if (fightEnded) {
-          setIsFighting(false);
-          setDiceRollingType(null);
-          return;
-        }
-
+        // Update health values first, before checking if fight ended
         setHeroDiceRolls([heroRoll1, heroRoll2]);
         setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
 
@@ -425,6 +415,20 @@ function App() {
         if (newMonsterHealth !== currentMonsterHealth) {
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-2', 'danger');
+        }
+
+        // Now check if fight ended with the updated health values
+        fightEnded = checkFightEnd(newHealth, newMonsterHealth);
+
+        if (fightEnded) {
+          setIsFighting(false);
+          setDiceRollingType(null);
+          return;
+        }
+
+        // Only show use luck if hero won and fight didn't end
+        if (resultType === 'heroWins') {
+          shouldShowUseLuck = true;
         }
 
         setFightResult({
