@@ -132,7 +132,7 @@ export default function CharacterSection({
         <div className="d-flex justify-content-center gap-2 mt-3">
           <button
             type="button"
-            className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+            className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
             onClick={() => {
               onRandomStats();
             }}
