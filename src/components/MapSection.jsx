@@ -178,9 +178,28 @@ export default function MapSection({
                     : 'secondary'
                 : item.color;
 
+            // Get tooltip text based on color
+            const getTooltipText = (color) => {
+              switch (color) {
+                case 'dark':
+                  return t('trail.died');
+                case 'info':
+                  return t('trail.question');
+                case 'success':
+                  return t('trail.good');
+                case 'danger':
+                  return t('trail.bad');
+                case 'warning':
+                  return t('trail.important');
+                default:
+                  return null;
+              }
+            };
+
             // Determine pill class based on color
             let pillClass = 'badge rounded-pill';
             let customStyle = {};
+            const tooltipText = getTooltipText(color);
 
             if (num === 1) {
               // Number 1 always uses primary-1 (dark blue)
@@ -250,7 +269,12 @@ export default function MapSection({
             }
 
             return (
-              <span key={index} className={pillClass} style={customStyle}>
+              <span
+                key={index}
+                className={pillClass}
+                style={customStyle}
+                title={tooltipText || undefined}
+              >
                 {num}
               </span>
             );
