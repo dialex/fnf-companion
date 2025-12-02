@@ -9,7 +9,12 @@ import {
   mdiHandCoin,
   mdiFoodApple,
   mdiSilverwareForkKnife,
+  mdiDice1,
+  mdiDice2,
   mdiDice3,
+  mdiDice4,
+  mdiDice5,
+  mdiDice6,
   mdiDiceMultiple,
   mdiWebBox,
   mdiChevronDown,
@@ -39,6 +44,8 @@ function App() {
   const [maxHealth, setMaxHealth] = useState(null);
   const [maxLuck, setMaxLuck] = useState(null);
   const [rollingButton, setRollingButton] = useState(null);
+  const [rollDieResult, setRollDieResult] = useState(null);
+  const [rollDiceResults, setRollDiceResults] = useState(null);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -230,56 +237,60 @@ function App() {
                 {t('navigation.fight')}
               </a>
               <div className="position-relative language-selector">
-              <div
-                className="d-flex align-items-center"
-                style={{ cursor: 'pointer', gap: '0.125rem' }}
-                onClick={handleLanguageIconClick}
-              >
-                <Icon path={mdiWebBox} size={1} className="text-white" />
-                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
-              </div>
-              {showLanguageSelect && (
                 <div
-                  className="position-absolute"
-                  style={{
-                    top: '100%',
-                    right: 0,
-                    marginTop: '0.5rem',
-                    minWidth: '120px',
-                    zIndex: 1060,
-                    backgroundColor: 'white',
-                    borderRadius: '0.25rem',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                    overflow: 'hidden',
-                  }}
+                  className="d-flex align-items-center"
+                  style={{ cursor: 'pointer', gap: '0.125rem' }}
+                  onClick={handleLanguageIconClick}
                 >
-                  {getAvailableLanguages().map((lang) => (
-                    <button
-                      key={lang}
-                      type="button"
-                      className="content w-100 text-start border-0 bg-transparent px-3 py-2"
-                      style={{
-                        cursor: 'pointer',
-                        color: '#333',
-                        transition: 'background-color 0.2s',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#f8f9fa';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                      }}
-                      onClick={() => handleLanguageChange(lang)}
-                    >
-                      {lang === 'en'
-                        ? 'English'
-                        : lang === 'pt'
-                          ? 'Português'
-                          : lang.toUpperCase()}
-                    </button>
-                  ))}
+                  <Icon path={mdiWebBox} size={1} className="text-white" />
+                  <Icon
+                    path={mdiChevronDown}
+                    size={0.8}
+                    className="text-white"
+                  />
                 </div>
-              )}
+                {showLanguageSelect && (
+                  <div
+                    className="position-absolute"
+                    style={{
+                      top: '100%',
+                      right: 0,
+                      marginTop: '0.5rem',
+                      minWidth: '120px',
+                      zIndex: 1060,
+                      backgroundColor: 'white',
+                      borderRadius: '0.25rem',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {getAvailableLanguages().map((lang) => (
+                      <button
+                        key={lang}
+                        type="button"
+                        className="content w-100 text-start border-0 bg-transparent px-3 py-2"
+                        style={{
+                          cursor: 'pointer',
+                          color: '#333',
+                          transition: 'background-color 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#f8f9fa';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'transparent';
+                        }}
+                        onClick={() => handleLanguageChange(lang)}
+                      >
+                        {lang === 'en'
+                          ? 'English'
+                          : lang === 'pt'
+                            ? 'Português'
+                            : lang.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </nav>
@@ -512,8 +523,14 @@ function App() {
                       type="button"
                       className="btn btn-light d-flex align-items-center justify-content-center gap-2"
                       onClick={() => {
+                        if (rollingButton !== null) return;
                         setRollingButton('rollDie');
-                        setTimeout(() => setRollingButton(null), 1000);
+                        setTimeout(() => {
+                          const result = Math.floor(Math.random() * 6) + 1;
+                          setRollDieResult(result);
+                          setRollDiceResults(null);
+                          setRollingButton(null);
+                        }, 1000);
                       }}
                       disabled={rollingButton !== null}
                     >
@@ -535,8 +552,15 @@ function App() {
                       type="button"
                       className="btn btn-light d-flex align-items-center justify-content-center gap-2"
                       onClick={() => {
+                        if (rollingButton !== null) return;
                         setRollingButton('rollDice');
-                        setTimeout(() => setRollingButton(null), 1000);
+                        setTimeout(() => {
+                          const result1 = Math.floor(Math.random() * 6) + 1;
+                          const result2 = Math.floor(Math.random() * 6) + 1;
+                          setRollDiceResults([result1, result2]);
+                          setRollDieResult(null);
+                          setRollingButton(null);
+                        }, 1000);
                       }}
                       disabled={rollingButton !== null}
                     >
@@ -555,8 +579,67 @@ function App() {
                       />
                     </button>
                   </div>
-                  <div style={{ minHeight: '100px' }}>
-                    {/* Dice roll results will be displayed here */}
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: '100px' }}
+                  >
+                    {rollDieResult && (
+                      <Icon
+                        path={
+                          rollDieResult === 1
+                            ? mdiDice1
+                            : rollDieResult === 2
+                              ? mdiDice2
+                              : rollDieResult === 3
+                                ? mdiDice3
+                                : rollDieResult === 4
+                                  ? mdiDice4
+                                  : rollDieResult === 5
+                                    ? mdiDice5
+                                    : mdiDice6
+                        }
+                        size={3}
+                        style={{ color: '#007e6e' }}
+                      />
+                    )}
+                    {rollDiceResults && (
+                      <div className="d-flex align-items-center">
+                        <Icon
+                          path={
+                            rollDiceResults[0] === 1
+                              ? mdiDice1
+                              : rollDiceResults[0] === 2
+                                ? mdiDice2
+                                : rollDiceResults[0] === 3
+                                  ? mdiDice3
+                                  : rollDiceResults[0] === 4
+                                    ? mdiDice4
+                                    : rollDiceResults[0] === 5
+                                      ? mdiDice5
+                                      : mdiDice6
+                          }
+                          size={3}
+                          style={{ color: '#007e6e' }}
+                        />
+                        <Icon
+                          path={
+                            rollDiceResults[1] === 1
+                              ? mdiDice1
+                              : rollDiceResults[1] === 2
+                                ? mdiDice2
+                                : rollDiceResults[1] === 3
+                                  ? mdiDice3
+                                  : rollDiceResults[1] === 4
+                                    ? mdiDice4
+                                    : rollDiceResults[1] === 5
+                                      ? mdiDice5
+                                      : mdiDice6
+                          }
+                          size={3}
+                          style={{ color: '#007e6e' }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
