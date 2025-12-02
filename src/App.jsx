@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { t } from './translations';
+import { t, getCurrentLanguage, setLanguage } from './translations';
 import './App.css';
 
 // Components
@@ -13,6 +13,15 @@ import FightSection from './components/FightSection';
 import NotesSection from './components/NotesSection';
 
 function App() {
+  // Language state to trigger re-renders when language changes
+  // Initialize from localStorage via getCurrentLanguage()
+  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
+
+  // Handler to update language and trigger re-render
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    setCurrentLang(lang);
+  };
   // Character state
   const [name, setName] = useState('');
   const [skill, setSkill] = useState('');
@@ -946,7 +955,7 @@ function App() {
 
   return (
     <div className="min-vh-100 bg-beige">
-      <Header />
+      <Header onLanguageChange={handleLanguageChange} />
       <main className="container mx-auto py-4">
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">

@@ -8,13 +8,17 @@ import {
   getAvailableLanguages,
 } from '../translations';
 
-export default function Header() {
+export default function Header({ onLanguageChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
     setShowLanguageSelect(false);
+    // Notify parent component to trigger re-render
+    if (onLanguageChange) {
+      onLanguageChange(lang);
+    }
   };
 
   const handleLanguageIconClick = () => {
@@ -148,11 +152,7 @@ export default function Header() {
                 onClick={handleLanguageIconClick}
               >
                 <Icon path={mdiWebBox} size={1} className="text-white" />
-                <Icon
-                  path={mdiChevronDown}
-                  size={0.8}
-                  className="text-white"
-                />
+                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
               </div>
               {showLanguageSelect && (
                 <div

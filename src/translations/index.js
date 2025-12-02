@@ -6,11 +6,30 @@ const translations = {
   pt: ptTranslations,
 };
 
-let currentLanguage = 'en';
+// Load language from localStorage or default to 'en'
+const getStoredLanguage = () => {
+  try {
+    const stored = localStorage.getItem('fnf-companion-language');
+    if (stored && translations[stored]) {
+      return stored;
+    }
+  } catch (error) {
+    console.warn('Could not read language from localStorage:', error);
+  }
+  return 'en';
+};
+
+let currentLanguage = getStoredLanguage();
 
 export const setLanguage = (lang) => {
   if (translations[lang]) {
     currentLanguage = lang;
+    // Save to localStorage
+    try {
+      localStorage.setItem('fnf-companion-language', lang);
+    } catch (error) {
+      console.warn('Could not save language to localStorage:', error);
+    }
   }
 };
 
