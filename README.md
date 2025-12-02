@@ -11,11 +11,12 @@ A companion website while you play Fight & Fantasy books.
 - Record your trail
 - Easily fight monsters
 
-And even more advanced features
+And even advanced features too:
 
 - Works offline
 - Save, load and share savegames
-- 
+- Soundboard, to make your reading more immersive
+- Works on desktop and mobile, so you can play on the go
 
 ## Development
 
