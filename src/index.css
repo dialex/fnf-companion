@@ -2,19 +2,19 @@
 
 /* Direct override for btn-primary */
 .btn-primary {
-  background-color: #d4a24b !important;
-  border-color: #d4a24b !important;
+  background-color: #1a303f !important;
+  border-color: #1a303f !important;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: #be8e3e !important;
-  border-color: #be8e3e !important;
+  background-color: #152832 !important;
+  border-color: #152832 !important;
 }
 
 .btn-primary:active {
-  background-color: #a97933 !important;
-  border-color: #a97933 !important;
+  background-color: #102025 !important;
+  border-color: #102025 !important;
 }
 
 /* Content font - Caudex, 10% smaller than base */
