@@ -413,10 +413,10 @@ function App() {
     // Start fight animation
     setIsFighting(true);
     setDiceRollingType('fight');
+    // Don't clear dice rolls here - they'll be replaced when new dice are set
+    // This prevents the visual gap between attacks
     setFightResult(null);
     setFightOutcome(null);
-    setHeroDiceRolls(null);
-    setMonsterDiceRolls(null);
     setLuckUsed(false);
 
     // Clear other results
@@ -1641,11 +1641,12 @@ function App() {
                           {t('fight.fight')}
                           <Icon path={mdiSwordCross} size={1} />
                         </button>
-                        {showUseLuck && !luckUsed && (
+                        {showUseLuck && (
                           <button
                             type="button"
                             className="btn btn-secondary d-flex align-items-center gap-2"
                             disabled={
+                              luckUsed ||
                               !luck ||
                               parseInt(luck) <= 0 ||
                               diceRollingType !== null ||
