@@ -78,29 +78,15 @@ function App() {
   }, [showLanguageSelect]);
 
   const handleNumberChange = (setter, value, maxValue) => {
-    // Allow empty string for typing/clearing
-    if (value === '') {
-      setter('');
-      return;
-    }
+    // Just set the value - let the browser handle number input
+    setter(value);
 
-    // For number inputs, the browser handles validation
-    // Just parse and apply constraints
-    const numValue = parseFloat(value);
-
-    // If valid number, apply constraints
-    if (!isNaN(numValue)) {
-      // Apply max constraint if needed
-      const clampedValue =
-        maxValue !== null ? Math.min(numValue, maxValue) : numValue;
-
-      // Ensure non-negative
-      const finalValue = Math.max(0, clampedValue);
-      setter(String(finalValue));
-    } else {
-      // Invalid number - allow it for now (user might be typing)
-      // The browser's number input will handle validation
-      setter(value);
+    // Only apply max constraint if there is one and value is valid
+    if (maxValue !== null && value !== '') {
+      const numValue = parseInt(value);
+      if (!isNaN(numValue) && numValue > maxValue) {
+        setter(String(maxValue));
+      }
     }
   };
 
