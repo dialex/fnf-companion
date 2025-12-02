@@ -1035,7 +1035,6 @@ function App() {
               trailInput={trailInput}
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
-              onTrailTest={handleTrailTest}
               onTrailPillColorChange={handleTrailPillColorChange}
                 />
               </div>

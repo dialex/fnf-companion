@@ -16,7 +16,6 @@ export default function MapSection({
   trailInput,
   onTrailInputChange,
   onTrailSubmit,
-  onTrailTest,
   onTrailPillColorChange,
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
@@ -139,14 +138,6 @@ export default function MapSection({
               <Icon path={mdiPencilPlus} size={1} />
             </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-light btn-sm"
-            onClick={onTrailTest}
-            title="Test: Add 20 random numbers"
-          >
-            {t('trail.test')}
-          </button>
           <div className="btn-group" role="group">
             <button
               type="button"
