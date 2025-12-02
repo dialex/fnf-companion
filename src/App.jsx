@@ -49,6 +49,7 @@ function App() {
   const [testLuckResult, setTestLuckResult] = useState(null);
   const [isTestingLuck, setIsTestingLuck] = useState(false);
   const [diceRollingType, setDiceRollingType] = useState(null);
+  const [fieldBadges, setFieldBadges] = useState({});
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -82,6 +83,22 @@ function App() {
     setter(String(Math.max(0, clampedValue)));
   };
 
+  const showFieldBadge = (fieldName, value, type = 'success') => {
+    const id = Date.now();
+    setFieldBadges((prev) => ({
+      ...prev,
+      [fieldName]: { value, type, id },
+    }));
+    // Clear badge after animation completes
+    setTimeout(() => {
+      setFieldBadges((prev) => {
+        const updated = { ...prev };
+        delete updated[fieldName];
+        return updated;
+      });
+    }, 1500);
+  };
+
   const handleConsumeMeal = () => {
     const currentMeals = parseInt(meals) || 0;
     if (currentMeals > 0) {
@@ -95,11 +112,18 @@ function App() {
       });
 
       setMeals(String(currentMeals - 1));
+      showFieldBadge('meals', '-1', 'danger');
+
       const currentHealth = parseInt(health) || 0;
       const newHealth = currentHealth + 4;
+      const actualIncrease =
+        maxHealth !== null ? Math.min(newHealth, maxHealth) - currentHealth : 4;
       setHealth(
         String(maxHealth !== null ? Math.min(newHealth, maxHealth) : newHealth)
       );
+      if (actualIncrease > 0) {
+        showFieldBadge('health', `+${actualIncrease}`, 'success');
+      }
     }
   };
 
@@ -418,7 +442,7 @@ function App() {
                     />
                   </div>
                 </div>
-                <div className="field-group">
+                <div className="field-group" style={{ position: 'relative' }}>
                   <div className="field-icon">
                     <Icon path={mdiHeart} size={1} />
                   </div>
@@ -442,6 +466,18 @@ function App() {
                       placeholder={t('placeholders.health')}
                     />
                   </div>
+                  {fieldBadges.health && (
+                    <span
+                      className={`badge bg-${
+                        fieldBadges.health.type === 'success'
+                          ? 'success'
+                          : 'danger'
+                      } field-badge`}
+                      key={fieldBadges.health.id}
+                    >
+                      {fieldBadges.health.value}
+                    </span>
+                  )}
                 </div>
                 <div className="field-group">
                   <div className="field-icon">
@@ -535,7 +571,7 @@ function App() {
                     }
                   />
                 </div>
-                <div className="field-group">
+                <div className="field-group" style={{ position: 'relative' }}>
                   <div className="field-icon">
                     <Icon path={mdiFoodApple} size={1} />
                   </div>
@@ -569,6 +605,18 @@ function App() {
                       <Icon path={mdiSilverwareForkKnife} size={1} />
                     </button>
                   </div>
+                  {fieldBadges.meals && (
+                    <span
+                      className={`badge bg-${
+                        fieldBadges.meals.type === 'success'
+                          ? 'success'
+                          : 'danger'
+                      } field-badge`}
+                      key={fieldBadges.meals.id}
+                    >
+                      {fieldBadges.meals.value}
+                    </span>
+                  )}
                 </div>
               </div>
             </section>

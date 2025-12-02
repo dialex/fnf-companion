@@ -147,3 +147,39 @@ header h1.heading {
   display: flex;
   align-items: center;
 }
+
+.field-badge {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  animation: slideInFadeOut 1s ease-out forwards;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+@keyframes slideInFadeOut {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.field-group {
+  position: relative;
+}
