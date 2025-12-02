@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { t, getCurrentLanguage, setLanguage } from './translations';
+import {
+  loadState,
+  saveState,
+  buildStateObject,
+  applyLoadedState,
+  createDebouncedSave,
+} from './utils/stateManager';
 import './App.css';
 
 // Components
@@ -72,187 +79,55 @@ function App() {
   // Field badges
   const [fieldBadges, setFieldBadges] = useState({});
 
-  // LocalStorage management
-  const STORAGE_KEY = 'fnf-companion-state';
-  const DEBOUNCE_DELAY = 2000; // 2 seconds
-  const saveTimeoutRef = useRef(null);
+  // State management
   const isInitialMountRef = useRef(true);
+  const debouncedSaveRef = useRef(
+    createDebouncedSave((state) => {
+      saveState(state);
+    })
+  );
 
-  // Save state to localStorage
-  const saveStateToStorage = (state) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      console.log('State saved to localStorage');
-    } catch (error) {
-      console.warn('Failed to save to localStorage:', error);
-    }
-  };
-
-  // Load state from localStorage
-  const loadStateFromStorage = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch (error) {
-      console.warn('Failed to load from localStorage:', error);
-      return null;
-    }
-  };
-
-  // Debounced save function
-  const debouncedSave = (state) => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    saveTimeoutRef.current = setTimeout(() => {
-      saveStateToStorage(state);
-    }, DEBOUNCE_DELAY);
-  };
-
-  // Collect all state into a single object
-  const getStateToSave = () => {
-    return {
-      metadata: {
-        version: '1.0.0',
-        savedAt: new Date().toISOString(),
-        bookname: '', // Will be added to UI later
-      },
-      character: {
-        name,
-        skill,
-        health,
-        luck,
-        isLocked,
-        maxSkill,
-        maxHealth,
-        maxLuck,
-      },
-      consumables: {
-        coins,
-        meals,
-        transactionObject,
-        transactionCost,
-      },
-      inventory,
-      notes,
-      fight: {
-        monsterSkill,
-        monsterHealth,
-        monsterCreature,
-        graveyard,
-        showUseLuck,
-        luckUsed,
-        isFighting,
-        fightResult,
-        fightOutcome,
-        heroDiceRolls,
-        monsterDiceRolls,
-      },
-      diceRolls: {
-        rollingButton,
-        rollDieResult,
-        rollDiceResults,
-        testLuckResult,
-        isTestingLuck,
-        testSkillResult,
-        diceRollingType,
-      },
-    };
-  };
-
-  // Load state on mount - run FIRST before any other effects
+  // Load state on mount
   useEffect(() => {
-    const savedState = loadStateFromStorage();
-    console.log('Loading state from localStorage:', savedState);
-
+    const savedState = loadState();
     if (savedState) {
-      // Restore character state
-      if (savedState.character) {
-        if (savedState.character.name !== undefined)
-          setName(savedState.character.name);
-        if (savedState.character.skill !== undefined)
-          setSkill(savedState.character.skill);
-        if (savedState.character.health !== undefined)
-          setHealth(savedState.character.health);
-        if (savedState.character.luck !== undefined)
-          setLuck(savedState.character.luck);
-        if (savedState.character.isLocked !== undefined)
-          setIsLocked(savedState.character.isLocked);
-        if (savedState.character.maxSkill !== undefined)
-          setMaxSkill(savedState.character.maxSkill);
-        if (savedState.character.maxHealth !== undefined)
-          setMaxHealth(savedState.character.maxHealth);
-        if (savedState.character.maxLuck !== undefined)
-          setMaxLuck(savedState.character.maxLuck);
-      }
-
-      // Restore consumables
-      if (savedState.consumables) {
-        if (savedState.consumables.coins !== undefined)
-          setCoins(savedState.consumables.coins);
-        if (savedState.consumables.meals !== undefined)
-          setMeals(savedState.consumables.meals);
-        if (savedState.consumables.transactionObject !== undefined)
-          setTransactionObject(savedState.consumables.transactionObject);
-        if (savedState.consumables.transactionCost !== undefined)
-          setTransactionCost(savedState.consumables.transactionCost);
-      }
-
-      // Restore inventory and notes
-      if (savedState.inventory !== undefined)
-        setInventory(savedState.inventory);
-      if (savedState.notes !== undefined) setNotes(savedState.notes);
-
-      // Restore fight state
-      if (savedState.fight) {
-        if (savedState.fight.monsterSkill !== undefined)
-          setMonsterSkill(savedState.fight.monsterSkill);
-        if (savedState.fight.monsterHealth !== undefined)
-          setMonsterHealth(savedState.fight.monsterHealth);
-        if (savedState.fight.monsterCreature !== undefined)
-          setMonsterCreature(savedState.fight.monsterCreature);
-        if (savedState.fight.graveyard !== undefined)
-          setGraveyard(savedState.fight.graveyard);
-        if (savedState.fight.showUseLuck !== undefined)
-          setShowUseLuck(savedState.fight.showUseLuck);
-        if (savedState.fight.luckUsed !== undefined)
-          setLuckUsed(savedState.fight.luckUsed);
-        if (savedState.fight.isFighting !== undefined)
-          setIsFighting(savedState.fight.isFighting);
-        if (savedState.fight.fightResult !== undefined)
-          setFightResult(savedState.fight.fightResult);
-        if (savedState.fight.fightOutcome !== undefined)
-          setFightOutcome(savedState.fight.fightOutcome);
-        if (savedState.fight.heroDiceRolls !== undefined)
-          setHeroDiceRolls(savedState.fight.heroDiceRolls);
-        if (savedState.fight.monsterDiceRolls !== undefined)
-          setMonsterDiceRolls(savedState.fight.monsterDiceRolls);
-      }
-
-      // Restore dice rolls state
-      if (savedState.diceRolls) {
-        if (savedState.diceRolls.rollingButton !== undefined)
-          setRollingButton(savedState.diceRolls.rollingButton);
-        if (savedState.diceRolls.rollDieResult !== undefined)
-          setRollDieResult(savedState.diceRolls.rollDieResult);
-        if (savedState.diceRolls.rollDiceResults !== undefined)
-          setRollDiceResults(savedState.diceRolls.rollDiceResults);
-        if (savedState.diceRolls.testLuckResult !== undefined)
-          setTestLuckResult(savedState.diceRolls.testLuckResult);
-        if (savedState.diceRolls.isTestingLuck !== undefined)
-          setIsTestingLuck(savedState.diceRolls.isTestingLuck);
-        if (savedState.diceRolls.testSkillResult !== undefined)
-          setTestSkillResult(savedState.diceRolls.testSkillResult);
-        if (savedState.diceRolls.diceRollingType !== undefined)
-          setDiceRollingType(savedState.diceRolls.diceRollingType);
-      }
-
-      console.log('State restored from localStorage');
-    } else {
-      console.log('No saved state found in localStorage');
+      applyLoadedState(savedState, {
+        setName,
+        setSkill,
+        setHealth,
+        setLuck,
+        setIsLocked,
+        setMaxSkill,
+        setMaxHealth,
+        setMaxLuck,
+        setCoins,
+        setMeals,
+        setTransactionObject,
+        setTransactionCost,
+        setInventory,
+        setNotes,
+        setMonsterSkill,
+        setMonsterHealth,
+        setMonsterCreature,
+        setGraveyard,
+        setShowUseLuck,
+        setLuckUsed,
+        setIsFighting,
+        setFightResult,
+        setFightOutcome,
+        setHeroDiceRolls,
+        setMonsterDiceRolls,
+        setRollingButton,
+        setRollDieResult,
+        setRollDiceResults,
+        setTestLuckResult,
+        setIsTestingLuck,
+        setTestSkillResult,
+        setDiceRollingType,
+      });
     }
 
-    // Mark initial mount as complete AFTER a small delay to ensure all state setters have run
+    // Mark initial mount as complete after a small delay
     setTimeout(() => {
       isInitialMountRef.current = false;
     }, 100);
@@ -262,69 +137,49 @@ function App() {
   useEffect(() => {
     // Skip save on initial mount
     if (isInitialMountRef.current) {
-      console.log('Skipping save - initial mount');
       return;
     }
 
-    console.log('State changed, preparing to save...');
-    const stateToSave = {
-      metadata: {
-        version: '1.0.0',
-        savedAt: new Date().toISOString(),
-        bookname: '',
-      },
-      character: {
-        name,
-        skill,
-        health,
-        luck,
-        isLocked,
-        maxSkill,
-        maxHealth,
-        maxLuck,
-      },
-      consumables: {
-        coins,
-        meals,
-        transactionObject,
-        transactionCost,
-      },
+    const stateToSave = buildStateObject({
+      name,
+      skill,
+      health,
+      luck,
+      isLocked,
+      maxSkill,
+      maxHealth,
+      maxLuck,
+      coins,
+      meals,
+      transactionObject,
+      transactionCost,
       inventory,
       notes,
-      fight: {
-        monsterSkill,
-        monsterHealth,
-        monsterCreature,
-        graveyard,
-        showUseLuck,
-        luckUsed,
-        isFighting,
-        fightResult,
-        fightOutcome,
-        heroDiceRolls,
-        monsterDiceRolls,
-      },
-      diceRolls: {
-        rollingButton,
-        rollDieResult,
-        rollDiceResults,
-        testLuckResult,
-        isTestingLuck,
-        testSkillResult,
-        diceRollingType,
-      },
-    };
+      monsterSkill,
+      monsterHealth,
+      monsterCreature,
+      graveyard,
+      showUseLuck,
+      luckUsed,
+      isFighting,
+      fightResult,
+      fightOutcome,
+      heroDiceRolls,
+      monsterDiceRolls,
+      rollingButton,
+      rollDieResult,
+      rollDiceResults,
+      testLuckResult,
+      isTestingLuck,
+      testSkillResult,
+      diceRollingType,
+    });
 
-    console.log('Calling debouncedSave with state:', stateToSave);
-    debouncedSave(stateToSave);
+    debouncedSaveRef.current(stateToSave);
 
     // Cleanup: save immediately on unmount
     return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-        // Use the same state object from the effect closure
-        saveStateToStorage(stateToSave);
-      }
+      saveState(stateToSave);
     };
   }, [
     name,

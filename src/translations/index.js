@@ -1,20 +1,19 @@
 import enTranslations from './en.json';
 import ptTranslations from './pt.json';
+import { getFromStorage, saveToStorage } from '../utils/localStorage';
 
 const translations = {
   en: enTranslations,
   pt: ptTranslations,
 };
 
+const LANGUAGE_STORAGE_KEY = 'fnf-companion-language';
+
 // Load language from localStorage or default to 'en'
 const getStoredLanguage = () => {
-  try {
-    const stored = localStorage.getItem('fnf-companion-language');
-    if (stored && translations[stored]) {
-      return stored;
-    }
-  } catch (error) {
-    console.warn('Could not read language from localStorage:', error);
+  const stored = getFromStorage(LANGUAGE_STORAGE_KEY, 'en');
+  if (stored && translations[stored]) {
+    return stored;
   }
   return 'en';
 };
@@ -24,12 +23,7 @@ let currentLanguage = getStoredLanguage();
 export const setLanguage = (lang) => {
   if (translations[lang]) {
     currentLanguage = lang;
-    // Save to localStorage
-    try {
-      localStorage.setItem('fnf-companion-language', lang);
-    } catch (error) {
-      console.warn('Could not save language to localStorage:', error);
-    }
+    saveToStorage(LANGUAGE_STORAGE_KEY, lang);
   }
 };
 
