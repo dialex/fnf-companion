@@ -505,7 +505,7 @@ function App() {
                   </div>
                   {fieldBadges.health && (
                     <span
-                      className={`badge bg-${
+                      className={`badge rounded-pill bg-${
                         fieldBadges.health.type === 'success'
                           ? 'success'
                           : 'danger'
@@ -644,7 +644,7 @@ function App() {
                   </div>
                   {fieldBadges.meals && (
                     <span
-                      className={`badge bg-${
+                      className={`badge rounded-pill bg-${
                         fieldBadges.meals.type === 'success'
                           ? 'success'
                           : 'danger'
