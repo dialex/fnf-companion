@@ -51,8 +51,8 @@ function App() {
   const [inventory, setInventory] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Trail state
-  const [trailSequence, setTrailSequence] = useState([1]);
+  // Trail state - each item is { number: number, color: string }
+  const [trailSequence, setTrailSequence] = useState([{ number: 1, color: 'primary-1' }]);
   const [trailInput, setTrailInput] = useState('');
 
   // Fight state
@@ -264,18 +264,34 @@ function App() {
       return;
     }
 
-    // Add number to sequence
-    setTrailSequence((prev) => [...prev, num]);
+    // Add number to sequence with default color
+    setTrailSequence((prev) => [...prev, { number: num, color: 'secondary' }]);
     // Clear input
     setTrailInput('');
   };
 
   const handleTrailTest = () => {
-    // Generate 20 random numbers between 1 and 400
-    const randomNumbers = Array.from({ length: 20 }, () =>
-      Math.floor(Math.random() * 400) + 1
-    );
+    // Available colors for random selection
+    const colors = ['dark', 'info', 'success', 'danger', 'warning'];
+    // Generate 20 random numbers between 1 and 400 with random colors
+    const randomNumbers = Array.from({ length: 20 }, () => ({
+      number: Math.floor(Math.random() * 400) + 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }));
     setTrailSequence((prev) => [...prev, ...randomNumbers]);
+  };
+
+  const handleTrailPillColorChange = (color) => {
+    setTrailSequence((prev) => {
+      if (prev.length === 0) return prev;
+      const newSequence = [...prev];
+      const lastIndex = newSequence.length - 1;
+      newSequence[lastIndex] = {
+        ...newSequence[lastIndex],
+        color: color,
+      };
+      return newSequence;
+    });
   };
 
   // Character handlers
@@ -407,7 +423,7 @@ function App() {
     setIsTestingLuck(false);
     setTestSkillResult(null);
     setDiceRollingType(null);
-    setTrailSequence([1]);
+    setTrailSequence([{ number: 1, color: 'primary-1' }]);
     setTrailInput('');
   };
 
@@ -1020,6 +1036,7 @@ function App() {
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
               onTrailTest={handleTrailTest}
+              onTrailPillColorChange={handleTrailPillColorChange}
                 />
               </div>
         </div>

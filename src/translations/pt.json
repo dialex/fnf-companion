@@ -28,7 +28,8 @@
     "luck": "Sorte",
     "coins": "Moedas",
     "meals": "Refeições",
-    "potion": "Poção"
+    "potion": "Poção",
+    "chapter": "Capítulo"
   },
   "placeholders": {
     "skill": "1 dado + 6",
@@ -84,5 +85,13 @@
     "battleLost": "Perdeste... Fim da aventura",
     "defeatCreature": "Derrotaste",
     "defeatedBy": "Foste derrotado por"
+  },
+  "trail": {
+    "test": "Testar",
+    "died": "Morreu",
+    "question": "Dúvida",
+    "good": "Bom",
+    "bad": "Mau",
+    "important": "Importante"
   }
 }

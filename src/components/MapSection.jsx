@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
-import { mdiMap, mdiPencilPlus } from '@mdi/js';
+import {
+  mdiMap,
+  mdiPencilPlus,
+  mdiCoffin,
+  mdiMapMarkerCheck,
+  mdiMapMarkerRemoveVariant,
+  mdiMapMarkerStar,
+  mdiMapMarkerQuestion,
+} from '@mdi/js';
 import { t } from '../translations';
 
 export default function MapSection({
@@ -9,11 +17,17 @@ export default function MapSection({
   onTrailInputChange,
   onTrailSubmit,
   onTrailTest,
+  onTrailPillColorChange,
 }) {
+  const [selectedButton, setSelectedButton] = useState(null);
+
   // Ensure sequence always starts with 1
   const displaySequence =
-    trailSequence.length === 0 || trailSequence[0] !== 1
-      ? [1, ...trailSequence.filter((n) => n !== 1)]
+    trailSequence.length === 0 || trailSequence[0]?.number !== 1
+      ? [
+          { number: 1, color: 'primary-1' },
+          ...trailSequence.filter((item) => item.number !== 1),
+        ]
       : trailSequence;
 
   const handleKeyPress = (e) => {
@@ -51,7 +65,9 @@ export default function MapSection({
       <div className="section-content d-flex flex-column align-items-center">
         {/* Input and submit button */}
         <div className="d-flex align-items-center gap-2 mb-4">
-          <label className="content field-label mb-0">Chapter</label>
+          <label className="content field-label mb-0">
+            {t('fields.chapter')}
+          </label>
           <div className="input-group" style={{ flex: 1 }}>
             <input
               type="number"
@@ -88,45 +104,156 @@ export default function MapSection({
             onClick={onTrailTest}
             title="Test: Add 20 random numbers"
           >
-            Test
+            {t('trail.test')}
           </button>
+          <div className="btn-group" role="group">
+            <button
+              type="button"
+              className={`btn btn-dark btn-sm text-white ${selectedButton === 'died' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedButton('died');
+                onTrailPillColorChange('dark');
+              }}
+              title={t('trail.died')}
+            >
+              <Icon path={mdiCoffin} size={1} />
+            </button>
+            <button
+              type="button"
+              className={`btn btn-info btn-sm text-white ${selectedButton === 'question' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedButton('question');
+                onTrailPillColorChange('info');
+              }}
+              title={t('trail.question')}
+            >
+              <Icon path={mdiMapMarkerQuestion} size={1} />
+            </button>
+            <button
+              type="button"
+              className={`btn btn-success btn-sm text-white ${selectedButton === 'good' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedButton('good');
+                onTrailPillColorChange('success');
+              }}
+              title={t('trail.good')}
+            >
+              <Icon path={mdiMapMarkerCheck} size={1} />
+            </button>
+            <button
+              type="button"
+              className={`btn btn-danger btn-sm text-white ${selectedButton === 'bad' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedButton('bad');
+                onTrailPillColorChange('danger');
+              }}
+              title={t('trail.bad')}
+            >
+              <Icon path={mdiMapMarkerRemoveVariant} size={1} />
+            </button>
+            <button
+              type="button"
+              className={`btn btn-warning btn-sm text-white ${selectedButton === 'star' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedButton('star');
+                onTrailPillColorChange('warning');
+              }}
+              title={t('trail.important')}
+            >
+              <Icon path={mdiMapMarkerStar} size={1} />
+            </button>
+          </div>
         </div>
 
         {/* Sequence display */}
         <div className="d-flex flex-wrap justify-content-center gap-2">
-          {displaySequence.map((num, index) => {
+          {displaySequence.map((item, index) => {
+            const num = typeof item === 'number' ? item : item.number;
+            const color =
+              typeof item === 'number'
+                ? num === 1
+                  ? 'primary-1'
+                  : num === 400
+                    ? 'primary-2'
+                    : 'secondary'
+                : item.color;
+
+            // Determine pill class based on color
+            let pillClass = 'badge rounded-pill';
+            let customStyle = {};
+
             if (num === 1) {
-              return (
-                <span
-                  key={index}
-                  className="badge rounded-pill text-white"
-                  style={{
+              // Number 1 always uses primary-1 (dark blue)
+              pillClass += ' text-white';
+              customStyle = {
+                backgroundColor: '#1a303f',
+                borderColor: '#1a303f',
+              };
+            } else if (num === 400) {
+              // Number 400 always uses primary-2 (golden)
+              pillClass += ' text-white';
+              customStyle = {
+                backgroundColor: '#D4A24B',
+                borderColor: '#D4A24B',
+              };
+            } else {
+              // Other numbers use their assigned color
+              switch (color) {
+                case 'primary-1':
+                  pillClass += ' text-white';
+                  customStyle = {
                     backgroundColor: '#1a303f',
                     borderColor: '#1a303f',
-                  }}
-                >
-                  {num}
-                </span>
-              );
-            } else if (num === 400) {
-              return (
-                <span
-                  key={index}
-                  className="badge rounded-pill text-bg-warning"
-                >
-                  {num}
-                </span>
-              );
-            } else {
-              return (
-                <span
-                  key={index}
-                  className="badge rounded-pill text-bg-secondary"
-                >
-                  {num}
-                </span>
-              );
+                  };
+                  break;
+                case 'primary-2':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#D4A24B',
+                    borderColor: '#D4A24B',
+                  };
+                  break;
+                case 'dark':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#495057', // Lighter dark gray
+                    borderColor: '#495057',
+                  };
+                  break;
+                case 'info':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#0dcaf0', // Bootstrap default info
+                    borderColor: '#0dcaf0',
+                  };
+                  break;
+                case 'success':
+                  pillClass += ' text-bg-success';
+                  break;
+                case 'danger':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#dc3545', // Lighter danger red (Bootstrap default)
+                    borderColor: '#dc3545',
+                  };
+                  break;
+                case 'warning':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#ffc107', // Lighter warning yellow
+                    borderColor: '#ffc107',
+                  };
+                  break;
+                default:
+                  pillClass += ' text-bg-secondary';
+              }
             }
+
+            return (
+              <span key={index} className={pillClass} style={customStyle}>
+                {num}
+              </span>
+            );
           })}
         </div>
       </div>

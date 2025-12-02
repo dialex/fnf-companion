@@ -28,7 +28,8 @@
     "luck": "Luck",
     "coins": "Coins",
     "meals": "Meals",
-    "potion": "Potion"
+    "potion": "Potion",
+    "chapter": "Chapter"
   },
   "placeholders": {
     "skill": "1 die + 6",
@@ -84,5 +85,13 @@
     "battleLost": "You lost... Game over",
     "defeatCreature": "Defeated",
     "defeatedBy": "You were defeated by"
+  },
+  "trail": {
+    "test": "Test",
+    "died": "Died",
+    "question": "Question",
+    "good": "Good",
+    "bad": "Bad",
+    "important": "Important"
   }
 }

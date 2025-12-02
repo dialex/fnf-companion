@@ -1,9 +1,15 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-/* Direct override for btn-primary */
+/* Primary color variables */
+:root {
+  --primary-color-1: #1a303f; /* Dark blue */
+  --primary-color-2: #d4a24b; /* Golden */
+}
+
+/* Direct override for btn-primary - uses primary color 1 */
 .btn-primary {
-  background-color: #1a303f !important;
-  border-color: #1a303f !important;
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
 }
 
 .btn-primary:hover,
@@ -15,6 +21,38 @@
 .btn-primary:active {
   background-color: #102025 !important;
   border-color: #102025 !important;
+}
+
+/* Override for secondary color - lighter gray */
+.btn-secondary {
+  background-color: #9ca3af !important;
+  border-color: #9ca3af !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #8b92a0 !important;
+  border-color: #8b92a0 !important;
+}
+
+.btn-secondary:active {
+  background-color: #7a8190 !important;
+  border-color: #7a8190 !important;
+}
+
+.bg-secondary {
+  background-color: #9ca3af !important;
+}
+
+.text-bg-secondary {
+  background-color: #9ca3af !important;
+  color: white !important;
+}
+
+.alert-secondary {
+  background-color: #9ca3af !important;
+  border-color: #9ca3af !important;
+  color: white !important;
 }
 
 /* Content font - Caudex, 10% smaller than base */

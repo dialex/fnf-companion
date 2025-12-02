@@ -58,7 +58,7 @@ export const getDefaultState = () => ({
     testSkillResult: null,
     diceRollingType: null,
   },
-    trailSequence: [1], // Always starts with 1
+    trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
 });
 
 /**
@@ -187,7 +187,7 @@ export const buildStateObject = (stateValues) => {
       testSkillResult: stateValues.testSkillResult ?? null,
       diceRollingType: stateValues.diceRollingType ?? null,
     },
-    trailSequence: stateValues.trailSequence || [1],
+    trailSequence: stateValues.trailSequence || [{ number: 1, color: 'primary-1' }],
   };
 };
 
@@ -279,10 +279,23 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.trailSequence !== undefined) {
     // Ensure sequence always starts with 1
     const sequence = savedState.trailSequence;
-    if (sequence.length === 0 || sequence[0] !== 1) {
-      setters.setTrailSequence([1, ...sequence.filter((n) => n !== 1)]);
+    // Handle migration from old format (just numbers) to new format (objects)
+    const normalizedSequence = sequence.map((item) => {
+      if (typeof item === 'number') {
+        return {
+          number: item,
+          color: item === 1 ? 'primary-1' : item === 400 ? 'primary-2' : 'secondary'
+        };
+      }
+      return item;
+    });
+    if (normalizedSequence.length === 0 || normalizedSequence[0].number !== 1) {
+      setters.setTrailSequence([
+        { number: 1, color: 'primary-1' },
+        ...normalizedSequence.filter((item) => item.number !== 1)
+      ]);
     } else {
-      setters.setTrailSequence(sequence);
+      setters.setTrailSequence(normalizedSequence);
     }
   }
 };
