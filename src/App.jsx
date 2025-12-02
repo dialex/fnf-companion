@@ -182,6 +182,17 @@ function App() {
       // Check if lucky (sum <= luck)
       const isLucky = sum <= currentLuck;
 
+      // Play lucky sound if lucky
+      if (isLucky) {
+        const audio = new Audio(
+          `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
+        );
+        audio.play().catch((error) => {
+          // Silently handle audio play errors (e.g., user hasn't interacted yet)
+          console.warn('Could not play audio:', error);
+        });
+      }
+
       // Set result
       setTestLuckResult({
         roll1,
