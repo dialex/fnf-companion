@@ -31,6 +31,8 @@ export const getDefaultState = () => ({
     meals: '10',
     transactionObject: '',
     transactionCost: '',
+    potionType: '',
+    potionUsed: false,
   },
   inventory: '',
   notes: '',
@@ -155,6 +157,8 @@ export const buildStateObject = (stateValues) => {
       meals: stateValues.meals || '10',
       transactionObject: stateValues.transactionObject || '',
       transactionCost: stateValues.transactionCost || '',
+      potionType: stateValues.potionType || '',
+      potionUsed: stateValues.potionUsed || false,
     },
     inventory: stateValues.inventory || '',
     notes: stateValues.notes || '',
@@ -215,6 +219,8 @@ export const applyLoadedState = (savedState, setters) => {
       setters.setTransactionObject(cons.transactionObject);
     if (cons.transactionCost !== undefined)
       setters.setTransactionCost(cons.transactionCost);
+    if (cons.potionType !== undefined) setters.setPotionType(cons.potionType);
+    if (cons.potionUsed !== undefined) setters.setPotionUsed(cons.potionUsed);
   }
 
   // Restore inventory and notes

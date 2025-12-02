@@ -12,6 +12,7 @@
     "notes": "Notas"
   },
   "sections": {
+    "game": "Jogo",
     "character": "Personagem",
     "consumables": "Consumíveis",
     "diceRolls": "Lançamentos",
@@ -26,7 +27,8 @@
     "health": "Força",
     "luck": "Sorte",
     "coins": "Moedas",
-    "meals": "Refeições"
+    "meals": "Refeições",
+    "potion": "Poção"
   },
   "placeholders": {
     "skill": "1 dado + 6",
@@ -46,7 +48,8 @@
   "buttons": {
     "randomStats": "Aleatório",
     "lock": "Bloquear",
-    "unlock": "Desbloquear"
+    "unlock": "Desbloquear",
+    "reset": "Reiniciar"
   },
   "inventory": {
     "label": "Carregas na tua mochila..."
@@ -55,6 +58,12 @@
     "buy": "Comprar",
     "item": "Item",
     "added": "Comprado"
+  },
+  "potion": {
+    "select": "Escolhe uma",
+    "restoreSkill": "Recuperar perícia",
+    "restoreHealth": "Recuperar força",
+    "restoreLuck": "Recuperar sorte"
   },
   "fight": {
     "graveyard": "Cemitério",

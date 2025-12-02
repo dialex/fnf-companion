@@ -5,16 +5,17 @@
   "navigation": {
     "character": "Character",
     "consumables": "Consumables",
-    "diceRolls": "Dice rolls",
+    "diceRolls": "Rolls",
     "inventory": "Inventory",
     "map": "Trail",
     "fight": "Fight",
     "notes": "Notes"
   },
   "sections": {
+    "game": "Game",
     "character": "Character",
     "consumables": "Consumables",
-    "diceRolls": "Dice rolls",
+    "diceRolls": "Rolls",
     "inventory": "Inventory",
     "map": "Trail",
     "fight": "Fight",
@@ -26,7 +27,8 @@
     "health": "Health",
     "luck": "Luck",
     "coins": "Coins",
-    "meals": "Meals"
+    "meals": "Meals",
+    "potion": "Potion"
   },
   "placeholders": {
     "skill": "1 die + 6",
@@ -46,7 +48,8 @@
   "buttons": {
     "randomStats": "Randomize",
     "lock": "Lock",
-    "unlock": "Unlock"
+    "unlock": "Unlock",
+    "reset": "Reset"
   },
   "inventory": {
     "label": "You carry in your backpack..."
@@ -55,6 +58,12 @@
     "buy": "Buy",
     "item": "Item",
     "added": "Bought"
+  },
+  "potion": {
+    "select": "Select potion",
+    "restoreSkill": "Restore skill",
+    "restoreHealth": "Restore health",
+    "restoreLuck": "Restore luck"
   },
   "fight": {
     "graveyard": "Graveyard",

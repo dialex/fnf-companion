@@ -44,6 +44,8 @@ function App() {
   const [meals, setMeals] = useState('10');
   const [transactionObject, setTransactionObject] = useState('');
   const [transactionCost, setTransactionCost] = useState('');
+  const [potionType, setPotionType] = useState('');
+  const [potionUsed, setPotionUsed] = useState(false);
 
   // Inventory and notes
   const [inventory, setInventory] = useState('');
@@ -104,6 +106,8 @@ function App() {
         setMeals,
         setTransactionObject,
         setTransactionCost,
+        setPotionType,
+        setPotionUsed,
         setInventory,
         setNotes,
         setMonsterSkill,
@@ -153,6 +157,8 @@ function App() {
       meals,
       transactionObject,
       transactionCost,
+      potionType,
+      potionUsed,
       inventory,
       notes,
       monsterSkill,
@@ -194,6 +200,8 @@ function App() {
     meals,
     transactionObject,
     transactionCost,
+    potionType,
+    potionUsed,
     inventory,
     notes,
     monsterSkill,
@@ -308,6 +316,69 @@ function App() {
         showFieldBadge('health', `+${actualIncrease}`, 'success');
       }
     }
+  };
+
+  const handleConsumePotion = () => {
+    if (potionUsed || !potionType || !isLocked) return;
+
+    if (potionType === 'skill' && maxSkill !== null) {
+      setSkill(String(maxSkill));
+      showFieldBadge(
+        'skill',
+        `+${maxSkill - (parseInt(skill) || 0)}`,
+        'success'
+      );
+    } else if (potionType === 'health' && maxHealth !== null) {
+      setHealth(String(maxHealth));
+      showFieldBadge(
+        'health',
+        `+${maxHealth - (parseInt(health) || 0)}`,
+        'success'
+      );
+    } else if (potionType === 'luck' && maxLuck !== null) {
+      setLuck(String(maxLuck));
+      showFieldBadge('luck', `+${maxLuck - (parseInt(luck) || 0)}`, 'success');
+    }
+
+    setPotionUsed(true);
+  };
+
+  const handleReset = () => {
+    // Reset all state to defaults
+    setName('');
+    setSkill('');
+    setHealth('');
+    setLuck('');
+    setIsLocked(false);
+    setMaxSkill(null);
+    setMaxHealth(null);
+    setMaxLuck(null);
+    setCoins('0');
+    setMeals('10');
+    setTransactionObject('');
+    setTransactionCost('');
+    setPotionType('');
+    setPotionUsed(false);
+    setInventory('');
+    setNotes('');
+    setMonsterSkill('');
+    setMonsterHealth('');
+    setMonsterCreature('');
+    setGraveyard('');
+    setShowUseLuck(false);
+    setLuckUsed(false);
+    setIsFighting(false);
+    setFightResult(null);
+    setFightOutcome(null);
+    setHeroDiceRolls(null);
+    setMonsterDiceRolls(null);
+    setRollingButton(null);
+    setRollDieResult(null);
+    setRollDiceResults(null);
+    setTestLuckResult(null);
+    setIsTestingLuck(false);
+    setTestSkillResult(null);
+    setDiceRollingType(null);
   };
 
   const handlePurchase = () => {
@@ -740,6 +811,8 @@ function App() {
           meals,
           transactionObject,
           transactionCost,
+          potionType,
+          potionUsed,
         },
         inventory,
         notes,
@@ -786,6 +859,8 @@ function App() {
     meals,
     transactionObject,
     transactionCost,
+    potionType,
+    potionUsed,
     inventory,
     notes,
     monsterSkill,
@@ -812,6 +887,26 @@ function App() {
     <div className="min-vh-100 bg-beige">
       <Header onLanguageChange={handleLanguageChange} />
       <main className="container mx-auto py-4">
+        <div className="row gx-4 mb-4">
+          <div className="col-12">
+            <section id="game" className="section-container mb-4">
+              <div className="section-header">
+                <h2 className="heading section-title">{t('sections.game')}</h2>
+              </div>
+              <div className="section-content" style={{ minHeight: 'auto' }}>
+                <div className="d-flex justify-content-center">
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={handleReset}
+                  >
+                    {t('buttons.reset')}
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <CharacterSection
@@ -840,15 +935,24 @@ function App() {
               meals={meals}
               health={health}
               maxHealth={maxHealth}
+              skill={skill}
+              maxSkill={maxSkill}
+              luck={luck}
+              maxLuck={maxLuck}
               transactionObject={transactionObject}
               transactionCost={transactionCost}
               fieldBadges={fieldBadges}
+              isLocked={isLocked}
+              potionType={potionType}
+              potionUsed={potionUsed}
               onCoinsChange={setCoins}
               onMealsChange={setMeals}
               onTransactionObjectChange={setTransactionObject}
               onTransactionCostChange={setTransactionCost}
               onConsumeMeal={handleConsumeMeal}
               onPurchase={handlePurchase}
+              onPotionTypeChange={setPotionType}
+              onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
             />
           </div>

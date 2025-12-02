@@ -5,6 +5,9 @@ import {
   mdiFoodApple,
   mdiBagPersonalPlus,
   mdiSilverwareForkKnife,
+  mdiBottleTonicPlus,
+  mdiCup,
+  mdiCupOutline,
 } from '@mdi/js';
 import { t } from '../translations';
 
@@ -13,15 +16,24 @@ export default function ConsumablesSection({
   meals,
   health,
   maxHealth,
+  skill,
+  maxSkill,
+  luck,
+  maxLuck,
   transactionObject,
   transactionCost,
   fieldBadges,
+  isLocked,
+  potionType,
+  potionUsed,
   onCoinsChange,
   onMealsChange,
   onTransactionObjectChange,
   onTransactionCostChange,
   onConsumeMeal,
   onPurchase,
+  onPotionTypeChange,
+  onConsumePotion,
   onNumberChange,
 }) {
   return (
@@ -141,6 +153,53 @@ export default function ConsumablesSection({
             </button>
           </div>
         </div>
+        {isLocked && (
+          <div className="field-group">
+            <div className="field-icon">
+              <Icon path={mdiBottleTonicPlus} size={1} />
+            </div>
+            <label className="content field-label">{t('fields.potion')}</label>
+            <div className="input-group" style={{ flex: 1 }}>
+              <select
+                className="content field-input form-control"
+                value={potionType}
+                onChange={(e) => onPotionTypeChange(e.target.value)}
+                disabled={potionUsed}
+                style={potionUsed ? { textDecoration: 'line-through' } : {}}
+              >
+                <option value="">{t('potion.select')}</option>
+                <option value="skill">{t('potion.restoreSkill')}</option>
+                <option value="health">{t('potion.restoreHealth')}</option>
+                <option value="luck">{t('potion.restoreLuck')}</option>
+              </select>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onConsumePotion}
+                disabled={
+                  !potionType ||
+                  potionUsed ||
+                  (potionType === 'skill' &&
+                    maxSkill !== null &&
+                    parseInt(skill) >= maxSkill) ||
+                  (potionType === 'health' &&
+                    maxHealth !== null &&
+                    parseInt(health) >= maxHealth) ||
+                  (potionType === 'luck' &&
+                    maxLuck !== null &&
+                    parseInt(luck) >= maxLuck)
+                }
+                style={{
+                  minWidth: 'auto',
+                  width: 'auto',
+                  padding: '0.5rem',
+                }}
+              >
+                <Icon path={potionUsed ? mdiCupOutline : mdiCup} size={1} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

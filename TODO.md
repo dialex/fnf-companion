@@ -1,10 +1,4 @@
-- Refactor, each section should have it's own file, and one for the homepage that composes all of them. Each section knows how to display itself and contains its logic
-- Auto-save state to local storage on every change, with debounce
-- Add Game section
-  - Allows to manually save game to file
-  - Display notif when game is saved
-  - Load game from file
-  - Display notif when game is loaded
+- Support restore potions, from v2 of the books
 - Map
   - Number field + Add button or enter
   - Separate buttons: Died ⚰️ + Question 🤷 + Good 🟢 + Bad 🔴 + Star ⭐️
@@ -12,6 +6,11 @@
     - Sequence of numbers are labels →
     - 123 → ⚰️ → ...
     - 123 🟢 → 456 → ...
+- Add Game section
+  - Allows to manually save game to file
+  - Display notif when game is saved
+  - Load game from file
+  - Display notif when game is loaded
 - Soundboard
   - Ambience (will loop)
   - Battle (will loop)
