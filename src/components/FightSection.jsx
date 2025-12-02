@@ -49,16 +49,29 @@ export default function FightSection({
           {t('sections.fight')}
         </h2>
       </div>
-      <div className="section-content">
-        <div className="row gx-4">
-          <div className="col-12 col-md-4 d-flex flex-column">
+      <div className="section-content d-flex flex-column">
+        <div className="row gx-4 flex-grow-1" style={{ minHeight: 0 }}>
+          <div className="col-12 col-md-4 d-flex flex-column" style={{ minHeight: 0 }}>
             <h3 className="heading mb-3">{t('fight.graveyard')}</h3>
-            <textarea
-              className="content field-input form-control flex-grow-1"
-              value={graveyard}
-              readOnly
-              style={{ resize: 'none' }}
-            />
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+              }}
+            >
+              <textarea
+                className="content field-input form-control"
+                value={graveyard}
+                readOnly
+                style={{
+                  resize: 'none',
+                  height: '100%',
+                  minHeight: '200px',
+                }}
+              />
+            </div>
           </div>
           <div className="col-12 col-md-8">
             <div className="row gx-4">
