@@ -78,10 +78,30 @@ function App() {
   }, [showLanguageSelect]);
 
   const handleNumberChange = (setter, value, maxValue) => {
-    const numValue = parseInt(value) || 0;
-    const clampedValue =
-      maxValue !== null ? Math.min(numValue, maxValue) : numValue;
-    setter(String(Math.max(0, clampedValue)));
+    // Allow empty string for typing/clearing
+    if (value === '') {
+      setter('');
+      return;
+    }
+
+    // For number inputs, the browser handles validation
+    // Just parse and apply constraints
+    const numValue = parseFloat(value);
+
+    // If valid number, apply constraints
+    if (!isNaN(numValue)) {
+      // Apply max constraint if needed
+      const clampedValue =
+        maxValue !== null ? Math.min(numValue, maxValue) : numValue;
+
+      // Ensure non-negative
+      const finalValue = Math.max(0, clampedValue);
+      setter(String(finalValue));
+    } else {
+      // Invalid number - allow it for now (user might be typing)
+      // The browser's number input will handle validation
+      setter(value);
+    }
   };
 
   const showFieldBadge = (fieldName, value, type = 'success') => {
