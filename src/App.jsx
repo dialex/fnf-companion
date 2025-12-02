@@ -116,14 +116,14 @@ function App() {
       ...prev,
       [fieldName]: { value, type, id },
     }));
-    // Clear badge after animation completes
+    // Clear badge after animation completes (matches CSS animation duration of 2.2s)
     setTimeout(() => {
       setFieldBadges((prev) => {
         const updated = { ...prev };
         delete updated[fieldName];
         return updated;
       });
-    }, 3000);
+    }, 2200);
   };
 
   const handleConsumeMeal = () => {
