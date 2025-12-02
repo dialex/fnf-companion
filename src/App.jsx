@@ -228,6 +228,7 @@ function App() {
     isTestingLuck,
     testSkillResult,
     diceRollingType,
+    trailSequence,
   ]);
 
   // Utility functions

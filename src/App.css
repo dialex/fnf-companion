@@ -23,6 +23,9 @@
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   scroll-margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .section-header {
@@ -47,6 +50,9 @@
 .section-content {
   padding: 20px;
   min-height: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .field-group {
