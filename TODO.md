@@ -13,6 +13,9 @@
 - Implement logic of roll dice
   - Display result using icons
   - Use primary color
+- Implement fight section
+  - Red vs Green dice
+  - Keep log of monsters beaten (graveyard)
 - Add section for notes
 - Auto-save state to local storage on every change, with debounce
 - Add Game section
