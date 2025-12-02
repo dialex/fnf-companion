@@ -5,7 +5,6 @@ import {
   mdiFoodApple,
   mdiBagPersonalPlus,
   mdiSilverwareForkKnife,
-  mdiHandExtended,
 } from '@mdi/js';
 import { t } from '../translations';
 
@@ -137,9 +136,9 @@ export default function ConsumablesSection({
                 width: 'auto',
                 padding: '0.5rem',
               }}
-                    >
-                      <Icon path={mdiHandExtended} size={1} />
-                    </button>
+            >
+              <Icon path={mdiHandCoin} size={1} />
+            </button>
           </div>
         </div>
       </div>
