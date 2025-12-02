@@ -155,7 +155,7 @@ header h1.heading {
   transform: translateY(-50%);
   z-index: 1000;
   pointer-events: none;
-  animation: slideInFadeOut 1s ease-out forwards;
+  animation: slideInFadeOut 2.2s ease-out forwards;
   font-size: 0.9rem;
   padding: 0.35rem 0.65rem;
   white-space: nowrap;

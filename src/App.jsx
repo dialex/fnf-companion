@@ -51,6 +51,7 @@ function App() {
   const [monsterCreature, setMonsterCreature] = useState('');
   const [graveyard, setGraveyard] = useState('');
   const [showUseLuck, setShowUseLuck] = useState(false);
+  const [luckUsed, setLuckUsed] = useState(false);
   const [isFighting, setIsFighting] = useState(false);
   const [fightResult, setFightResult] = useState(null);
   const [heroDiceRolls, setHeroDiceRolls] = useState(null);
@@ -121,7 +122,7 @@ function App() {
         delete updated[fieldName];
         return updated;
       });
-    }, 1500);
+    }, 3000);
   };
 
   const handleConsumeMeal = () => {
@@ -318,8 +319,244 @@ function App() {
     }, 1000);
   };
 
+  const handleFight = () => {
+    const currentSkill = parseInt(skill) || 0;
+    const currentHealth = parseInt(health) || 0;
+    const currentLuck = parseInt(luck) || 0;
+
+    // Validate all fields are filled
+    if (
+      !currentSkill ||
+      !currentHealth ||
+      !currentLuck ||
+      !monsterCreature.trim() ||
+      !monsterSkill ||
+      !monsterHealth ||
+      parseInt(monsterSkill) <= 0 ||
+      parseInt(monsterHealth) <= 0 ||
+      isFighting ||
+      diceRollingType !== null
+    ) {
+      return;
+    }
+
+    // Start fight animation
+    setIsFighting(true);
+    setDiceRollingType('fight');
+    setFightResult(null);
+    setHeroDiceRolls(null);
+    setMonsterDiceRolls(null);
+    setLuckUsed(false);
+
+    // Clear other results
+    setRollDieResult(null);
+    setRollDiceResults(null);
+    setTestLuckResult(null);
+    setTestSkillResult(null);
+
+    // After animation, roll dice and calculate results
+    setTimeout(() => {
+      // Roll dice for hero and monster
+      const heroRoll1 = Math.floor(Math.random() * 6) + 1;
+      const heroRoll2 = Math.floor(Math.random() * 6) + 1;
+      const heroDiceSum = heroRoll1 + heroRoll2;
+
+      const monsterRoll1 = Math.floor(Math.random() * 6) + 1;
+      const monsterRoll2 = Math.floor(Math.random() * 6) + 1;
+      const monsterDiceSum = monsterRoll1 + monsterRoll2;
+
+      setHeroDiceRolls([heroRoll1, heroRoll2]);
+      setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
+
+      // Calculate totals: dice sum + skill
+      const heroSkill = parseInt(skill) || 0;
+      const monsterSkillValue = parseInt(monsterSkill) || 0;
+      const heroTotal = heroDiceSum + heroSkill;
+      const monsterTotal = monsterDiceSum + monsterSkillValue;
+
+      // Determine result
+      let resultType = '';
+      let resultMessage = '';
+
+      if (heroTotal === monsterTotal) {
+        resultType = 'tie';
+        resultMessage = t('fight.attackTie');
+      } else if (heroTotal > monsterTotal) {
+        resultType = 'heroWins';
+        resultMessage = t('fight.attackWin');
+        // Monster takes 2 damage
+        const currentMonsterHealth = parseInt(monsterHealth) || 0;
+        const newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
+        setMonsterHealth(String(newMonsterHealth));
+        showFieldBadge('monsterHealth', '-2', 'danger');
+      } else {
+        resultType = 'monsterWins';
+        resultMessage = t('fight.attackLoss');
+        // Hero takes 2 damage
+        const currentHealth = parseInt(health) || 0;
+        const newHealth = Math.max(0, currentHealth - 2);
+        setHealth(String(newHealth));
+        showFieldBadge('heroHealth', '-2', 'danger');
+      }
+
+      setFightResult({
+        type: resultType,
+        message: resultMessage,
+        heroTotal,
+        monsterTotal,
+      });
+
+      // Stop animation
+      setIsFighting(false);
+      setDiceRollingType(null);
+      setShowUseLuck(true);
+    }, 1000);
+  };
+
+  const handleUseLuck = () => {
+    const currentLuck = parseInt(luck) || 0;
+    if (
+      currentLuck <= 0 ||
+      diceRollingType !== null ||
+      !fightResult ||
+      luckUsed
+    )
+      return;
+
+    // Start luck test animation
+    setIsTestingLuck(true);
+    setDiceRollingType('useLuck');
+    setTestLuckResult(null);
+    setLuckUsed(true);
+
+    // Clear other results (but keep fight dice visible)
+    setRollDieResult(null);
+    setRollDiceResults(null);
+    setTestSkillResult(null);
+
+    // After animation, roll dice and test luck
+    setTimeout(() => {
+      // Roll two dice
+      const roll1 = Math.floor(Math.random() * 6) + 1;
+      const roll2 = Math.floor(Math.random() * 6) + 1;
+      const sum = roll1 + roll2;
+
+      // Check if lucky (sum <= luck)
+      const isLucky = sum <= currentLuck;
+
+      // Play lucky sound if lucky
+      if (isLucky) {
+        const audio = new Audio(
+          `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
+        );
+        audio.play().catch((error) => {
+          console.warn('Could not play audio:', error);
+        });
+      }
+
+      // Apply effects based on previous fight result
+      const heroWonLastFight = fightResult.type === 'heroWins';
+
+      if (heroWonLastFight) {
+        // Hero won the attack
+        if (isLucky) {
+          // Monster takes 1 extra damage
+          const currentMonsterHealth = parseInt(monsterHealth) || 0;
+          const newMonsterHealth = Math.max(0, currentMonsterHealth - 1);
+          setMonsterHealth(String(newMonsterHealth));
+          showFieldBadge('monsterHealth', '-1', 'danger');
+        } else {
+          // Monster recovers 1 health
+          const currentMonsterHealth = parseInt(monsterHealth) || 0;
+          const newMonsterHealth = currentMonsterHealth + 1;
+          setMonsterHealth(String(newMonsterHealth));
+          showFieldBadge('monsterHealth', '+1', 'success');
+        }
+      } else {
+        // Hero lost the attack (or tied)
+        if (isLucky) {
+          // Hero recovers 1 health
+          const currentHealth = parseInt(health) || 0;
+          const maxHealthValue =
+            maxHealth !== null ? parseInt(maxHealth) : null;
+          const newHealth =
+            maxHealthValue !== null
+              ? Math.min(currentHealth + 1, maxHealthValue)
+              : currentHealth + 1;
+          const actualIncrease = newHealth - currentHealth;
+          setHealth(String(newHealth));
+          if (actualIncrease > 0) {
+            showFieldBadge('heroHealth', '+1', 'success');
+          }
+        } else {
+          // Hero takes 1 extra damage
+          const currentHealth = parseInt(health) || 0;
+          const newHealth = Math.max(0, currentHealth - 1);
+          setHealth(String(newHealth));
+          showFieldBadge('heroHealth', '-1', 'danger');
+        }
+      }
+
+      // Decrease luck by 1
+      const newLuck = Math.max(0, currentLuck - 1);
+      setLuck(String(newLuck));
+
+      // Set result for display
+      setTestLuckResult({
+        roll1,
+        roll2,
+        isLucky,
+      });
+
+      // Stop animation
+      setIsTestingLuck(false);
+      setDiceRollingType(null);
+    }, 1000);
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'default');
+  }, []);
+
+  // Test data generation for development
+  useEffect(() => {
+    // Generate random hero stats if empty
+    if (!skill) {
+      const randomSkill = Math.floor(Math.random() * 6) + 6; // 6-11
+      setSkill(String(randomSkill));
+    }
+    if (!health) {
+      const randomHealth = Math.floor(Math.random() * 6) + 15; // 15-20
+      setHealth(String(randomHealth));
+    }
+    if (!luck) {
+      const randomLuck = Math.floor(Math.random() * 6) + 6; // 6-11
+      setLuck(String(randomLuck));
+    }
+    // Generate random monster data if empty
+    if (!monsterCreature) {
+      const creatureNames = [
+        'Goblin',
+        'Orc',
+        'Troll',
+        'Dragon',
+        'Skeleton',
+        'Zombie',
+        'Demon',
+        'Vampire',
+      ];
+      const randomName =
+        creatureNames[Math.floor(Math.random() * creatureNames.length)];
+      setMonsterCreature(randomName);
+    }
+    if (!monsterSkill) {
+      const randomSkill = Math.floor(Math.random() * 6) + 5; // 5-10
+      setMonsterSkill(String(randomSkill));
+    }
+    if (!monsterHealth) {
+      const randomHealth = Math.floor(Math.random() * 6) + 5; // 5-10
+      setMonsterHealth(String(randomHealth));
+    }
   }, []);
 
   return (
@@ -743,7 +980,7 @@ function App() {
                     <input
                       type="text"
                       className="content field-input form-control"
-                      placeholder={t('transaction.objectPlaceholder')}
+                      placeholder={t('transaction.item')}
                       value={transactionObject}
                       onChange={(e) => setTransactionObject(e.target.value)}
                     />
@@ -1120,141 +1357,364 @@ function App() {
                       style={{ resize: 'none' }}
                     />
                   </div>
-                  <div className="col-12 col-md-4 d-flex flex-column">
-                    <h3 className="heading mb-3">{t('fight.hero')}</h3>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiClover} size={1} />
+                  <div className="col-12 col-md-8">
+                    <div className="row gx-4">
+                      <div className="col-12 col-md-6 d-flex flex-column">
+                        <h3 className="heading mb-3">{t('fight.hero')}</h3>
+                        <div className="field-group">
+                          <div className="field-icon">
+                            <Icon path={mdiClover} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fields.luck')}
+                          </label>
+                          <input
+                            type="number"
+                            className="content field-input form-control"
+                            value={luck || ''}
+                            readOnly
+                            disabled
+                          />
+                        </div>
+                        <div className="field-group">
+                          <div className="field-icon">
+                            <Icon path={mdiSword} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fields.skill')}
+                          </label>
+                          <input
+                            type="number"
+                            className="content field-input form-control"
+                            value={skill || ''}
+                            readOnly
+                            disabled
+                          />
+                        </div>
+                        <div
+                          className="field-group"
+                          style={{ position: 'relative' }}
+                        >
+                          <div className="field-icon">
+                            <Icon path={mdiHeart} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fields.health')}
+                          </label>
+                          <input
+                            type="number"
+                            className="content field-input form-control"
+                            value={health || ''}
+                            readOnly
+                            disabled
+                          />
+                          {fieldBadges.heroHealth && (
+                            <span
+                              className={`badge rounded-pill bg-${
+                                fieldBadges.heroHealth.type === 'success'
+                                  ? 'success'
+                                  : 'danger'
+                              } field-badge`}
+                              key={fieldBadges.heroHealth.id}
+                            >
+                              {fieldBadges.heroHealth.value}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <label className="content field-label">
-                        {t('fields.luck')}
-                      </label>
-                      <input
-                        type="number"
-                        className="content field-input form-control"
-                        value={luck || ''}
-                        readOnly
-                        disabled
-                      />
-                    </div>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiSword} size={1} />
+                      <div className="col-12 col-md-6 d-flex flex-column">
+                        <h3 className="heading mb-3">{t('fight.monster')}</h3>
+                        <div className="field-group">
+                          <div className="field-icon">
+                            <Icon path={mdiSnake} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fight.creature')}
+                          </label>
+                          <input
+                            type="text"
+                            className="content field-input form-control"
+                            placeholder={t('fight.creaturePlaceholder')}
+                            value={monsterCreature}
+                            onChange={(e) => setMonsterCreature(e.target.value)}
+                          />
+                        </div>
+                        <div className="field-group">
+                          <div className="field-icon">
+                            <Icon path={mdiSword} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fields.skill')}
+                          </label>
+                          <input
+                            type="number"
+                            className="content field-input form-control"
+                            min="0"
+                            value={monsterSkill}
+                            onChange={(e) =>
+                              handleNumberChange(
+                                setMonsterSkill,
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                        <div
+                          className="field-group"
+                          style={{ position: 'relative' }}
+                        >
+                          <div className="field-icon">
+                            <Icon path={mdiHeart} size={1} />
+                          </div>
+                          <label className="content field-label">
+                            {t('fields.health')}
+                          </label>
+                          <input
+                            type="number"
+                            className="content field-input form-control"
+                            min="0"
+                            value={monsterHealth}
+                            onChange={(e) =>
+                              handleNumberChange(
+                                setMonsterHealth,
+                                e.target.value
+                              )
+                            }
+                          />
+                          {fieldBadges.monsterHealth && (
+                            <span
+                              className={`badge rounded-pill bg-${
+                                fieldBadges.monsterHealth.type === 'success'
+                                  ? 'success'
+                                  : 'danger'
+                              } field-badge`}
+                              key={fieldBadges.monsterHealth.id}
+                            >
+                              {fieldBadges.monsterHealth.value}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <label className="content field-label">
-                        {t('fields.skill')}
-                      </label>
-                      <input
-                        type="number"
-                        className="content field-input form-control"
-                        value={skill || ''}
-                        readOnly
-                        disabled
-                      />
                     </div>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiHeart} size={1} />
+                    <div className="row gx-4 mt-3">
+                      <div className="col-12 d-flex gap-2 justify-content-center">
+                        <button
+                          type="button"
+                          className="btn btn-primary d-flex align-items-center gap-2"
+                          disabled={
+                            !monsterCreature.trim() ||
+                            !monsterSkill ||
+                            !monsterHealth ||
+                            parseInt(monsterSkill) <= 0 ||
+                            parseInt(monsterHealth) <= 0 ||
+                            !skill ||
+                            !health ||
+                            !luck ||
+                            parseInt(skill) <= 0 ||
+                            parseInt(health) <= 0 ||
+                            parseInt(luck) <= 0 ||
+                            isFighting ||
+                            diceRollingType !== null
+                          }
+                          onClick={handleFight}
+                        >
+                          {t('fight.fight')}
+                          <Icon path={mdiSwordCross} size={1} />
+                        </button>
+                        {showUseLuck && !luckUsed && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary d-flex align-items-center gap-2"
+                            disabled={
+                              !luck ||
+                              parseInt(luck) <= 0 ||
+                              diceRollingType !== null ||
+                              isTestingLuck
+                            }
+                            onClick={handleUseLuck}
+                          >
+                            {t('fight.useLuck')}
+                            <Icon path={mdiClover} size={1} />
+                          </button>
+                        )}
                       </div>
-                      <label className="content field-label">
-                        {t('fields.health')}
-                      </label>
-                      <input
-                        type="number"
-                        className="content field-input form-control"
-                        value={health || ''}
-                        readOnly
-                        disabled
-                      />
                     </div>
-                  </div>
-                  <div className="col-12 col-md-4 d-flex flex-column">
-                    <h3 className="heading mb-3">{t('fight.monster')}</h3>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiSnake} size={1} />
+                    <div className="row gx-4 mt-3">
+                      <div className="col-12 col-md-6">
+                        <div
+                          className="d-flex justify-content-center align-items-center"
+                          style={{ minHeight: '80px' }}
+                        >
+                          {diceRollingType === 'fight' && (
+                            <div className="d-flex align-items-center gap-2">
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#007e6e',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#007e6e',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                            </div>
+                          )}
+                          {diceRollingType === 'useLuck' && (
+                            <div className="d-flex align-items-center gap-2">
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#007e6e',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#007e6e',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                            </div>
+                          )}
+                          {testLuckResult &&
+                            diceRollingType === null &&
+                            !isTestingLuck && (
+                              <div className="d-flex align-items-center gap-2">
+                                <Icon
+                                  path={getDiceIcon(testLuckResult.roll1)}
+                                  size={3}
+                                  style={{ color: '#007e6e' }}
+                                />
+                                <Icon
+                                  path={getDiceIcon(testLuckResult.roll2)}
+                                  size={3}
+                                  style={{ color: '#007e6e' }}
+                                />
+                              </div>
+                            )}
+                          {heroDiceRolls &&
+                            diceRollingType === null &&
+                            !isTestingLuck &&
+                            !testLuckResult && (
+                              <div className="d-flex align-items-center gap-2">
+                                <Icon
+                                  path={getDiceIcon(heroDiceRolls[0])}
+                                  size={3}
+                                  style={{ color: '#007e6e' }}
+                                />
+                                <Icon
+                                  path={getDiceIcon(heroDiceRolls[1])}
+                                  size={3}
+                                  style={{ color: '#007e6e' }}
+                                />
+                              </div>
+                            )}
+                        </div>
                       </div>
-                      <label className="content field-label">
-                        {t('fight.creature')}
-                      </label>
-                      <input
-                        type="text"
-                        className="content field-input form-control"
-                        placeholder={t('fight.creaturePlaceholder')}
-                        value={monsterCreature}
-                        onChange={(e) => setMonsterCreature(e.target.value)}
-                      />
-                    </div>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiSword} size={1} />
+                      <div className="col-12 col-md-6">
+                        <div
+                          className="d-flex justify-content-center align-items-center"
+                          style={{ minHeight: '80px' }}
+                        >
+                          {diceRollingType === 'fight' && (
+                            <div className="d-flex align-items-center gap-2">
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#7e000f',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                              <Icon
+                                path={mdiDice3}
+                                size={3}
+                                className="dice-rolling"
+                                style={{
+                                  color: '#7e000f',
+                                  animationDuration: '0.3s',
+                                }}
+                              />
+                            </div>
+                          )}
+                          {monsterDiceRolls &&
+                            diceRollingType === null &&
+                            !isTestingLuck && (
+                              <div className="d-flex align-items-center gap-2">
+                                <Icon
+                                  path={getDiceIcon(monsterDiceRolls[0])}
+                                  size={3}
+                                  style={{ color: '#7e000f' }}
+                                />
+                                <Icon
+                                  path={getDiceIcon(monsterDiceRolls[1])}
+                                  size={3}
+                                  style={{ color: '#7e000f' }}
+                                />
+                              </div>
+                            )}
+                        </div>
                       </div>
-                      <label className="content field-label">
-                        {t('fields.skill')}
-                      </label>
-                      <input
-                        type="number"
-                        className="content field-input form-control"
-                        min="0"
-                        value={monsterSkill}
-                        onChange={(e) =>
-                          handleNumberChange(setMonsterSkill, e.target.value)
-                        }
-                      />
                     </div>
-                    <div className="field-group">
-                      <div className="field-icon">
-                        <Icon path={mdiHeart} size={1} />
+                    {testLuckResult &&
+                      diceRollingType === null &&
+                      !isTestingLuck &&
+                      fightResult && (
+                        <div className="row gx-4 mt-3">
+                          <div className="col-12">
+                            <div
+                              className={`alert content ${
+                                testLuckResult.isLucky
+                                  ? 'alert-success'
+                                  : 'alert-danger'
+                              } mb-0 text-center`}
+                              role="alert"
+                            >
+                              {testLuckResult.isLucky
+                                ? t('dice.youWereLucky')
+                                : t('dice.youWereUnlucky')}{' '}
+                              {fightResult.type === 'heroWins'
+                                ? testLuckResult.isLucky
+                                  ? t('fight.attackWinLucky')
+                                  : t('fight.attackWinUnlucky')
+                                : testLuckResult.isLucky
+                                  ? t('fight.attackLossLucky')
+                                  : t('fight.attackLossUnlucky')}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    {fightResult && (
+                      <div className="row gx-4 mt-3">
+                        <div className="col-12">
+                          <div
+                            className={`alert content ${
+                              fightResult.type === 'tie'
+                                ? 'alert-secondary'
+                                : fightResult.type === 'heroWins'
+                                  ? 'alert-success'
+                                  : 'alert-danger'
+                            } mb-0 text-center`}
+                            role="alert"
+                          >
+                            {fightResult.message}
+                          </div>
+                        </div>
                       </div>
-                      <label className="content field-label">
-                        {t('fields.health')}
-                      </label>
-                      <input
-                        type="number"
-                        className="content field-input form-control"
-                        min="0"
-                        value={monsterHealth}
-                        onChange={(e) =>
-                          handleNumberChange(setMonsterHealth, e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="row gx-4 mt-3">
-                  <div className="col-md-8 offset-md-4 d-flex gap-2 justify-content-center">
-                    <button
-                      type="button"
-                      className="btn btn-primary d-flex align-items-center gap-2"
-                      disabled={
-                        !monsterCreature.trim() ||
-                        !monsterSkill ||
-                        !monsterHealth ||
-                        parseInt(monsterSkill) <= 0 ||
-                        parseInt(monsterHealth) <= 0
-                      }
-                      onClick={() => {
-                        // TODO: Implement fight logic
-                        setShowUseLuck(true);
-                      }}
-                    >
-                      {t('fight.fight')}
-                      <Icon path={mdiSwordCross} size={1} />
-                    </button>
-                    {showUseLuck && (
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        disabled={
-                          !monsterCreature.trim() ||
-                          !monsterSkill ||
-                          !monsterHealth ||
-                          parseInt(monsterSkill) <= 0 ||
-                          parseInt(monsterHealth) <= 0
-                        }
-                      >
-                        {t('fight.useLuck')}
-                      </button>
                     )}
                   </div>
                 </div>

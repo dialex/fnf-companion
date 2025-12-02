@@ -53,7 +53,7 @@
   },
   "transaction": {
     "buy": "Buy",
-    "objectPlaceholder": "Object",
+    "item": "Item",
     "added": "Bought"
   },
   "fight": {
@@ -63,6 +63,13 @@
     "creature": "Creature",
     "creaturePlaceholder": "Name",
     "fight": "Fight",
-    "useLuck": "Use luck"
+    "useLuck": "Use luck",
+    "attackTie": "It's a tie, nothing happens",
+    "attackWin": "You hit the monster!",
+    "attackLoss": "The monster hurts you!",
+    "attackWinLucky": "You deal extra damage",
+    "attackWinUnlucky": "The monster recovers",
+    "attackLossLucky": "You recover health",
+    "attackLossUnlucky": "You take extra damage"
   }
 }

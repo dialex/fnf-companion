@@ -53,7 +53,7 @@
   },
   "transaction": {
     "buy": "Comprar",
-    "objectPlaceholder": "Objeto",
+    "item": "Item",
     "added": "Comprado"
   },
   "fight": {
@@ -63,6 +63,13 @@
     "creature": "Criatura",
     "creaturePlaceholder": "Nome",
     "fight": "Combater",
-    "useLuck": "Usar sorte"
+    "useLuck": "Usar sorte",
+    "attackTie": "Empate, nada acontece",
+    "attackWin": "Atacaste o monstro!",
+    "attackLoss": "Foste ferido pelo monstro!",
+    "attackWinLucky": "Causas dano extra",
+    "attackWinUnlucky": "O monstro recupera",
+    "attackLossLucky": "Recuperas força",
+    "attackLossUnlucky": "Sofres dano extra"
   }
 }
