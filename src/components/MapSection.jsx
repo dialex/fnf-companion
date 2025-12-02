@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiMap,
@@ -20,6 +20,7 @@ export default function MapSection({
   onTrailPillColorChange,
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
+  const pillRefs = useRef({});
 
   // Ensure sequence always starts with 1
   const displaySequence =
@@ -29,6 +30,46 @@ export default function MapSection({
           ...trailSequence.filter((item) => item.number !== 1),
         ]
       : trailSequence;
+
+  // Initialize Bootstrap tooltips
+  useEffect(() => {
+    // Dynamically import Bootstrap's Tooltip
+    import('bootstrap').then((bootstrap) => {
+      const { Tooltip } = bootstrap;
+
+      // Initialize tooltips for all pills
+      Object.entries(pillRefs.current).forEach(([key, element]) => {
+        if (element) {
+          // Dispose existing tooltip if it exists
+          const existingTooltip = bootstrap.Tooltip.getInstance(element);
+          if (existingTooltip) {
+            existingTooltip.dispose();
+          }
+
+          // Create new tooltip
+          new Tooltip(element, {
+            placement: 'top',
+            trigger: 'hover focus',
+            html: false,
+          });
+        }
+      });
+    });
+
+    // Cleanup function
+    return () => {
+      import('bootstrap').then((bootstrap) => {
+        Object.values(pillRefs.current).forEach((element) => {
+          if (element) {
+            const tooltip = bootstrap.Tooltip.getInstance(element);
+            if (tooltip) {
+              tooltip.dispose();
+            }
+          }
+        });
+      });
+    };
+  }, [displaySequence]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -179,7 +220,7 @@ export default function MapSection({
                 : item.color;
 
             // Get tooltip text based on color
-            const getTooltipText = (color) => {
+            const getTooltipText = (color, number) => {
               switch (color) {
                 case 'dark':
                   return t('trail.died');
@@ -192,14 +233,14 @@ export default function MapSection({
                 case 'warning':
                   return t('trail.important');
                 default:
-                  return null;
+                  return String(number);
               }
             };
 
             // Determine pill class based on color
             let pillClass = 'badge rounded-pill';
             let customStyle = {};
-            const tooltipText = getTooltipText(color);
+            const tooltipText = getTooltipText(color, num);
 
             if (num === 1) {
               // Number 1 always uses primary-1 (dark blue)
@@ -268,12 +309,21 @@ export default function MapSection({
               }
             }
 
+            const pillId = `trail-pill-${index}`;
             return (
               <span
                 key={index}
+                id={pillId}
+                ref={(el) => {
+                  pillRefs.current[pillId] = el;
+                }}
                 className={pillClass}
                 style={customStyle}
-                title={tooltipText || undefined}
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-title={tooltipText || String(num)}
+                role="button"
+                tabIndex={0}
               >
                 {num}
               </span>
