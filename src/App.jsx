@@ -592,6 +592,14 @@ function App() {
                     type="button"
                     className="btn btn-light d-flex align-items-center justify-content-center gap-2"
                     onClick={handleToggleLock}
+                    disabled={
+                      !skill ||
+                      !health ||
+                      !luck ||
+                      parseInt(skill) <= 0 ||
+                      parseInt(health) <= 0 ||
+                      parseInt(luck) <= 0
+                    }
                   >
                     {isLocked ? t('buttons.unlock') : t('buttons.lock')}
                     <Icon
