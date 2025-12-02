@@ -183,3 +183,64 @@ header h1.heading {
 .field-group {
   position: relative;
 }
+
+.notes-handwritten,
+textarea.field-input.notes-handwritten {
+  font-family: 'Caveat', cursive !important;
+  font-size: 1.6rem !important; /* 50% bigger than base 1.25rem */
+  font-weight: 600 !important; /* semi-bold */
+  line-height: 1.2 !important; /* tighter line spacing */
+}
+
+/* Transaction cost input - single digit, centered, no spinner */
+.transaction-cost-input {
+  width: 3rem !important;
+  flex: 0 0 3rem !important;
+  text-align: center;
+  padding: 0.5rem 0.25rem !important;
+}
+
+/* Remove spinner arrows from number input */
+.transaction-cost-input::-webkit-outer-spin-button,
+.transaction-cost-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.transaction-cost-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Inventory badge - top right corner */
+.inventory-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1000;
+  pointer-events: none;
+  animation: slideInFadeOutInventory 1s ease-out forwards;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+@keyframes slideInFadeOutInventory {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}

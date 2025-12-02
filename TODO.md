@@ -1,7 +1,3 @@
-- Section consumables
-  - Text field for item + Number field for cost + Button to Buy
-  - When clicked, adds item to Inventory (adds to bottom) and subtracts cost from gold
-  - If gold is not enough Buy is disabled
 - Implement fight section
   - Red vs Green dice
   - Keep log of monsters beaten (graveyard)

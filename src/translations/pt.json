@@ -50,5 +50,10 @@
   },
   "inventory": {
     "label": "Carregas na tua mochila..."
+  },
+  "transaction": {
+    "buy": "Comprar",
+    "objectPlaceholder": "Objeto",
+    "added": "Comprado"
   }
 }

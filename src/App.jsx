@@ -7,7 +7,9 @@ import {
   mdiAccount,
   mdiClover,
   mdiHandCoin,
+  mdiHandExtended,
   mdiFoodApple,
+  mdiBagPersonalPlus,
   mdiSilverwareForkKnife,
   mdiDice1,
   mdiDice2,
@@ -41,6 +43,8 @@ function App() {
   const [coins, setCoins] = useState('0');
   const [meals, setMeals] = useState('10');
   const [inventory, setInventory] = useState('');
+  const [transactionObject, setTransactionObject] = useState('');
+  const [transactionCost, setTransactionCost] = useState('');
   const [notes, setNotes] = useState('');
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
@@ -136,6 +140,29 @@ function App() {
       if (actualIncrease > 0) {
         showFieldBadge('health', `+${actualIncrease}`, 'success');
       }
+    }
+  };
+
+  const handlePurchase = () => {
+    const objectName = transactionObject.trim();
+    const cost = parseInt(transactionCost) || 0;
+    const currentCoins = parseInt(coins) || 0;
+
+    if (objectName && cost > 0 && currentCoins >= cost) {
+      // Update coins
+      const newCoins = Math.max(0, currentCoins - cost);
+      setCoins(String(newCoins));
+      showFieldBadge('coins', `-${cost}`, 'danger');
+
+      // Append to inventory
+      const currentInventory = inventory.trim();
+      const separator = currentInventory ? '\n' : '';
+      setInventory(`${currentInventory}${separator}${objectName}`);
+      showFieldBadge('inventory', t('transaction.added'), 'success');
+
+      // Clear transaction fields
+      setTransactionObject('');
+      setTransactionCost('');
     }
   };
 
@@ -620,7 +647,7 @@ function App() {
                 </h2>
               </div>
               <div className="section-content">
-                <div className="field-group">
+                <div className="field-group" style={{ position: 'relative' }}>
                   <div className="field-icon">
                     <Icon path={mdiHandCoin} size={1} />
                   </div>
@@ -636,6 +663,18 @@ function App() {
                       handleNumberChange(setCoins, e.target.value)
                     }
                   />
+                  {fieldBadges.coins && (
+                    <span
+                      className={`badge rounded-pill bg-${
+                        fieldBadges.coins.type === 'success'
+                          ? 'success'
+                          : 'danger'
+                      } field-badge`}
+                      key={fieldBadges.coins.id}
+                    >
+                      {fieldBadges.coins.value}
+                    </span>
+                  )}
                 </div>
                 <div className="field-group" style={{ position: 'relative' }}>
                   <div className="field-icon">
@@ -683,6 +722,55 @@ function App() {
                       {fieldBadges.meals.value}
                     </span>
                   )}
+                </div>
+                <div className="field-group">
+                  <div className="field-icon">
+                    <Icon path={mdiBagPersonalPlus} size={1} />
+                  </div>
+                  <label className="content field-label">
+                    {t('transaction.buy')}
+                  </label>
+                  <div className="input-group" style={{ flex: 1 }}>
+                    <input
+                      type="text"
+                      className="content field-input form-control"
+                      placeholder={t('transaction.objectPlaceholder')}
+                      value={transactionObject}
+                      onChange={(e) => setTransactionObject(e.target.value)}
+                    />
+                    <input
+                      type="number"
+                      className="content field-input form-control transaction-cost-input"
+                      min="0"
+                      max="9"
+                      placeholder="0"
+                      value={transactionCost}
+                      onChange={(e) => setTransactionCost(e.target.value)}
+                      onFocus={(e) => {
+                        if (e.target.value === '0') {
+                          setTransactionCost('');
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handlePurchase}
+                      disabled={
+                        !transactionObject.trim() ||
+                        !transactionCost ||
+                        parseInt(transactionCost) <= 0 ||
+                        parseInt(coins) < parseInt(transactionCost)
+                      }
+                      style={{
+                        minWidth: 'auto',
+                        width: 'auto',
+                        padding: '0.5rem',
+                      }}
+                    >
+                      <Icon path={mdiHandCoin} size={1} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -967,13 +1055,27 @@ function App() {
                 </h2>
               </div>
               <div className="section-content">
-                <textarea
-                  className="content field-input form-control"
-                  value={inventory}
-                  onChange={(e) => setInventory(e.target.value)}
-                  rows={10}
-                  style={{ resize: 'vertical', minHeight: '200px' }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <textarea
+                    className="content field-input form-control"
+                    value={inventory}
+                    onChange={(e) => setInventory(e.target.value)}
+                    rows={10}
+                    style={{ resize: 'vertical', minHeight: '200px' }}
+                  />
+                  {fieldBadges.inventory && (
+                    <span
+                      className={`badge rounded-pill bg-${
+                        fieldBadges.inventory.type === 'success'
+                          ? 'success'
+                          : 'danger'
+                      } inventory-badge`}
+                      key={fieldBadges.inventory.id}
+                    >
+                      {fieldBadges.inventory.value}
+                    </span>
+                  )}
+                </div>
               </div>
             </section>
           </div>
@@ -1015,7 +1117,7 @@ function App() {
               </div>
               <div className="section-content">
                 <textarea
-                  className="content field-input form-control"
+                  className="content field-input form-control notes-handwritten"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={10}

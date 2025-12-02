@@ -50,5 +50,10 @@
   },
   "inventory": {
     "label": "You carry in your backpack..."
+  },
+  "transaction": {
+    "buy": "Buy",
+    "objectPlaceholder": "Object",
+    "added": "Bought"
   }
 }
