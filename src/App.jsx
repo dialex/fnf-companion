@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiBookAccount,
@@ -70,6 +70,9 @@ function App() {
   const [isTestingLuck, setIsTestingLuck] = useState(false);
   const [testSkillResult, setTestSkillResult] = useState(null);
   const [diceRollingType, setDiceRollingType] = useState(null);
+  const fightAnimationIdRef = useRef(null);
+  const fightTimeoutRef = useRef(null);
+  const safetyTimeoutRef = useRef(null);
   const [fieldBadges, setFieldBadges] = useState({});
 
   const handleLanguageChange = (lang) => {
@@ -410,7 +413,19 @@ function App() {
       return;
     }
 
+    // Clear any existing timeouts from previous fights
+    if (fightTimeoutRef.current) {
+      clearTimeout(fightTimeoutRef.current);
+      fightTimeoutRef.current = null;
+    }
+    if (safetyTimeoutRef.current) {
+      clearTimeout(safetyTimeoutRef.current);
+      safetyTimeoutRef.current = null;
+    }
+
     // Start fight animation
+    const animationId = Date.now();
+    fightAnimationIdRef.current = animationId;
     setIsFighting(true);
     setDiceRollingType('fight');
     // Don't clear dice rolls here - they'll be replaced when new dice are set
@@ -426,7 +441,12 @@ function App() {
     setTestSkillResult(null);
 
     // After animation, roll dice and calculate results
-    const fightTimeout = setTimeout(() => {
+    fightTimeoutRef.current = setTimeout(() => {
+      // Check if this animation is still valid (not replaced by a new one)
+      if (fightAnimationIdRef.current !== animationId) {
+        return;
+      }
+
       try {
         // Roll dice for hero and monster
         const heroRoll1 = Math.floor(Math.random() * 6) + 1;
@@ -437,20 +457,22 @@ function App() {
         const monsterRoll2 = Math.floor(Math.random() * 6) + 1;
         const monsterDiceSum = monsterRoll1 + monsterRoll2;
 
-        setHeroDiceRolls([heroRoll1, heroRoll2]);
-        setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
-
         // Calculate totals: dice sum + skill
         const heroSkill = parseInt(skill) || 0;
         const monsterSkillValue = parseInt(monsterSkill) || 0;
         const heroTotal = heroDiceSum + heroSkill;
         const monsterTotal = monsterDiceSum + monsterSkillValue;
 
-        // Determine result
-        let resultType = '';
-        let resultMessage = '';
         const currentHealth = parseInt(health) || 0;
         const currentMonsterHealth = parseInt(monsterHealth) || 0;
+
+        // Calculate all results first without updating state to avoid interrupting animation
+        let resultType = '';
+        let resultMessage = '';
+        let newHealth = currentHealth;
+        let newMonsterHealth = currentMonsterHealth;
+        let shouldShowUseLuck = false;
+        let fightEnded = false;
 
         if (heroTotal === monsterTotal) {
           resultType = 'tie';
@@ -459,35 +481,39 @@ function App() {
           resultType = 'heroWins';
           resultMessage = t('fight.attackWin');
           // Monster takes 2 damage
-          const newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
-          setMonsterHealth(String(newMonsterHealth));
-          showFieldBadge('monsterHealth', '-2', 'danger');
-
-          // Check if fight is over with updated values
-          const fightEnded = checkFightEnd(currentHealth, newMonsterHealth);
-          if (fightEnded) {
-            // Fight is over, stop animation immediately
-            setIsFighting(false);
-            setDiceRollingType(null);
-            return; // Exit early, don't set fightResult
+          newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
+          fightEnded = checkFightEnd(currentHealth, newMonsterHealth);
+          if (!fightEnded) {
+            shouldShowUseLuck = true;
           }
-          setShowUseLuck(true);
         } else {
           resultType = 'monsterWins';
           resultMessage = t('fight.attackLoss');
           // Hero takes 2 damage
-          const newHealth = Math.max(0, currentHealth - 2);
+          newHealth = Math.max(0, currentHealth - 2);
+          fightEnded = checkFightEnd(newHealth, currentMonsterHealth);
+        }
+
+        // If fight ended, stop animation immediately
+        if (fightEnded) {
+          setIsFighting(false);
+          setDiceRollingType(null);
+          return; // Exit early, don't set fightResult
+        }
+
+        // Batch all state updates together after animation completes to prevent interruption
+        // Set dice results first (they'll be visible when animation stops)
+        setHeroDiceRolls([heroRoll1, heroRoll2]);
+        setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
+
+        // Then update health and other state
+        if (newHealth !== currentHealth) {
           setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-2', 'danger');
-
-          // Check if fight is over with updated values
-          const fightEnded = checkFightEnd(newHealth, currentMonsterHealth);
-          if (fightEnded) {
-            // Fight is over, stop animation immediately
-            setIsFighting(false);
-            setDiceRollingType(null);
-            return; // Exit early, don't set fightResult
-          }
+        }
+        if (newMonsterHealth !== currentMonsterHealth) {
+          setMonsterHealth(String(newMonsterHealth));
+          showFieldBadge('monsterHealth', '-2', 'danger');
         }
 
         setFightResult({
@@ -497,9 +523,17 @@ function App() {
           monsterTotal,
         });
 
-        // Stop animation
-        setIsFighting(false);
-        setDiceRollingType(null);
+        if (shouldShowUseLuck) {
+          setShowUseLuck(true);
+        }
+
+        // Stop animation last
+        // Only clear if this animation is still active
+        if (fightAnimationIdRef.current === animationId) {
+          setIsFighting(false);
+          setDiceRollingType(null);
+          fightAnimationIdRef.current = null;
+        }
       } catch (error) {
         // Ensure animation stops even if there's an error
         console.error('Error in fight calculation:', error);
@@ -509,15 +543,18 @@ function App() {
     }, 1000);
 
     // Safety: Force clear after 2 seconds if still rolling
-    setTimeout(() => {
-      setDiceRollingType((current) => {
-        if (current === 'fight') {
-          console.warn('Fight animation safety timeout - forcing clear');
-          setIsFighting(false);
-          return null;
-        }
-        return current;
-      });
+    safetyTimeoutRef.current = setTimeout(() => {
+      // Only clear if this is still the same animation
+      if (fightAnimationIdRef.current === animationId) {
+        setDiceRollingType((current) => {
+          if (current === 'fight') {
+            setIsFighting(false);
+            fightAnimationIdRef.current = null;
+            return null;
+          }
+          return current;
+        });
+      }
     }, 2000);
   };
 
@@ -635,47 +672,6 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'default');
-  }, []);
-
-  // Test data generation for development
-  useEffect(() => {
-    // Generate random hero stats if empty
-    if (!skill) {
-      const randomSkill = Math.floor(Math.random() * 6) + 6; // 6-11
-      setSkill(String(randomSkill));
-    }
-    if (!health) {
-      const randomHealth = Math.floor(Math.random() * 6) + 15; // 15-20
-      setHealth(String(randomHealth));
-    }
-    if (!luck) {
-      const randomLuck = Math.floor(Math.random() * 6) + 6; // 6-11
-      setLuck(String(randomLuck));
-    }
-    // Generate random monster data if empty
-    if (!monsterCreature) {
-      const creatureNames = [
-        'Goblin',
-        'Orc',
-        'Troll',
-        'Dragon',
-        'Skeleton',
-        'Zombie',
-        'Demon',
-        'Vampire',
-      ];
-      const randomName =
-        creatureNames[Math.floor(Math.random() * creatureNames.length)];
-      setMonsterCreature(randomName);
-    }
-    if (!monsterSkill) {
-      const randomSkill = Math.floor(Math.random() * 6) + 5; // 5-10
-      setMonsterSkill(String(randomSkill));
-    }
-    if (!monsterHealth) {
-      const randomHealth = Math.floor(Math.random() * 6) + 5; // 5-10
-      setMonsterHealth(String(randomHealth));
-    }
   }, []);
 
   return (
