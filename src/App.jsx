@@ -37,6 +37,7 @@ function App() {
   const [maxSkill, setMaxSkill] = useState(null);
   const [maxHealth, setMaxHealth] = useState(null);
   const [maxLuck, setMaxLuck] = useState(null);
+  const [rollingButton, setRollingButton] = useState(null);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -356,10 +357,28 @@ function App() {
                   <button
                     type="button"
                     className="btn btn-light d-flex align-items-center justify-content-center gap-2"
-                    onClick={handleRandomStats}
+                    onClick={() => {
+                      setRollingButton('randomize');
+                      setTimeout(() => {
+                        handleRandomStats();
+                        setRollingButton(null);
+                      }, 1000);
+                    }}
+                    disabled={rollingButton !== null}
                   >
                     {t('buttons.randomStats')}
-                    <Icon path={mdiDice3} size={1} />
+                    <Icon
+                      path={mdiDice3}
+                      size={1}
+                      className={
+                        rollingButton === 'randomize' ? 'dice-rolling' : ''
+                      }
+                      style={
+                        rollingButton === 'randomize'
+                          ? { animationDuration: '0.3s' }
+                          : {}
+                      }
+                    />
                   </button>
                   <button
                     type="button"
@@ -461,16 +480,48 @@ function App() {
                     <button
                       type="button"
                       className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => {
+                        setRollingButton('rollDie');
+                        setTimeout(() => setRollingButton(null), 1000);
+                      }}
+                      disabled={rollingButton !== null}
                     >
                       {t('dice.rollDie')}
-                      <Icon path={mdiDice3} size={1} />
+                      <Icon
+                        path={mdiDice3}
+                        size={1}
+                        className={
+                          rollingButton === 'rollDie' ? 'dice-rolling' : ''
+                        }
+                        style={
+                          rollingButton === 'rollDie'
+                            ? { animationDuration: '0.3s' }
+                            : {}
+                        }
+                      />
                     </button>
                     <button
                       type="button"
                       className="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => {
+                        setRollingButton('rollDice');
+                        setTimeout(() => setRollingButton(null), 1000);
+                      }}
+                      disabled={rollingButton !== null}
                     >
                       {t('dice.rollDice')}
-                      <Icon path={mdiDiceMultiple} size={1} />
+                      <Icon
+                        path={mdiDiceMultiple}
+                        size={1}
+                        className={
+                          rollingButton === 'rollDice' ? 'dice-rolling' : ''
+                        }
+                        style={
+                          rollingButton === 'rollDice'
+                            ? { animationDuration: '0.3s' }
+                            : {}
+                        }
+                      />
                     </button>
                   </div>
                   <div style={{ minHeight: '100px' }}>
