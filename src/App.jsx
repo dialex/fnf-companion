@@ -54,6 +54,7 @@ function App() {
   const [luckUsed, setLuckUsed] = useState(false);
   const [isFighting, setIsFighting] = useState(false);
   const [fightResult, setFightResult] = useState(null);
+  const [fightOutcome, setFightOutcome] = useState(null);
   const [heroDiceRolls, setHeroDiceRolls] = useState(null);
   const [monsterDiceRolls, setMonsterDiceRolls] = useState(null);
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
@@ -319,6 +320,74 @@ function App() {
     }, 1000);
   };
 
+  // Helper function to check if fight is over and handle end of fight
+  const checkFightEnd = (heroHealthValue = null, monsterHealthValue = null) => {
+    const currentHealth =
+      heroHealthValue !== null ? heroHealthValue : parseInt(health) || 0;
+    const currentMonsterHealth =
+      monsterHealthValue !== null
+        ? monsterHealthValue
+        : parseInt(monsterHealth) || 0;
+    const creatureName = monsterCreature.trim();
+
+    if (currentMonsterHealth <= 0 && creatureName) {
+      // Hero wins
+      setFightOutcome('won');
+      const currentGraveyard = graveyard.trim();
+      const separator = currentGraveyard ? '\n' : '';
+      setGraveyard(
+        `${currentGraveyard}${separator}${t('fight.defeatCreature')} ${creatureName}`
+      );
+
+      // Stop any ongoing animations immediately
+      setIsFighting(false);
+      setDiceRollingType(null);
+
+      // Reset after showing result
+      setTimeout(() => {
+        setFightOutcome(null);
+        setMonsterCreature('');
+        setMonsterSkill('');
+        setMonsterHealth('');
+        setHeroDiceRolls(null);
+        setMonsterDiceRolls(null);
+        setFightResult(null);
+        setTestLuckResult(null);
+        setShowUseLuck(false);
+        setLuckUsed(false);
+      }, 5000);
+      return true;
+    } else if (currentHealth <= 0) {
+      // Hero loses
+      setFightOutcome('lost');
+      const currentGraveyard = graveyard.trim();
+      const separator = currentGraveyard ? '\n' : '';
+      setGraveyard(
+        `${currentGraveyard}${separator}${t('fight.defeatedBy')} ${creatureName}`
+      );
+
+      // Stop any ongoing animations immediately
+      setIsFighting(false);
+      setDiceRollingType(null);
+
+      // Reset after showing result
+      setTimeout(() => {
+        setFightOutcome(null);
+        setMonsterCreature('');
+        setMonsterSkill('');
+        setMonsterHealth('');
+        setHeroDiceRolls(null);
+        setMonsterDiceRolls(null);
+        setFightResult(null);
+        setTestLuckResult(null);
+        setShowUseLuck(false);
+        setLuckUsed(false);
+      }, 5000);
+      return true;
+    }
+    return false;
+  };
+
   const handleFight = () => {
     const currentSkill = parseInt(skill) || 0;
     const currentHealth = parseInt(health) || 0;
@@ -335,7 +404,8 @@ function App() {
       parseInt(monsterSkill) <= 0 ||
       parseInt(monsterHealth) <= 0 ||
       isFighting ||
-      diceRollingType !== null
+      diceRollingType !== null ||
+      fightOutcome !== null
     ) {
       return;
     }
@@ -344,6 +414,7 @@ function App() {
     setIsFighting(true);
     setDiceRollingType('fight');
     setFightResult(null);
+    setFightOutcome(null);
     setHeroDiceRolls(null);
     setMonsterDiceRolls(null);
     setLuckUsed(false);
@@ -355,62 +426,99 @@ function App() {
     setTestSkillResult(null);
 
     // After animation, roll dice and calculate results
-    setTimeout(() => {
-      // Roll dice for hero and monster
-      const heroRoll1 = Math.floor(Math.random() * 6) + 1;
-      const heroRoll2 = Math.floor(Math.random() * 6) + 1;
-      const heroDiceSum = heroRoll1 + heroRoll2;
+    const fightTimeout = setTimeout(() => {
+      try {
+        // Roll dice for hero and monster
+        const heroRoll1 = Math.floor(Math.random() * 6) + 1;
+        const heroRoll2 = Math.floor(Math.random() * 6) + 1;
+        const heroDiceSum = heroRoll1 + heroRoll2;
 
-      const monsterRoll1 = Math.floor(Math.random() * 6) + 1;
-      const monsterRoll2 = Math.floor(Math.random() * 6) + 1;
-      const monsterDiceSum = monsterRoll1 + monsterRoll2;
+        const monsterRoll1 = Math.floor(Math.random() * 6) + 1;
+        const monsterRoll2 = Math.floor(Math.random() * 6) + 1;
+        const monsterDiceSum = monsterRoll1 + monsterRoll2;
 
-      setHeroDiceRolls([heroRoll1, heroRoll2]);
-      setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
+        setHeroDiceRolls([heroRoll1, heroRoll2]);
+        setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
 
-      // Calculate totals: dice sum + skill
-      const heroSkill = parseInt(skill) || 0;
-      const monsterSkillValue = parseInt(monsterSkill) || 0;
-      const heroTotal = heroDiceSum + heroSkill;
-      const monsterTotal = monsterDiceSum + monsterSkillValue;
+        // Calculate totals: dice sum + skill
+        const heroSkill = parseInt(skill) || 0;
+        const monsterSkillValue = parseInt(monsterSkill) || 0;
+        const heroTotal = heroDiceSum + heroSkill;
+        const monsterTotal = monsterDiceSum + monsterSkillValue;
 
-      // Determine result
-      let resultType = '';
-      let resultMessage = '';
-
-      if (heroTotal === monsterTotal) {
-        resultType = 'tie';
-        resultMessage = t('fight.attackTie');
-      } else if (heroTotal > monsterTotal) {
-        resultType = 'heroWins';
-        resultMessage = t('fight.attackWin');
-        // Monster takes 2 damage
-        const currentMonsterHealth = parseInt(monsterHealth) || 0;
-        const newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
-        setMonsterHealth(String(newMonsterHealth));
-        showFieldBadge('monsterHealth', '-2', 'danger');
-      } else {
-        resultType = 'monsterWins';
-        resultMessage = t('fight.attackLoss');
-        // Hero takes 2 damage
+        // Determine result
+        let resultType = '';
+        let resultMessage = '';
         const currentHealth = parseInt(health) || 0;
-        const newHealth = Math.max(0, currentHealth - 2);
-        setHealth(String(newHealth));
-        showFieldBadge('heroHealth', '-2', 'danger');
+        const currentMonsterHealth = parseInt(monsterHealth) || 0;
+
+        if (heroTotal === monsterTotal) {
+          resultType = 'tie';
+          resultMessage = t('fight.attackTie');
+        } else if (heroTotal > monsterTotal) {
+          resultType = 'heroWins';
+          resultMessage = t('fight.attackWin');
+          // Monster takes 2 damage
+          const newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
+          setMonsterHealth(String(newMonsterHealth));
+          showFieldBadge('monsterHealth', '-2', 'danger');
+
+          // Check if fight is over with updated values
+          const fightEnded = checkFightEnd(currentHealth, newMonsterHealth);
+          if (fightEnded) {
+            // Fight is over, stop animation immediately
+            setIsFighting(false);
+            setDiceRollingType(null);
+            return; // Exit early, don't set fightResult
+          }
+          setShowUseLuck(true);
+        } else {
+          resultType = 'monsterWins';
+          resultMessage = t('fight.attackLoss');
+          // Hero takes 2 damage
+          const newHealth = Math.max(0, currentHealth - 2);
+          setHealth(String(newHealth));
+          showFieldBadge('heroHealth', '-2', 'danger');
+
+          // Check if fight is over with updated values
+          const fightEnded = checkFightEnd(newHealth, currentMonsterHealth);
+          if (fightEnded) {
+            // Fight is over, stop animation immediately
+            setIsFighting(false);
+            setDiceRollingType(null);
+            return; // Exit early, don't set fightResult
+          }
+        }
+
+        setFightResult({
+          type: resultType,
+          message: resultMessage,
+          heroTotal,
+          monsterTotal,
+        });
+
+        // Stop animation
+        setIsFighting(false);
+        setDiceRollingType(null);
+      } catch (error) {
+        // Ensure animation stops even if there's an error
+        console.error('Error in fight calculation:', error);
+        setIsFighting(false);
+        setDiceRollingType(null);
       }
-
-      setFightResult({
-        type: resultType,
-        message: resultMessage,
-        heroTotal,
-        monsterTotal,
-      });
-
-      // Stop animation
-      setIsFighting(false);
-      setDiceRollingType(null);
-      setShowUseLuck(true);
     }, 1000);
+
+    // Safety: Force clear after 2 seconds if still rolling
+    setTimeout(() => {
+      setDiceRollingType((current) => {
+        if (current === 'fight') {
+          console.warn('Fight animation safety timeout - forcing clear');
+          setIsFighting(false);
+          return null;
+        }
+        return current;
+      });
+    }, 2000);
   };
 
   const handleUseLuck = () => {
@@ -457,18 +565,21 @@ function App() {
       // Apply effects based on previous fight result
       const heroWonLastFight = fightResult.type === 'heroWins';
 
+      const currentHealth = parseInt(health) || 0;
+      const currentMonsterHealth = parseInt(monsterHealth) || 0;
+      let newHealth = currentHealth;
+      let newMonsterHealth = currentMonsterHealth;
+
       if (heroWonLastFight) {
         // Hero won the attack
         if (isLucky) {
           // Monster takes 1 extra damage
-          const currentMonsterHealth = parseInt(monsterHealth) || 0;
-          const newMonsterHealth = Math.max(0, currentMonsterHealth - 1);
+          newMonsterHealth = Math.max(0, currentMonsterHealth - 1);
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-1', 'danger');
         } else {
           // Monster recovers 1 health
-          const currentMonsterHealth = parseInt(monsterHealth) || 0;
-          const newMonsterHealth = currentMonsterHealth + 1;
+          newMonsterHealth = currentMonsterHealth + 1;
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '+1', 'success');
         }
@@ -476,10 +587,9 @@ function App() {
         // Hero lost the attack (or tied)
         if (isLucky) {
           // Hero recovers 1 health
-          const currentHealth = parseInt(health) || 0;
           const maxHealthValue =
             maxHealth !== null ? parseInt(maxHealth) : null;
-          const newHealth =
+          newHealth =
             maxHealthValue !== null
               ? Math.min(currentHealth + 1, maxHealthValue)
               : currentHealth + 1;
@@ -490,8 +600,7 @@ function App() {
           }
         } else {
           // Hero takes 1 extra damage
-          const currentHealth = parseInt(health) || 0;
-          const newHealth = Math.max(0, currentHealth - 1);
+          newHealth = Math.max(0, currentHealth - 1);
           setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-1', 'danger');
         }
@@ -500,6 +609,16 @@ function App() {
       // Decrease luck by 1
       const newLuck = Math.max(0, currentLuck - 1);
       setLuck(String(newLuck));
+
+      // Check if fight is over with updated values BEFORE setting results
+      const fightEnded = checkFightEnd(newHealth, newMonsterHealth);
+
+      if (fightEnded) {
+        // Fight is over, stop animation immediately and don't set luck result
+        setIsTestingLuck(false);
+        setDiceRollingType(null);
+        return; // Exit early
+      }
 
       // Set result for display
       setTestLuckResult({
@@ -1514,7 +1633,8 @@ function App() {
                             parseInt(health) <= 0 ||
                             parseInt(luck) <= 0 ||
                             isFighting ||
-                            diceRollingType !== null
+                            diceRollingType !== null ||
+                            fightOutcome !== null
                           }
                           onClick={handleFight}
                         >
@@ -1673,7 +1793,8 @@ function App() {
                     {testLuckResult &&
                       diceRollingType === null &&
                       !isTestingLuck &&
-                      fightResult && (
+                      fightResult &&
+                      !fightOutcome && (
                         <div className="row gx-4 mt-3">
                           <div className="col-12">
                             <div
@@ -1698,23 +1819,42 @@ function App() {
                           </div>
                         </div>
                       )}
-                    {fightResult && (
+                    {fightOutcome ? (
                       <div className="row gx-4 mt-3">
                         <div className="col-12">
                           <div
                             className={`alert content ${
-                              fightResult.type === 'tie'
-                                ? 'alert-secondary'
-                                : fightResult.type === 'heroWins'
-                                  ? 'alert-success'
-                                  : 'alert-danger'
+                              fightOutcome === 'won'
+                                ? 'alert-info'
+                                : 'alert-dark'
                             } mb-0 text-center`}
                             role="alert"
                           >
-                            {fightResult.message}
+                            {fightOutcome === 'won'
+                              ? t('fight.battleWon')
+                              : t('fight.battleLost')}
                           </div>
                         </div>
                       </div>
+                    ) : (
+                      fightResult && (
+                        <div className="row gx-4 mt-3">
+                          <div className="col-12">
+                            <div
+                              className={`alert content ${
+                                fightResult.type === 'tie'
+                                  ? 'alert-secondary'
+                                  : fightResult.type === 'heroWins'
+                                    ? 'alert-success'
+                                    : 'alert-danger'
+                              } mb-0 text-center`}
+                              role="alert"
+                            >
+                              {fightResult.message}
+                            </div>
+                          </div>
+                        </div>
+                      )
                     )}
                   </div>
                 </div>

@@ -70,6 +70,10 @@
     "attackWinLucky": "You deal extra damage",
     "attackWinUnlucky": "The monster recovers",
     "attackLossLucky": "You recover health",
-    "attackLossUnlucky": "You take extra damage"
+    "attackLossUnlucky": "You take extra damage",
+    "battleWon": "You won!",
+    "battleLost": "You lost... Game over",
+    "defeatCreature": "Defeated",
+    "defeatedBy": "You were defeated by"
   }
 }

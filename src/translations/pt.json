@@ -70,6 +70,10 @@
     "attackWinLucky": "Causas dano extra",
     "attackWinUnlucky": "O monstro recupera",
     "attackLossLucky": "Recuperas força",
-    "attackLossUnlucky": "Sofres dano extra"
+    "attackLossUnlucky": "Sofres dano extra",
+    "battleWon": "Ganhaste!",
+    "battleLost": "Perdeste... Fim da aventura",
+    "defeatCreature": "Derrotaste",
+    "defeatedBy": "Foste derrotado por"
   }
 }
