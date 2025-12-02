@@ -55,5 +55,14 @@
     "buy": "Comprar",
     "objectPlaceholder": "Objeto",
     "added": "Comprado"
+  },
+  "fight": {
+    "graveyard": "Cemitério",
+    "hero": "Herói",
+    "monster": "Monstro",
+    "creature": "Criatura",
+    "creaturePlaceholder": "Nome",
+    "fight": "Combater",
+    "useLuck": "Usar sorte"
   }
 }

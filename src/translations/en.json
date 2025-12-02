@@ -55,5 +55,14 @@
     "buy": "Buy",
     "objectPlaceholder": "Object",
     "added": "Bought"
+  },
+  "fight": {
+    "graveyard": "Graveyard",
+    "hero": "Hero",
+    "monster": "Monster",
+    "creature": "Creature",
+    "creaturePlaceholder": "Name",
+    "fight": "Fight",
+    "useLuck": "Use luck"
   }
 }

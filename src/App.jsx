@@ -7,7 +7,7 @@ import {
   mdiAccount,
   mdiClover,
   mdiHandCoin,
-  mdiHandExtended,
+  mdiSnake,
   mdiFoodApple,
   mdiBagPersonalPlus,
   mdiSilverwareForkKnife,
@@ -46,6 +46,15 @@ function App() {
   const [transactionObject, setTransactionObject] = useState('');
   const [transactionCost, setTransactionCost] = useState('');
   const [notes, setNotes] = useState('');
+  const [monsterSkill, setMonsterSkill] = useState('');
+  const [monsterHealth, setMonsterHealth] = useState('');
+  const [monsterCreature, setMonsterCreature] = useState('');
+  const [graveyard, setGraveyard] = useState('');
+  const [showUseLuck, setShowUseLuck] = useState(false);
+  const [isFighting, setIsFighting] = useState(false);
+  const [fightResult, setFightResult] = useState(null);
+  const [heroDiceRolls, setHeroDiceRolls] = useState(null);
+  const [monsterDiceRolls, setMonsterDiceRolls] = useState(null);
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -1101,7 +1110,154 @@ function App() {
                 </h2>
               </div>
               <div className="section-content">
-                {/* Fight section - empty for now */}
+                <div className="row gx-4">
+                  <div className="col-12 col-md-4 d-flex flex-column">
+                    <h3 className="heading mb-3">{t('fight.graveyard')}</h3>
+                    <textarea
+                      className="content field-input form-control flex-grow-1"
+                      value={graveyard}
+                      readOnly
+                      style={{ resize: 'none' }}
+                    />
+                  </div>
+                  <div className="col-12 col-md-4 d-flex flex-column">
+                    <h3 className="heading mb-3">{t('fight.hero')}</h3>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiClover} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fields.luck')}
+                      </label>
+                      <input
+                        type="number"
+                        className="content field-input form-control"
+                        value={luck || ''}
+                        readOnly
+                        disabled
+                      />
+                    </div>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiSword} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fields.skill')}
+                      </label>
+                      <input
+                        type="number"
+                        className="content field-input form-control"
+                        value={skill || ''}
+                        readOnly
+                        disabled
+                      />
+                    </div>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiHeart} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fields.health')}
+                      </label>
+                      <input
+                        type="number"
+                        className="content field-input form-control"
+                        value={health || ''}
+                        readOnly
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-4 d-flex flex-column">
+                    <h3 className="heading mb-3">{t('fight.monster')}</h3>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiSnake} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fight.creature')}
+                      </label>
+                      <input
+                        type="text"
+                        className="content field-input form-control"
+                        placeholder={t('fight.creaturePlaceholder')}
+                        value={monsterCreature}
+                        onChange={(e) => setMonsterCreature(e.target.value)}
+                      />
+                    </div>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiSword} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fields.skill')}
+                      </label>
+                      <input
+                        type="number"
+                        className="content field-input form-control"
+                        min="0"
+                        value={monsterSkill}
+                        onChange={(e) =>
+                          handleNumberChange(setMonsterSkill, e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="field-group">
+                      <div className="field-icon">
+                        <Icon path={mdiHeart} size={1} />
+                      </div>
+                      <label className="content field-label">
+                        {t('fields.health')}
+                      </label>
+                      <input
+                        type="number"
+                        className="content field-input form-control"
+                        min="0"
+                        value={monsterHealth}
+                        onChange={(e) =>
+                          handleNumberChange(setMonsterHealth, e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="row gx-4 mt-3">
+                  <div className="col-md-8 offset-md-4 d-flex gap-2 justify-content-center">
+                    <button
+                      type="button"
+                      className="btn btn-primary d-flex align-items-center gap-2"
+                      disabled={
+                        !monsterCreature.trim() ||
+                        !monsterSkill ||
+                        !monsterHealth ||
+                        parseInt(monsterSkill) <= 0 ||
+                        parseInt(monsterHealth) <= 0
+                      }
+                      onClick={() => {
+                        // TODO: Implement fight logic
+                        setShowUseLuck(true);
+                      }}
+                    >
+                      {t('fight.fight')}
+                      <Icon path={mdiSwordCross} size={1} />
+                    </button>
+                    {showUseLuck && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        disabled={
+                          !monsterCreature.trim() ||
+                          !monsterSkill ||
+                          !monsterHealth ||
+                          parseInt(monsterSkill) <= 0 ||
+                          parseInt(monsterHealth) <= 0
+                        }
+                      >
+                        {t('fight.useLuck')}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </section>
           </div>
