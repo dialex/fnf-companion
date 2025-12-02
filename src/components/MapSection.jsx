@@ -242,8 +242,8 @@ export default function MapSection({
                 case 'info':
                   pillClass += ' text-white';
                   customStyle = {
-                    backgroundColor: '#0dcaf0', // Bootstrap default info
-                    borderColor: '#0dcaf0',
+                    backgroundColor: '#0c95b2',
+                    borderColor: '#0c95b2',
                   };
                   break;
                 case 'success':

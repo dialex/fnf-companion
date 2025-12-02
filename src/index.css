@@ -23,6 +23,26 @@
   border-color: #102025 !important;
 }
 
+/* Override for btn-info - custom blue with white text */
+.btn-info {
+  background-color: #0c95b2 !important;
+  border-color: #0c95b2 !important;
+  color: white !important;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+  background-color: #0a7a93 !important;
+  border-color: #0a7a93 !important;
+  color: white !important;
+}
+
+.btn-info:active {
+  background-color: #085f74 !important;
+  border-color: #085f74 !important;
+  color: white !important;
+}
+
 /* Override for secondary color - lighter gray */
 .btn-secondary {
   background-color: #9ca3af !important;
