@@ -102,6 +102,7 @@ function App() {
 
   // Section expansion control
   const [shouldExpandSections, setShouldExpandSections] = useState(false);
+  const [sectionResetKey, setSectionResetKey] = useState(0);
 
   // Game section collapse state
   const [isGameExpanded, setIsGameExpanded] = useState(true);
@@ -461,6 +462,8 @@ function App() {
     setTrailSequence([{ number: 1, color: 'primary-1' }]);
     setTrailInput('');
     setShouldExpandSections(false);
+    // Force all sections to remount with collapsed state
+    setSectionResetKey((prev) => prev + 1);
   };
 
   const handleSaveGame = () => {
@@ -1229,6 +1232,7 @@ function App() {
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <CharacterSection
+              key={`character-${sectionResetKey}`}
               name={name}
               skill={skill}
               health={health}
@@ -1252,6 +1256,7 @@ function App() {
           </div>
           <div className="col-12 col-md-4">
             <ConsumablesSection
+              key={`consumables-${sectionResetKey}`}
               coins={coins}
               meals={meals}
               health={health}
@@ -1281,6 +1286,7 @@ function App() {
           </div>
           <div className="col-12 col-md-4">
             <DiceRollsSection
+              key={`dice-${sectionResetKey}`}
               skill={skill}
               luck={luck}
               diceRollingType={diceRollingType}
@@ -1301,6 +1307,7 @@ function App() {
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <InventorySection
+              key={`inventory-${sectionResetKey}`}
               inventory={inventory}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
@@ -1310,6 +1317,7 @@ function App() {
           </div>
           <div className="col-12 col-md-8">
             <MapSection
+              key={`map-${sectionResetKey}`}
               trailSequence={trailSequence}
               trailInput={trailInput}
               onTrailInputChange={setTrailInput}
@@ -1323,6 +1331,7 @@ function App() {
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
+              key={`fight-${sectionResetKey}`}
               skill={skill}
               health={health}
               luck={luck}
@@ -1354,6 +1363,7 @@ function App() {
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
+              key={`notes-${sectionResetKey}`}
               notes={notes}
               onNotesChange={setNotes}
               initialExpanded={false}

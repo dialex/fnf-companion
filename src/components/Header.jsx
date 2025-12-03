@@ -11,6 +11,15 @@ import {
 export default function Header({ onLanguageChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 992);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -46,13 +55,13 @@ export default function Header({ onLanguageChange }) {
       className="navbar navbar-expand-lg sticky-top text-white shadow"
       style={{ backgroundColor: 'var(--header-bg)', zIndex: 1050 }}
     >
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-3 d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center gap-3">
           <Icon path={mdiBookAccount} size={2} className="text-white" />
           <h1 className="heading fs-1 mb-0">{t('app.title')}</h1>
         </div>
         <button
-          className="navbar-toggler"
+          className="navbar-toggler d-lg-none"
           type="button"
           onClick={() => setNavbarExpanded(!navbarExpanded)}
           aria-controls="navbarNav"
@@ -71,10 +80,10 @@ export default function Header({ onLanguageChange }) {
           />
         </button>
         <nav
-          className={`collapse navbar-collapse ${navbarExpanded ? 'show' : ''}`}
+          className={`collapse navbar-collapse ${navbarExpanded || isDesktop ? 'show' : ''}`}
           id="navbarNav"
         >
-          <div className="navbar-nav d-flex align-items-center gap-4 ms-auto">
+          <div className="navbar-nav d-flex align-items-center gap-4 ms-auto flex-wrap">
             <a
               href="#character"
               className="nav-link content text-white text-decoration-none"

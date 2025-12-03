@@ -48,6 +48,10 @@ export default function ConsumablesSection({
     }
   }, [autoExpand, isExpanded]);
 
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
+
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };

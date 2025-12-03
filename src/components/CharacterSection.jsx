@@ -42,6 +42,10 @@ export default function CharacterSection({
     }
   }, [autoExpand, isExpanded]);
 
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
+
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };

@@ -32,6 +32,10 @@ export default function MapSection({
     }
   }, [autoExpand, isExpanded]);
 
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
+
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };

@@ -1,7 +1,6 @@
 MAIN
 
 - Add Game section
-  - Allows to manually save game to file
   - Display notif when game is saved
   - Load game from file
   - Display notif when game is loaded

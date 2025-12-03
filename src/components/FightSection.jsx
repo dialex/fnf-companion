@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiSwordCross,
@@ -45,6 +45,10 @@ export default function FightSection({
   initialExpanded = true,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
+
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
 
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);

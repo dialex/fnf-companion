@@ -18,6 +18,10 @@ export default function InventorySection({
     }
   }, [autoExpand, isExpanded]);
 
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
+
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };

@@ -35,6 +35,10 @@ export default function DiceRollsSection({
     }
   }, [autoExpand, isExpanded]);
 
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
+
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };
