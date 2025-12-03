@@ -33,3 +33,10 @@ textarea.form-control {
   font-family: 'Caudex', serif;
   font-weight: 500;
 }
+
+/* Button group icon alignment */
+.btn-group .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
