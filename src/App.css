@@ -296,16 +296,16 @@ textarea.field-input.notes-handwritten {
   }
 }
 
-/* Volume slider styling - use Bootstrap primary color */
+/* Volume slider styling - use primary color 1 */
 .form-range::-webkit-slider-thumb {
-  background-color: #0d6efd !important;
+  background-color: var(--primary-color-1) !important;
   border: none;
   width: 12px;
   height: 12px;
 }
 
 .form-range::-moz-range-thumb {
-  background-color: #0d6efd !important;
+  background-color: var(--primary-color-1) !important;
   border: none;
   width: 12px;
   height: 12px;
@@ -316,13 +316,39 @@ textarea.field-input.notes-handwritten {
   font-size: 0.875rem;
 }
 
-/* Action sounds toggle - use primary color */
-.action-sounds-toggle:checked {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+/* Action sounds toggle - use primary color 1, override all Bootstrap primary colors */
+.form-check.form-switch .action-sounds-toggle {
+  border-color: var(--primary-color-1) !important;
 }
 
-.action-sounds-toggle:focus {
-  border-color: #0d6efd !important;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+.form-check.form-switch .action-sounds-toggle:not(:checked) {
+  background-color: transparent !important;
+  border-color: var(--primary-color-1) !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:not(:checked)::before {
+  background-color: var(--primary-color-1) !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:checked {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:checked::before {
+  background-color: white !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:focus {
+  border-color: var(--primary-color-1) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:focus:checked {
+  background-color: var(--primary-color-1) !important;
+}
+
+.form-check.form-switch .action-sounds-toggle:focus:not(:checked) {
+  background-color: transparent !important;
 }

@@ -73,9 +73,9 @@
     "battle": "Batalha",
     "victory": "Vitória",
     "defeat": "Derrota",
-    "actionSounds": "Sons de ação",
+    "actionSounds": "Ações",
     "invalidUrl": "Por favor introduz um link do YouTube.",
-    "youtubeUrl": "URL do YouTube"
+    "youtubeUrl": "Link do YouTube"
   },
   "inventory": {
     "label": "Carregas na tua mochila..."

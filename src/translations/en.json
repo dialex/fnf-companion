@@ -73,9 +73,9 @@
     "battle": "Battle",
     "victory": "Victory",
     "defeat": "Defeat",
-    "actionSounds": "Action sounds",
+    "actionSounds": "Actions",
     "invalidUrl": "Please provide a valid YouTube link.",
-    "youtubeUrl": "YouTube URL"
+    "youtubeUrl": "YouTube link"
   },
   "inventory": {
     "label": "You carry in your backpack..."

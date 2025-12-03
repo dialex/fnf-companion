@@ -754,7 +754,7 @@ function App() {
 
     if (actionSoundsEnabled) {
       const audio = new Audio(
-        `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
+        `${import.meta.env.BASE_URL}audio/minecraft-drink.mp3`
       );
       audio.play().catch((error) => {
         console.warn('Could not play audio:', error);
@@ -830,9 +830,9 @@ function App() {
     setActionSoundsEnabled(true);
     setSoundUrls({
       ambience: '',
-      battle: '',
-      victory: '',
-      defeat: '',
+      battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
+      victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
+      defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
     });
     setSoundInputs({
       ambience: '',
@@ -1782,8 +1782,14 @@ function App() {
                           )
                         )}
                       </div>
-                      <div className="d-flex justify-content-center mt-3">
-                        <div className="form-check form-switch">
+                      <div className="d-flex justify-content-center align-items-center mt-3">
+                        <label
+                          className="content me-2 mb-0"
+                          htmlFor="actionSoundsToggle"
+                        >
+                          {t('game.actionSounds')}
+                        </label>
+                        <div className="form-check form-switch mb-0">
                           <input
                             className="form-check-input action-sounds-toggle"
                             type="checkbox"
@@ -1794,12 +1800,6 @@ function App() {
                               setActionSoundsEnabled(e.target.checked)
                             }
                           />
-                          <label
-                            className="form-check-label content"
-                            htmlFor="actionSoundsToggle"
-                          >
-                            {t('game.actionSounds')}
-                          </label>
                         </div>
                       </div>
                     </div>
