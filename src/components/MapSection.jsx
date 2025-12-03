@@ -44,7 +44,7 @@ export default function MapSection({
   const displaySequence =
     trailSequence.length === 0 || trailSequence[0]?.number !== 1
       ? [
-          { number: 1, color: 'primary-1' },
+          { number: 1, color: 'primary-2' },
           ...trailSequence.filter((item) => item.number !== 1),
         ]
       : trailSequence;
@@ -249,7 +249,7 @@ export default function MapSection({
               const color =
                 typeof item === 'number'
                   ? num === 1
-                    ? 'primary-1'
+                    ? 'primary-2'
                     : num === 400
                       ? 'primary-2'
                       : 'light'
@@ -279,11 +279,11 @@ export default function MapSection({
               const tooltipText = getTooltipText(color, num);
 
               if (num === 1) {
-                // Number 1 always uses primary-1 (dark blue)
+                // Number 1 always uses primary-2 (golden)
                 pillClass += ' text-white';
                 customStyle = {
-                  backgroundColor: '#1a303f',
-                  borderColor: '#1a303f',
+                  backgroundColor: '#D4A24B',
+                  borderColor: '#D4A24B',
                 };
               } else if (num === 400) {
                 // Number 400 always uses primary-2 (golden)
@@ -312,8 +312,8 @@ export default function MapSection({
                   case 'dark':
                     pillClass += ' text-white';
                     customStyle = {
-                      backgroundColor: '#495057', // Lighter dark gray
-                      borderColor: '#495057',
+                      backgroundColor: '#212529',
+                      borderColor: '#212529',
                     };
                     break;
                   case 'info':
@@ -339,9 +339,6 @@ export default function MapSection({
                       backgroundColor: '#ffc107', // Lighter warning yellow
                       borderColor: '#ffc107',
                     };
-                    break;
-                  case 'light':
-                    pillClass += ' text-bg-light';
                     break;
                   default:
                     pillClass += ' text-bg-light';

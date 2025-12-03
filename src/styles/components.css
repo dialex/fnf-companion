@@ -374,3 +374,9 @@ input[type='number'].form-control.field-input {
   text-align: center;
   justify-content: center;
 }
+
+/* Trail pill light color override */
+.badge.text-bg-light {
+  background-color: #ededed !important;
+  color: #333 !important;
+}
