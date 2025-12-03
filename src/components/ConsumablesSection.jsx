@@ -91,7 +91,7 @@ export default function ConsumablesSection({
             <div className="field-icon">
               <Icon path={mdiHandCoin} size={1} />
             </div>
-            <label className="content field-label">{t('common.fields.coins')}</label>
+            <label className="content field-label">{t('fields.coins')}</label>
             <input
               type="number"
               className="content field-input form-control"
@@ -114,7 +114,7 @@ export default function ConsumablesSection({
             <div className="field-icon">
               <Icon path={mdiFoodApple} size={1} />
             </div>
-            <label className="content field-label">{t('common.fields.meals')}</label>
+            <label className="content field-label">{t('fields.meals')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               <input
                 type="number"
@@ -156,13 +156,13 @@ export default function ConsumablesSection({
               <Icon path={mdiBagPersonalPlus} size={1} />
             </div>
             <label className="content field-label">
-              {t('consumables.transaction.buy')}
+              {t('transaction.buy')}
             </label>
             <div className="input-group" style={{ flex: 1 }}>
               <input
                 type="text"
                 className="content field-input form-control"
-                placeholder={t('consumables.transaction.item')}
+                placeholder={t('transaction.item')}
                 value={transactionObject}
                 onChange={(e) => onTransactionObjectChange(e.target.value)}
               />
@@ -206,7 +206,7 @@ export default function ConsumablesSection({
                 <Icon path={mdiBottleTonicPlus} size={1} />
               </div>
               <label className="content field-label">
-                {t('common.fields.potion')}
+                {t('fields.potion')}
               </label>
               <div className="input-group" style={{ flex: 1 }}>
                 <select
@@ -216,10 +216,10 @@ export default function ConsumablesSection({
                   disabled={potionUsed}
                   style={potionUsed ? { textDecoration: 'line-through' } : {}}
                 >
-                  <option value="">{t('consumables.potion.select')}</option>
-                  <option value="skill">{t('consumables.potion.restoreSkill')}</option>
-                  <option value="health">{t('consumables.potion.restoreHealth')}</option>
-                  <option value="luck">{t('consumables.potion.restoreLuck')}</option>
+                  <option value="">{t('potion.select')}</option>
+                  <option value="skill">{t('potion.restoreSkill')}</option>
+                  <option value="health">{t('potion.restoreHealth')}</option>
+                  <option value="luck">{t('potion.restoreLuck')}</option>
                 </select>
                 <button
                   type="button"

@@ -20,41 +20,49 @@
     "fight": "Fight",
     "notes": "Notes"
   },
-  "common": {
-    "buttons": {
-      "randomStats": "Randomize",
-      "lock": "Lock",
-      "unlock": "Unlock",
-      "reset": "Restart",
-      "saveGame": "Save",
-      "loadGame": "Load",
-      "yes": "Yes",
-      "no": "No",
-      "submit": "Submit",
-      "play": "Play",
-      "pause": "Pause",
-      "stop": "Stop",
-      "delete": "Delete"
-    },
-    "fields": {
-      "name": "Name",
-      "book": "Book",
-      "skill": "Skill",
-      "health": "Health",
-      "luck": "Luck",
-      "coins": "Coins",
-      "meals": "Meals",
-      "potion": "Potion",
-      "chapter": "Chapter"
-    },
-    "placeholders": {
-      "skill": "1 die + 6",
-      "health": "2 dice + 12",
-      "luck": "1 die + 6"
-    },
-    "confirm": {
-      "reset": "Do you want to lose all progress and start a new game?"
-    }
+  "fields": {
+    "name": "Name",
+    "book": "Book",
+    "skill": "Skill",
+    "health": "Health",
+    "luck": "Luck",
+    "coins": "Coins",
+    "meals": "Meals",
+    "potion": "Potion",
+    "chapter": "Chapter"
+  },
+  "placeholders": {
+    "skill": "1 die + 6",
+    "health": "2 dice + 12",
+    "luck": "1 die + 6"
+  },
+  "dice": {
+    "testYourLuck": "Test luck",
+    "testYourSkill": "Test skill",
+    "rollDie": "Roll",
+    "rollDice": "Roll",
+    "youWereLucky": "You were lucky!",
+    "youWereUnlucky": "Tough luck...",
+    "youPassedTheTest": "You passed!",
+    "youFailedTheTest": "You failed..."
+  },
+  "buttons": {
+    "randomStats": "Randomize",
+    "lock": "Lock",
+    "unlock": "Unlock",
+    "reset": "Restart",
+    "saveGame": "Save",
+    "loadGame": "Load",
+    "yes": "Yes",
+    "no": "No",
+    "submit": "Submit",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "delete": "Delete"
+  },
+  "confirm": {
+    "reset": "Do you want to lose all progress and start a new game?"
   },
   "game": {
     "saved": "Game saved",
@@ -70,39 +78,19 @@
     "invalidUrl": "Please provide a valid YouTube link.",
     "youtubeUrl": "YouTube link"
   },
-  "consumables": {
-    "transaction": {
-      "buy": "Buy",
-      "item": "Item",
-      "added": "Bought"
-    },
-    "potion": {
-      "select": "Select potion",
-      "restoreSkill": "Restore skill",
-      "restoreHealth": "Restore health",
-      "restoreLuck": "Restore luck"
-    }
-  },
-  "dice": {
-    "testYourLuck": "Test luck",
-    "testYourSkill": "Test skill",
-    "rollDie": "Roll",
-    "rollDice": "Roll",
-    "youWereLucky": "You were lucky!",
-    "youWereUnlucky": "Tough luck...",
-    "youPassedTheTest": "You passed!",
-    "youFailedTheTest": "You failed..."
-  },
   "inventory": {
     "label": "You carry in your backpack..."
   },
-  "trail": {
-    "test": "Test",
-    "died": "Died",
-    "question": "Question",
-    "good": "Good",
-    "bad": "Bad",
-    "important": "Important"
+  "transaction": {
+    "buy": "Buy",
+    "item": "Item",
+    "added": "Bought"
+  },
+  "potion": {
+    "select": "Select potion",
+    "restoreSkill": "Restore skill",
+    "restoreHealth": "Restore health",
+    "restoreLuck": "Restore luck"
   },
   "fight": {
     "graveyard": "Graveyard",
@@ -125,5 +113,13 @@
     "defeatCreature": "Defeated",
     "defeatedBy": "You were defeated by",
     "youDied": "YOU DIED"
+  },
+  "trail": {
+    "test": "Test",
+    "died": "Died",
+    "question": "Question",
+    "good": "Good",
+    "bad": "Bad",
+    "important": "Important"
   }
 }

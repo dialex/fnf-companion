@@ -1151,7 +1151,7 @@ function App() {
       const currentInventory = inventory.trim();
       const separator = currentInventory ? '\n' : '';
       setInventory(`${currentInventory}${separator}${objectName}`);
-      showFieldBadge('inventory', t('consumables.transaction.added'), 'success');
+      showFieldBadge('inventory', t('transaction.added'), 'success');
 
       setTransactionObject('');
       setTransactionCost('');
@@ -1674,7 +1674,7 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-          </div>
+        </div>
       )}
       <Header onLanguageChange={handleLanguageChange} />
       {notification && (
@@ -1686,7 +1686,7 @@ function App() {
       )}
       {showResetConfirm && (
         <ConfirmationDialog
-          message={t('common.confirm.reset')}
+          message={t('confirm.reset')}
           onConfirm={confirmReset}
           onCancel={() => setShowResetConfirm(false)}
         />
@@ -1715,8 +1715,8 @@ function App() {
                     size={1}
                     style={{ marginLeft: 'auto' }}
                   />
-              </h2>
-            </div>
+                </h2>
+              </div>
               <div
                 className={`collapse ${isGameExpanded ? 'show' : ''}`}
                 id="game-collapse"
@@ -1726,11 +1726,11 @@ function App() {
                     <div className="col-12 col-xl-6">
                       <h3 className="heading mb-3">{t('game.book')}</h3>
                       <div className="field-group mb-3">
-                <label className="content field-label">
-                          {t('common.fields.name')}
-                </label>
-                <input
-                  type="text"
+                        <label className="content field-label">
+                          {t('fields.name')}
+                        </label>
+                        <input
+                          type="text"
                           id="book-input"
                           className="content field-input form-control"
                           placeholder=""
@@ -1748,8 +1748,8 @@ function App() {
                             }
                           }}
                           maxLength={50}
-                />
-              </div>
+                        />
+                      </div>
                       <div className="d-flex justify-content-center gap-3 flex-wrap">
                         <button
                           type="button"
@@ -1757,28 +1757,28 @@ function App() {
                           onClick={handleSaveGame}
                           disabled={!book.trim()}
                         >
-                          {t('common.buttons.saveGame')}
+                          {t('buttons.saveGame')}
                         </button>
                         <button
                           type="button"
                           className="btn btn-light"
                           onClick={handleLoadGame}
                         >
-                          {t('common.buttons.loadGame')}
+                          {t('buttons.loadGame')}
                         </button>
                         <button
                           type="button"
                           className="btn btn-danger"
                           onClick={handleReset}
                         >
-                          {t('common.buttons.reset')}
+                          {t('buttons.reset')}
                         </button>
-                </div>
+                      </div>
                     </div>
                     <div className="col-12 col-xl-6">
                       <div className="d-flex align-items-center gap-2 mb-3">
                         <h3 className="heading mb-0">{t('game.sound')}</h3>
-                <input
+                        <input
                           ref={actionSoundsCheckboxRef}
                           type="checkbox"
                           id="actionSoundsCheckbox"
@@ -1790,22 +1790,22 @@ function App() {
                           data-bs-placement="top"
                           data-bs-title={t('game.actionSoundsTooltip')}
                           style={{ cursor: 'pointer' }}
-                />
-              </div>
+                        />
+                      </div>
                       <div className="row g-3">
                         {['ambience', 'battle', 'victory', 'defeat'].map(
                           (soundType) => (
                             <div key={soundType} className="col-6">
                               <label className="content field-label mb-2">
                                 {t(`game.${soundType}`)}
-                </label>
+                              </label>
                               {!soundUrls[soundType] ? (
                                 <div>
                                   <div
                                     className="input-group"
                                     style={{ flex: 1 }}
                                   >
-                <input
+                                    <input
                                       type="text"
                                       className={`content field-input form-control ${
                                         soundErrors[soundType]
@@ -1814,7 +1814,7 @@ function App() {
                                       }`}
                                       placeholder={t('game.youtubeUrl')}
                                       value={soundInputs[soundType]}
-                  onChange={(e) =>
+                                      onChange={(e) =>
                                         handleSoundInputChange(
                                           soundType,
                                           e.target.value
@@ -1840,11 +1840,11 @@ function App() {
                                     >
                                       <Icon path={mdiCheck} size={1} />
                                     </button>
-              </div>
+                                  </div>
                                   {soundErrors[soundType] && (
                                     <div className="invalid-feedback d-block sound-error">
                                       {soundErrors[soundType]}
-                </div>
+                                    </div>
                                   )}
                                 </div>
                               ) : (
@@ -1858,7 +1858,7 @@ function App() {
                                       width: 'auto',
                                       padding: '0.5rem',
                                     }}
-                                    title={t('common.buttons.delete')}
+                                    title={t('buttons.delete')}
                                   >
                                     <Icon path={mdiTrashCan} size={1} />
                                   </button>
@@ -1875,8 +1875,8 @@ function App() {
                                     }}
                                     title={
                                       soundPlaying[soundType]
-                                        ? t('common.buttons.pause')
-                                        : t('common.buttons.play')
+                                        ? t('buttons.pause')
+                                        : t('buttons.play')
                                     }
                                   >
                                     <Icon
@@ -1897,16 +1897,16 @@ function App() {
                                       width: 'auto',
                                       padding: '0.5rem',
                                     }}
-                                    title={t('common.buttons.stop')}
+                                    title={t('buttons.stop')}
                                   >
                                     <Icon path={mdiStop} size={1} />
                                   </button>
                                   <div className="d-flex align-items-center gap-1">
                                     <Icon path={mdiVolumeHigh} size={0.8} />
-                <input
+                                    <input
                                       type="range"
                                       className="form-range"
-                  min="0"
+                                      min="0"
                                       max="100"
                                       value={soundVolumes[soundType]}
                                       onChange={(e) =>
@@ -1919,21 +1919,21 @@ function App() {
                                         width: '50px',
                                         height: '4px',
                                       }}
-                />
-              </div>
-            </div>
+                                    />
+                                  </div>
+                                </div>
                               )}
-            </div>
+                            </div>
                           )
                         )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-                </div>
-              </div>
-            </div>
-          </section>
-            </div>
-            </div>
+            </section>
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <CharacterSection
@@ -1958,7 +1958,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-        </div>
+          </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1988,7 +1988,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-            </div>
+          </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -2006,9 +2006,9 @@ function App() {
               onRollDice={handleRollDice}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-              />
-            </div>
-            </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -2019,7 +2019,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-        </div>
+          </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -2031,8 +2031,8 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-            </div>
-            </div>
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection

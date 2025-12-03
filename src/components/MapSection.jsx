@@ -152,7 +152,7 @@ export default function MapSection({
           {/* Input and submit button */}
           <div className="d-flex align-items-center gap-2 mb-4">
             <label className="content field-label mb-0">
-              {t('common.fields.chapter')}
+              {t('fields.chapter')}
             </label>
             <div className="input-group" style={{ flex: 1 }}>
               <input

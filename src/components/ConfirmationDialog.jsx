@@ -26,14 +26,14 @@ const ConfirmationDialog = ({
               className="btn btn-secondary"
               onClick={onCancel}
             >
-              {cancelText || t('common.buttons.no')}
+              {cancelText || t('buttons.no')}
             </button>
             <button
               type="button"
               className="btn btn-danger"
               onClick={onConfirm}
             >
-              {confirmText || t('common.buttons.yes')}
+              {confirmText || t('buttons.yes')}
             </button>
           </div>
         </div>

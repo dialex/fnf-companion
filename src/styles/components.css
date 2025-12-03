@@ -240,13 +240,6 @@ header h1.heading {
   align-items: center;
 }
 
-/* Reduce main title font size on mobile to prevent word wrap */
-@media (max-width: 767.98px) {
-  header h1.heading {
-    font-size: 1.5rem !important;
-  }
-}
-
 /* Transaction cost input */
 .transaction-cost-input {
   width: 3rem !important;

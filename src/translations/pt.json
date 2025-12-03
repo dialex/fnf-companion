@@ -20,41 +20,49 @@
     "fight": "Combate",
     "notes": "Notas"
   },
-  "common": {
-    "buttons": {
-      "randomStats": "Aleatório",
-      "lock": "Bloquear",
-      "unlock": "Desbloquear",
-      "reset": "Recomeçar",
-      "saveGame": "Guardar",
-      "loadGame": "Carregar",
-      "yes": "Sim",
-      "no": "Não",
-      "submit": "Submeter",
-      "play": "Reproduzir",
-      "pause": "Pausar",
-      "stop": "Parar",
-      "delete": "Eliminar"
-    },
-    "fields": {
-      "name": "Nome",
-      "book": "Livro",
-      "skill": "Perícia",
-      "health": "Força",
-      "luck": "Sorte",
-      "coins": "Moedas",
-      "meals": "Refeições",
-      "potion": "Poção",
-      "chapter": "Capítulo"
-    },
-    "placeholders": {
-      "skill": "1 dado + 6",
-      "health": "2 dados + 12",
-      "luck": "1 dado + 6"
-    },
-    "confirm": {
-      "reset": "Queres perder todo o progresso e recomeçar do zero?"
-    }
+  "fields": {
+    "name": "Nome",
+    "book": "Livro",
+    "skill": "Perícia",
+    "health": "Força",
+    "luck": "Sorte",
+    "coins": "Moedas",
+    "meals": "Refeições",
+    "potion": "Poção",
+    "chapter": "Capítulo"
+  },
+  "placeholders": {
+    "skill": "1 dado + 6",
+    "health": "2 dados + 12",
+    "luck": "1 dado + 6"
+  },
+  "dice": {
+    "testYourLuck": "Testar sorte",
+    "testYourSkill": "Testar perícia",
+    "rollDie": "Lançar",
+    "rollDice": "Lançar",
+    "youWereLucky": "Tiveste sorte!",
+    "youWereUnlucky": "Tiveste azar...",
+    "youPassedTheTest": "Passaste!",
+    "youFailedTheTest": "Falhaste..."
+  },
+  "buttons": {
+    "randomStats": "Aleatório",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear",
+    "reset": "Recomeçar",
+    "saveGame": "Guardar",
+    "loadGame": "Carregar",
+    "yes": "Sim",
+    "no": "Não",
+    "submit": "Submeter",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "stop": "Parar",
+    "delete": "Eliminar"
+  },
+  "confirm": {
+    "reset": "Queres perder todo o progresso e recomeçar do zero?"
   },
   "game": {
     "saved": "Jogo guardado",
@@ -70,39 +78,19 @@
     "invalidUrl": "Por favor introduz um link do YouTube.",
     "youtubeUrl": "Link do YouTube"
   },
-  "consumables": {
-    "transaction": {
-      "buy": "Comprar",
-      "item": "Item",
-      "added": "Comprado"
-    },
-    "potion": {
-      "select": "Escolhe uma",
-      "restoreSkill": "Recuperar perícia",
-      "restoreHealth": "Recuperar força",
-      "restoreLuck": "Recuperar sorte"
-    }
-  },
-  "dice": {
-    "testYourLuck": "Testar sorte",
-    "testYourSkill": "Testar perícia",
-    "rollDie": "Lançar",
-    "rollDice": "Lançar",
-    "youWereLucky": "Tiveste sorte!",
-    "youWereUnlucky": "Tiveste azar...",
-    "youPassedTheTest": "Passaste!",
-    "youFailedTheTest": "Falhaste..."
-  },
   "inventory": {
     "label": "Carregas na tua mochila..."
   },
-  "trail": {
-    "test": "Testar",
-    "died": "Morri",
-    "question": "Dúvida",
-    "good": "Bom",
-    "bad": "Mau",
-    "important": "Importante"
+  "transaction": {
+    "buy": "Comprar",
+    "item": "Item",
+    "added": "Comprado"
+  },
+  "potion": {
+    "select": "Escolhe uma",
+    "restoreSkill": "Recuperar perícia",
+    "restoreHealth": "Recuperar força",
+    "restoreLuck": "Recuperar sorte"
   },
   "fight": {
     "graveyard": "Cemitério",
@@ -125,5 +113,13 @@
     "defeatCreature": "Derrotaste",
     "defeatedBy": "Foste derrotado por",
     "youDied": "MORRESTE"
+  },
+  "trail": {
+    "test": "Testar",
+    "died": "Morri",
+    "question": "Dúvida",
+    "good": "Bom",
+    "bad": "Mau",
+    "important": "Importante"
   }
 }
