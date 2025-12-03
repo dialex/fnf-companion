@@ -97,7 +97,9 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiSword} size={1} />
             </div>
-            <label className="content field-label">{t('character.skill')}</label>
+            <label className="content field-label">
+              {t('character.skill')}
+            </label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxSkill !== null && (
                 <span className="input-group-text locked-number text-white">
@@ -120,7 +122,9 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiHeart} size={1} />
             </div>
-            <label className="content field-label">{t('character.health')}</label>
+            <label className="content field-label">
+              {t('character.health')}
+            </label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxHealth !== null && (
                 <span className="input-group-text locked-number text-white">

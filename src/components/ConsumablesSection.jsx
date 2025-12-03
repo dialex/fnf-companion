@@ -91,7 +91,9 @@ export default function ConsumablesSection({
             <div className="field-icon">
               <Icon path={mdiHandCoin} size={1} />
             </div>
-            <label className="content field-label">{t('consumables.coins')}</label>
+            <label className="content field-label">
+              {t('consumables.coins')}
+            </label>
             <input
               type="number"
               className="content field-input form-control"
@@ -114,7 +116,9 @@ export default function ConsumablesSection({
             <div className="field-icon">
               <Icon path={mdiFoodApple} size={1} />
             </div>
-            <label className="content field-label">{t('consumables.meals')}</label>
+            <label className="content field-label">
+              {t('consumables.meals')}
+            </label>
             <div className="input-group" style={{ flex: 1 }}>
               <input
                 type="number"
@@ -217,9 +221,15 @@ export default function ConsumablesSection({
                   style={potionUsed ? { textDecoration: 'line-through' } : {}}
                 >
                   <option value="">{t('consumables.potionSelect')}</option>
-                  <option value="skill">{t('consumables.potionRestoreSkill')}</option>
-                  <option value="health">{t('consumables.potionRestoreHealth')}</option>
-                  <option value="luck">{t('consumables.potionRestoreLuck')}</option>
+                  <option value="skill">
+                    {t('consumables.potionRestoreSkill')}
+                  </option>
+                  <option value="health">
+                    {t('consumables.potionRestoreHealth')}
+                  </option>
+                  <option value="luck">
+                    {t('consumables.potionRestoreLuck')}
+                  </option>
                 </select>
                 <button
                   type="button"

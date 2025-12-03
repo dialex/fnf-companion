@@ -231,7 +231,9 @@ export const buildStateObject = (stateValues) => {
     },
     actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
     allSoundsMuted: stateValues.allSoundsMuted ?? false,
-    trailSequence: stateValues.trailSequence || [{ number: 1, color: 'primary-1' }],
+    trailSequence: stateValues.trailSequence || [
+      { number: 1, color: 'primary-1' },
+    ],
   };
 };
 
@@ -345,10 +347,7 @@ export const applyLoadedState = (savedState, setters) => {
   ) {
     setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
   }
-  if (
-    savedState.allSoundsMuted !== undefined &&
-    setters.setAllSoundsMuted
-  ) {
+  if (savedState.allSoundsMuted !== undefined && setters.setAllSoundsMuted) {
     setters.setAllSoundsMuted(savedState.allSoundsMuted);
   }
 
@@ -361,7 +360,8 @@ export const applyLoadedState = (savedState, setters) => {
       if (typeof item === 'number') {
         return {
           number: item,
-          color: item === 1 ? 'primary-1' : item === 400 ? 'primary-2' : 'secondary'
+          color:
+            item === 1 ? 'primary-1' : item === 400 ? 'primary-2' : 'secondary',
         };
       }
       return item;
@@ -369,7 +369,7 @@ export const applyLoadedState = (savedState, setters) => {
     if (normalizedSequence.length === 0 || normalizedSequence[0].number !== 1) {
       setters.setTrailSequence([
         { number: 1, color: 'primary-1' },
-        ...normalizedSequence.filter((item) => item.number !== 1)
+        ...normalizedSequence.filter((item) => item.number !== 1),
       ]);
     } else {
       setters.setTrailSequence(normalizedSequence);
