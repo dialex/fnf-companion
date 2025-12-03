@@ -8,6 +8,8 @@ import {
   mdiMapMarkerRemoveVariant,
   mdiMapMarkerStar,
   mdiMapMarkerQuestion,
+  mdiChevronDown,
+  mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
 
@@ -20,6 +22,11 @@ export default function MapSection({
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleCollapse = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   // Ensure sequence always starts with 1
   const displaySequence =
@@ -102,14 +109,31 @@ export default function MapSection({
   };
 
   return (
-    <section id="map" className="section-container mb-4 h-100">
-      <div className="section-header">
+    <section id="map" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+      <div
+        className="section-header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+      >
         <h2 className="heading section-title d-flex align-items-center gap-2">
           <Icon path={mdiMapMarkerDistance} size={1} />
           {t('sections.map')}
+          <Icon
+            path={isExpanded ? mdiChevronDown : mdiChevronUp}
+            size={1}
+            style={{ marginLeft: 'auto' }}
+          />
         </h2>
       </div>
-      <div className="section-content d-flex flex-column align-items-center">
+      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="map-collapse">
+        <div className="section-content d-flex flex-column align-items-center">
         {/* Input and submit button */}
         <div className="d-flex align-items-center gap-2 mb-4">
           <label className="content field-label mb-0">
@@ -327,6 +351,7 @@ export default function MapSection({
             );
           })}
         </div>
+      </div>
       </div>
     </section>
   );

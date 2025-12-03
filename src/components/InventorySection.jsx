@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
-import { mdiBagPersonal } from '@mdi/js';
+import { mdiBagPersonal, mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import { t } from '../translations';
 
 export default function InventorySection({
@@ -8,15 +8,38 @@ export default function InventorySection({
   onInventoryChange,
   fieldBadges,
 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleCollapse = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <section id="inventory" className="section-container mb-4 h-100">
-      <div className="section-header">
+    <section id="inventory" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+      <div
+        className="section-header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+      >
         <h2 className="heading section-title d-flex align-items-center gap-2">
           <Icon path={mdiBagPersonal} size={1} />
           {t('sections.inventory')}
+          <Icon
+            path={isExpanded ? mdiChevronDown : mdiChevronUp}
+            size={1}
+            style={{ marginLeft: 'auto' }}
+          />
         </h2>
       </div>
-      <div className="section-content d-flex flex-column">
+      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="inventory-collapse">
+        <div className="section-content d-flex flex-column">
         <div
           style={{
             position: 'relative',
@@ -49,6 +72,7 @@ export default function InventorySection({
             </span>
           )}
         </div>
+      </div>
       </div>
     </section>
   );

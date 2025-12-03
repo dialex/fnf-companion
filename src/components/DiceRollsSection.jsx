@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiClover,
   mdiSword,
   mdiDice3,
   mdiDiceMultiple,
+  mdiChevronDown,
+  mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
 import { getDiceIcon } from '../utils/dice';
@@ -23,12 +25,37 @@ export default function DiceRollsSection({
   onRollDie,
   onRollDice,
 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleCollapse = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <section id="dice-rolls" className="section-container mb-4 h-100">
-      <div className="section-header">
-        <h2 className="heading section-title">{t('sections.diceRolls')}</h2>
+    <section id="dice-rolls" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+      <div
+        className="section-header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+      >
+        <h2 className="heading section-title d-flex align-items-center gap-2">
+          {t('sections.diceRolls')}
+          <Icon
+            path={isExpanded ? mdiChevronDown : mdiChevronUp}
+            size={1}
+            style={{ marginLeft: 'auto' }}
+          />
+        </h2>
       </div>
-      <div className="section-content">
+      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="dice-rolls-collapse">
+        <div className="section-content">
         <div className="d-flex flex-column gap-3">
           <div className="d-flex gap-2 justify-content-center">
             <button
@@ -236,6 +263,7 @@ export default function DiceRollsSection({
             )}
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

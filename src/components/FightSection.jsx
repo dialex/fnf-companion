@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiSwordCross,
@@ -7,6 +7,8 @@ import {
   mdiHeart,
   mdiSnake,
   mdiDice3,
+  mdiChevronDown,
+  mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
 import { getDiceIcon } from '../utils/dice';
@@ -41,15 +43,38 @@ export default function FightSection({
   onUseLuck,
   onNumberChange,
 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleCollapse = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <section id="fight" className="section-container mb-4 h-100">
-      <div className="section-header">
+    <section id="fight" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+      <div
+        className="section-header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+      >
         <h2 className="heading section-title d-flex align-items-center gap-2">
           <Icon path={mdiSwordCross} size={1} />
           {t('sections.fight')}
+          <Icon
+            path={isExpanded ? mdiChevronDown : mdiChevronUp}
+            size={1}
+            style={{ marginLeft: 'auto' }}
+          />
         </h2>
       </div>
-      <div className="section-content d-flex flex-column">
+      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="fight-collapse">
+        <div className="section-content d-flex flex-column">
         <div className="row gx-4 flex-grow-1" style={{ minHeight: 0 }}>
           <div className="col-12 col-md-4 d-flex flex-column" style={{ minHeight: 0 }}>
             <h3 className="heading mb-3">{t('fight.graveyard')}</h3>
@@ -444,6 +469,7 @@ export default function FightSection({
             )}
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

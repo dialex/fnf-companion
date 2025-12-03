@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiHandCoin,
@@ -8,6 +8,8 @@ import {
   mdiBottleTonicPlus,
   mdiCup,
   mdiCupOutline,
+  mdiChevronDown,
+  mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
 
@@ -36,12 +38,37 @@ export default function ConsumablesSection({
   onConsumePotion,
   onNumberChange,
 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const toggleCollapse = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <section id="consumables" className="section-container mb-4 h-100">
-      <div className="section-header">
-        <h2 className="heading section-title">{t('sections.consumables')}</h2>
+    <section id="consumables" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+      <div
+        className="section-header"
+        onClick={toggleCollapse}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleCollapse();
+          }
+        }}
+      >
+        <h2 className="heading section-title d-flex align-items-center gap-2">
+          {t('sections.consumables')}
+          <Icon
+            path={isExpanded ? mdiChevronDown : mdiChevronUp}
+            size={1}
+            style={{ marginLeft: 'auto' }}
+          />
+        </h2>
       </div>
-      <div className="section-content">
+      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="consumables-collapse">
+        <div className="section-content">
         <div className="field-group" style={{ position: 'relative' }}>
           <div className="field-icon">
             <Icon path={mdiHandCoin} size={1} />
@@ -200,6 +227,7 @@ export default function ConsumablesSection({
             </div>
           </div>
         )}
+      </div>
       </div>
     </section>
   );
