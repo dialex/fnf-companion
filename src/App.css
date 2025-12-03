@@ -316,6 +316,30 @@ textarea.field-input.notes-handwritten {
   font-size: 0.875rem;
 }
 
+/* Action sounds checkbox - use primary color 1 and make it bigger */
+#actionSoundsCheckbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: var(--primary-color-1);
+}
+
+#actionSoundsCheckbox:checked {
+  background-color: var(--primary-color-1);
+  border-color: var(--primary-color-1);
+}
+
+#actionSoundsCheckbox:focus {
+  border-color: var(--primary-color-1);
+  box-shadow: none;
+  outline: none;
+}
+
+#actionSoundsCheckbox:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
 /* Locked number fields - use primary color 1 and fixed width for 2 digits */
 .input-group-text.locked-number {
   background-color: var(--primary-color-1) !important;
@@ -323,41 +347,4 @@ textarea.field-input.notes-handwritten {
   min-width: 3rem;
   text-align: center;
   justify-content: center;
-}
-
-/* Action sounds toggle - use primary color 1, override all Bootstrap primary colors */
-.form-check.form-switch .action-sounds-toggle {
-  border-color: var(--primary-color-1) !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:not(:checked) {
-  background-color: transparent !important;
-  border-color: var(--primary-color-1) !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:not(:checked)::before {
-  background-color: var(--primary-color-1) !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:checked {
-  background-color: var(--primary-color-1) !important;
-  border-color: var(--primary-color-1) !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:checked::before {
-  background-color: white !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:focus {
-  border-color: var(--primary-color-1) !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:focus:checked {
-  background-color: var(--primary-color-1) !important;
-}
-
-.form-check.form-switch .action-sounds-toggle:focus:not(:checked) {
-  background-color: transparent !important;
 }

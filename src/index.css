@@ -13,14 +13,11 @@
 }
 
 .btn-primary:hover,
-.btn-primary:focus {
-  background-color: #152832 !important;
-  border-color: #152832 !important;
-}
-
-.btn-primary:active {
-  background-color: #102025 !important;
-  border-color: #102025 !important;
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
 }
 
 /* Override for btn-info - custom blue with white text */

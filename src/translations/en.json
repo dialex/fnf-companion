@@ -74,6 +74,7 @@
     "victory": "Victory",
     "defeat": "Defeat",
     "actionSounds": "Actions",
+    "actionSoundsTooltip": "Play sounds on actions",
     "invalidUrl": "Please provide a valid YouTube link.",
     "youtubeUrl": "YouTube link"
   },

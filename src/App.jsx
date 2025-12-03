@@ -161,6 +161,7 @@ function App() {
     victory: false,
     defeat: false,
   });
+  const actionSoundsCheckboxRef = useRef(null);
 
   // State management
   const isInitialMountRef = useRef(true);
@@ -1650,7 +1651,22 @@ function App() {
                       </div>
                     </div>
                     <div className="col-12 col-md-6">
-                      <h3 className="heading mb-3">{t('game.sound')}</h3>
+                      <div className="d-flex align-items-center gap-2 mb-3">
+                        <h3 className="heading mb-0">{t('game.sound')}</h3>
+                        <input
+                          ref={actionSoundsCheckboxRef}
+                          type="checkbox"
+                          id="actionSoundsCheckbox"
+                          checked={actionSoundsEnabled}
+                          onChange={(e) =>
+                            setActionSoundsEnabled(e.target.checked)
+                          }
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-title={t('game.actionSoundsTooltip')}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </div>
                       <div className="row g-3">
                         {['ambience', 'battle', 'victory', 'defeat'].map(
                           (soundType) => (
@@ -1785,26 +1801,6 @@ function App() {
                             </div>
                           )
                         )}
-                      </div>
-                      <div className="d-flex justify-content-center align-items-center mt-3">
-                        <label
-                          className="content me-2 mb-0"
-                          htmlFor="actionSoundsToggle"
-                        >
-                          {t('game.actionSounds')}
-                        </label>
-                        <div className="form-check form-switch mb-0">
-                          <input
-                            className="form-check-input action-sounds-toggle"
-                            type="checkbox"
-                            role="switch"
-                            id="actionSoundsToggle"
-                            checked={actionSoundsEnabled}
-                            onChange={(e) =>
-                              setActionSoundsEnabled(e.target.checked)
-                            }
-                          />
-                        </div>
                       </div>
                     </div>
                   </div>

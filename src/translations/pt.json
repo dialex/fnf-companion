@@ -74,6 +74,7 @@
     "victory": "Vitória",
     "defeat": "Derrota",
     "actionSounds": "Ações",
+    "actionSoundsTooltip": "Ouvir sons das ações",
     "invalidUrl": "Por favor introduz um link do YouTube.",
     "youtubeUrl": "Link do YouTube"
   },
