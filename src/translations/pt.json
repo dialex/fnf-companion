@@ -99,6 +99,7 @@
     "creature": "Criatura",
     "creaturePlaceholder": "Nome",
     "fight": "Combater",
+    "attack": "Atacar",
     "useLuck": "Usar sorte",
     "attackTie": "Empate, nada acontece",
     "attackWin": "Atacaste o monstro!",

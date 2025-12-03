@@ -87,6 +87,7 @@ function App() {
   const [fightOutcome, setFightOutcome] = useState(null);
   const [heroDiceRolls, setHeroDiceRolls] = useState(null);
   const [monsterDiceRolls, setMonsterDiceRolls] = useState(null);
+  const [isFightStarted, setIsFightStarted] = useState(false);
 
   // Dice rolling state
   const [rollingButton, setRollingButton] = useState(null);
@@ -225,6 +226,38 @@ function App() {
     setTimeout(() => {
       isInitialMountRef.current = false;
     }, 100);
+  }, []);
+
+  // Debug: Log current Bootstrap breakpoint
+  useEffect(() => {
+    const getBreakpoint = () => {
+      const width = window.innerWidth;
+      if (width >= 1400) return 'xxl (≥1400px)';
+      if (width >= 1200) return 'xl (≥1200px)';
+      if (width >= 992) return 'lg (≥992px)';
+      if (width >= 768) return 'md (≥768px)';
+      if (width >= 576) return 'sm (≥576px)';
+      return 'xs (<576px)';
+    };
+
+    const logBreakpoint = () => {
+      const breakpoint = getBreakpoint();
+      const width = window.innerWidth;
+      console.log(
+        `[Bootstrap Breakpoint] Current: ${breakpoint} | Width: ${width}px`
+      );
+    };
+
+    // Log on mount
+    logBreakpoint();
+
+    // Log on resize
+    const handleResize = () => {
+      logBreakpoint();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Save state on changes (debounced)
@@ -551,14 +584,19 @@ function App() {
     try {
       // Clear manual stop flag
       soundStoppedManuallyRef.current[soundType] = false;
-      // Pause all other sounds
+      // Pause all other sounds - check all players, not just those marked as playing
       const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
       soundTypes.forEach((st) => {
-        if (st !== soundType && soundPlaying[st]) {
+        if (st !== soundType) {
           const otherPlayer = youtubePlayersRef.current[st];
           if (otherPlayer) {
             try {
-              otherPlayer.pauseVideo();
+              // Check if video is actually playing and pause it
+              const playerState = otherPlayer.getPlayerState();
+              if (playerState === 1) {
+                // 1 = playing
+                otherPlayer.pauseVideo();
+              }
               setSoundPlaying((prev) => ({
                 ...prev,
                 [st]: false,
@@ -867,6 +905,7 @@ function App() {
     setShowUseLuck(false);
     setLuckUsed(false);
     setIsFighting(false);
+    setIsFightStarted(false);
     setFightResult(null);
     setFightOutcome(null);
     setHeroDiceRolls(null);
@@ -1222,6 +1261,7 @@ function App() {
         `${currentGraveyard}${separator}${t('fight.defeatCreature')} ${creatureName}`
       );
       setIsFighting(false);
+      setIsFightStarted(false);
       setDiceRollingType(null);
       setTimeout(() => {
         setFightOutcome(null);
@@ -1255,6 +1295,7 @@ function App() {
         `${currentGraveyard}${separator}${t('fight.defeatedBy')} ${creatureName}`
       );
       setIsFighting(false);
+      setIsFightStarted(false);
       setDiceRollingType(null);
       setTimeout(() => {
         setFightOutcome(null);
@@ -1294,8 +1335,12 @@ function App() {
       return;
     }
 
-    // Auto-play battle sound from the start
-    autoPlaySound('battle');
+    // Auto-play battle sound only on first fight click - do this immediately
+    if (!isFightStarted) {
+      setIsFightStarted(true);
+      // Call autoPlaySound immediately, before any other state changes
+      autoPlaySound('battle');
+    }
 
     if (fightTimeoutRef.current) {
       clearTimeout(fightTimeoutRef.current);
@@ -1998,6 +2043,7 @@ function App() {
               showUseLuck={showUseLuck}
               luckUsed={luckUsed}
               isFighting={isFighting}
+              isFightStarted={isFightStarted}
               fightResult={fightResult}
               fightOutcome={fightOutcome}
               heroDiceRolls={heroDiceRolls}

@@ -99,6 +99,7 @@
     "creature": "Creature",
     "creaturePlaceholder": "Name",
     "fight": "Fight",
+    "attack": "Attack",
     "useLuck": "Use luck",
     "attackTie": "It's a tie, nothing happens",
     "attackWin": "You hit the monster!",

@@ -27,6 +27,7 @@ export default function FightSection({
   showUseLuck,
   luckUsed,
   isFighting,
+  isFightStarted,
   fightResult,
   fightOutcome,
   heroDiceRolls,
@@ -262,7 +263,7 @@ export default function FightSection({
                     }
                     onClick={onFight}
                   >
-                    {t('fight.fight')}
+                    {isFightStarted ? t('fight.attack') : t('fight.fight')}
                     <Icon path={mdiSwordCross} size={1} />
                   </button>
                   {showUseLuck && (
