@@ -762,22 +762,26 @@ function App() {
     }
 
     if (potionType === 'skill' && maxSkill !== null) {
+      const currentSkill = parseInt(skill) || 0;
+      const difference = maxSkill - currentSkill;
       setSkill(String(maxSkill));
-      showFieldBadge(
-        'skill',
-        `+${maxSkill - (parseInt(skill) || 0)}`,
-        'success'
-      );
+      if (difference > 0) {
+        showFieldBadge('skill', `+${difference}`, 'success');
+      }
     } else if (potionType === 'health' && maxHealth !== null) {
+      const currentHealth = parseInt(health) || 0;
+      const difference = maxHealth - currentHealth;
       setHealth(String(maxHealth));
-      showFieldBadge(
-        'health',
-        `+${maxHealth - (parseInt(health) || 0)}`,
-        'success'
-      );
+      if (difference > 0) {
+        showFieldBadge('health', `+${difference}`, 'success');
+      }
     } else if (potionType === 'luck' && maxLuck !== null) {
+      const currentLuck = parseInt(luck) || 0;
+      const difference = maxLuck - currentLuck;
       setLuck(String(maxLuck));
-      showFieldBadge('luck', `+${maxLuck - (parseInt(luck) || 0)}`, 'success');
+      if (difference > 0) {
+        showFieldBadge('luck', `+${difference}`, 'success');
+      }
     }
 
     setPotionUsed(true);
