@@ -383,6 +383,10 @@ function App() {
       };
       return newSequence;
     });
+    // Auto-play defeat sound when died button is clicked
+    if (color === 'dark') {
+      autoPlaySound('defeat');
+    }
   };
 
   // Sound handlers
@@ -531,6 +535,45 @@ function App() {
       } catch (e) {
         console.error('Error setting volume:', e);
       }
+    }
+  };
+
+  // Auto-play sound from the beginning (stop then play)
+  const autoPlaySound = (soundType) => {
+    const player = youtubePlayersRef.current[soundType];
+    if (!player || !soundUrls[soundType]) return;
+
+    try {
+      // Clear manual stop flag
+      soundStoppedManuallyRef.current[soundType] = false;
+      // Pause all other sounds
+      const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
+      soundTypes.forEach((st) => {
+        if (st !== soundType && soundPlaying[st]) {
+          const otherPlayer = youtubePlayersRef.current[st];
+          if (otherPlayer) {
+            try {
+              otherPlayer.pauseVideo();
+              setSoundPlaying((prev) => ({
+                ...prev,
+                [st]: false,
+              }));
+            } catch (e) {
+              // Ignore errors
+            }
+          }
+        }
+      });
+      // Reset to beginning and play
+      player.pauseVideo();
+      player.seekTo(0, true);
+      player.playVideo();
+      setSoundPlaying((prev) => ({
+        ...prev,
+        [soundType]: true,
+      }));
+    } catch (e) {
+      console.error('Error auto-playing sound:', e);
     }
   };
 
@@ -1166,6 +1209,8 @@ function App() {
 
     if (currentMonsterHealth <= 0 && creatureName) {
       setFightOutcome('won');
+      // Auto-play victory sound
+      autoPlaySound('victory');
       const currentGraveyard = graveyard.trim();
       const separator = currentGraveyard ? '\n' : '';
       setGraveyard(
@@ -1188,6 +1233,8 @@ function App() {
       return true;
     } else if (currentHealth <= 0) {
       setFightOutcome('lost');
+      // Auto-play defeat sound
+      autoPlaySound('defeat');
       const currentGraveyard = graveyard.trim();
       const separator = currentGraveyard ? '\n' : '';
       setGraveyard(
@@ -1232,6 +1279,9 @@ function App() {
     ) {
       return;
     }
+
+    // Auto-play battle sound from the start
+    autoPlaySound('battle');
 
     if (fightTimeoutRef.current) {
       clearTimeout(fightTimeoutRef.current);
