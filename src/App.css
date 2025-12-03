@@ -298,14 +298,14 @@ textarea.field-input.notes-handwritten {
 
 /* Volume slider styling - use Bootstrap primary color */
 .form-range::-webkit-slider-thumb {
-  background-color: var(--bg-primary);
+  background-color: #0d6efd !important;
   border: none;
   width: 12px;
   height: 12px;
 }
 
 .form-range::-moz-range-thumb {
-  background-color: var(--bg-primary);
+  background-color: #0d6efd !important;
   border: none;
   width: 12px;
   height: 12px;
@@ -314,4 +314,15 @@ textarea.field-input.notes-handwritten {
 /* Sound validation message styling */
 .invalid-feedback.sound-error {
   font-size: 0.875rem;
+}
+
+/* Action sounds toggle - use primary color */
+.action-sounds-toggle:checked {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.action-sounds-toggle:focus {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
 }

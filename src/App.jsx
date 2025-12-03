@@ -153,7 +153,14 @@ function App() {
     victory: 100,
     defeat: 100,
   });
+  const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
   const youtubePlayersRef = useRef({});
+  const soundStoppedManuallyRef = useRef({
+    ambience: false,
+    battle: false,
+    victory: false,
+    defeat: false,
+  });
 
   // State management
   const isInitialMountRef = useRef(true);
@@ -208,6 +215,7 @@ function App() {
         setTrailSequence,
         setSoundUrls,
         setSoundVolumes,
+        setActionSoundsEnabled,
       });
     }
 
@@ -263,6 +271,7 @@ function App() {
       trailSequence,
       soundUrls,
       soundVolumes,
+      actionSoundsEnabled,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -309,6 +318,7 @@ function App() {
     trailSequence,
     soundUrls,
     soundVolumes,
+    actionSoundsEnabled,
   ]);
 
   // Utility functions
@@ -490,9 +500,15 @@ function App() {
     const player = youtubePlayersRef.current[soundType];
     if (!player) return;
 
+    // Only stop if it's currently playing
+    if (!soundPlaying[soundType]) return;
+
     try {
-      player.stopVideo();
-      player.seekTo(0);
+      // Mark as manually stopped to prevent auto-restart
+      soundStoppedManuallyRef.current[soundType] = true;
+      // Pause first, then seek to beginning
+      player.pauseVideo();
+      player.seekTo(0, true); // true = allowSeekAhead
       setSoundPlaying((prev) => ({
         ...prev,
         [soundType]: false,
@@ -568,16 +584,31 @@ function App() {
               events: {
                 onStateChange: (event) => {
                   // 0 = ended, 1 = playing, 2 = paused
+                  const shouldLoop =
+                    soundType === 'ambience' || soundType === 'battle';
+
+                  // Don't auto-restart if user manually stopped
+                  if (soundStoppedManuallyRef.current[soundType]) {
+                    if (event.data === 0 || event.data === 2) {
+                      // Video ended or paused after manual stop - keep it stopped
+                      setSoundPlaying((prev) => ({
+                        ...prev,
+                        [soundType]: false,
+                      }));
+                    }
+                    return;
+                  }
+
                   if (event.data === 0) {
                     // Video ended
-                    if (
-                      (soundType === 'ambience' || soundType === 'battle') &&
-                      soundPlaying[soundType]
-                    ) {
-                      // Restart if it was playing and should loop
+                    if (shouldLoop) {
+                      // Restart if it should loop (ambience/battle)
                       try {
-                        youtubePlayersRef.current[soundType].seekTo(0);
-                        youtubePlayersRef.current[soundType].playVideo();
+                        const player = youtubePlayersRef.current[soundType];
+                        if (player) {
+                          player.seekTo(0);
+                          player.playVideo();
+                        }
                       } catch (e) {
                         setSoundPlaying((prev) => ({
                           ...prev,
@@ -585,18 +616,28 @@ function App() {
                         }));
                       }
                     } else {
-                      // Stop for victory and defeat
+                      // Stop for victory and defeat - ensure they don't loop
+                      try {
+                        const player = youtubePlayersRef.current[soundType];
+                        if (player) {
+                          player.stopVideo();
+                        }
+                      } catch (e) {
+                        // Ignore errors
+                      }
                       setSoundPlaying((prev) => ({
                         ...prev,
                         [soundType]: false,
                       }));
                     }
                   } else if (event.data === 2) {
+                    // Paused
                     setSoundPlaying((prev) => ({
                       ...prev,
                       [soundType]: false,
                     }));
                   } else if (event.data === 1) {
+                    // Playing
                     setSoundPlaying((prev) => ({
                       ...prev,
                       [soundType]: true,
@@ -683,12 +724,14 @@ function App() {
   const handleConsumeMeal = () => {
     const currentMeals = parseInt(meals) || 0;
     if (currentMeals > 0) {
-      const audio = new Audio(
-        `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
-      );
-      audio.play().catch((error) => {
-        console.warn('Could not play audio:', error);
-      });
+      if (actionSoundsEnabled) {
+        const audio = new Audio(
+          `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
+        );
+        audio.play().catch((error) => {
+          console.warn('Could not play audio:', error);
+        });
+      }
 
       setMeals(String(currentMeals - 1));
       showFieldBadge('meals', '-1', 'danger');
@@ -708,6 +751,15 @@ function App() {
 
   const handleConsumePotion = () => {
     if (potionUsed || !potionType || !isLocked) return;
+
+    if (actionSoundsEnabled) {
+      const audio = new Audio(
+        `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
+      );
+      audio.play().catch((error) => {
+        console.warn('Could not play audio:', error);
+      });
+    }
 
     if (potionType === 'skill' && maxSkill !== null) {
       setSkill(String(maxSkill));
@@ -775,6 +827,7 @@ function App() {
     setDiceRollingType(null);
     setTrailSequence([{ number: 1, color: 'primary-1' }]);
     setTrailInput('');
+    setActionSoundsEnabled(true);
     setSoundUrls({
       ambience: '',
       battle: '',
@@ -805,6 +858,13 @@ function App() {
       victory: 100,
       defeat: 100,
     });
+    // Reset manual stop flags
+    soundStoppedManuallyRef.current = {
+      ambience: false,
+      battle: false,
+      victory: false,
+      defeat: false,
+    };
     // Stop and remove all YouTube players
     Object.keys(youtubePlayersRef.current).forEach((soundType) => {
       try {
@@ -859,6 +919,7 @@ function App() {
       trailSequence,
       soundUrls,
       soundVolumes,
+      actionSoundsEnabled,
     });
 
     // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
@@ -1013,12 +1074,14 @@ function App() {
       const isLucky = sum <= currentLuck;
 
       if (isLucky) {
-        const audio = new Audio(
-          `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
-        );
-        audio.play().catch((error) => {
-          console.warn('Could not play audio:', error);
-        });
+        if (actionSoundsEnabled) {
+          const audio = new Audio(
+            `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
+          );
+          audio.play().catch((error) => {
+            console.warn('Could not play audio:', error);
+          });
+        }
       }
 
       setTestLuckResult({ roll1, roll2, isLucky });
@@ -1310,12 +1373,14 @@ function App() {
       const isLucky = sum <= currentLuck;
 
       if (isLucky) {
-        const audio = new Audio(
-          `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
-        );
-        audio.play().catch((error) => {
-          console.warn('Could not play audio:', error);
-        });
+        if (actionSoundsEnabled) {
+          const audio = new Audio(
+            `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
+          );
+          audio.play().catch((error) => {
+            console.warn('Could not play audio:', error);
+          });
+        }
       }
 
       const heroWonLastFight = fightResult.type === 'heroWins';
@@ -1716,6 +1781,26 @@ function App() {
                             </div>
                           )
                         )}
+                      </div>
+                      <div className="d-flex justify-content-center mt-3">
+                        <div className="form-check form-switch">
+                          <input
+                            className="form-check-input action-sounds-toggle"
+                            type="checkbox"
+                            role="switch"
+                            id="actionSoundsToggle"
+                            checked={actionSoundsEnabled}
+                            onChange={(e) =>
+                              setActionSoundsEnabled(e.target.checked)
+                            }
+                          />
+                          <label
+                            className="form-check-label content"
+                            htmlFor="actionSoundsToggle"
+                          >
+                            {t('game.actionSounds')}
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
