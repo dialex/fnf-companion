@@ -175,7 +175,10 @@ body {
   flex-shrink: 0;
 }
 
-.field-input {
+.field-input,
+input.field-input,
+input[type='number'].field-input,
+input[type='text'].field-input {
   flex: 1;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-color);
@@ -189,9 +192,10 @@ body {
   border-color: var(--border-focus);
 }
 
-textarea.field-input {
+textarea.field-input,
+textarea.field-input.form-control {
   width: 100%;
-  font-family: inherit;
+  font-size: 1.15rem;
   resize: vertical;
   min-height: 200px;
 }
@@ -205,7 +209,6 @@ textarea.field-input.notes-handwritten {
   line-height: 1.2 !important; /* tighter line spacing */
 }
 
-/* Dice buttons */
 .dice-buttons {
   display: flex;
   flex-direction: column;
@@ -232,7 +235,6 @@ textarea.field-input.notes-handwritten {
   background: var(--button-active);
 }
 
-/* Header */
 header h1.heading {
   margin: 0;
   line-height: 1;
@@ -247,7 +249,6 @@ header h1.heading {
   }
 }
 
-/* Transaction cost input */
 .transaction-cost-input {
   width: 3rem !important;
   flex: 0 0 3rem !important;

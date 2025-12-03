@@ -1,1 +1,35 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Font overrides - placed here to override Bootstrap without !important */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-light,
+.btn-danger,
+.btn-info {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.form-control,
+input.form-control,
+input[type='number'].form-control,
+input[type='text'].form-control {
+  font-family: 'Caudex', serif;
+}
+
+textarea.form-control {
+  font-family: 'Caudex', serif;
+}
+
+.badge {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.invalid-feedback {
+  font-family: 'Caudex', serif;
+  font-weight: 500;
+}
