@@ -58,7 +58,19 @@ export const getDefaultState = () => ({
     testSkillResult: null,
     diceRollingType: null,
   },
-    trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
+  sounds: {
+    ambience: '',
+    battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
+    victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
+    defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
+  },
+  soundVolumes: {
+    ambience: 100,
+    battle: 100,
+    victory: 100,
+    defeat: 100,
+  },
+  trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
 });
 
 /**
@@ -91,6 +103,14 @@ export const loadState = () => {
     diceRolls: {
       ...defaultState.diceRolls,
       ...(savedState.diceRolls || {}),
+    },
+    sounds: {
+      ...defaultState.sounds,
+      ...(savedState.sounds || {}),
+    },
+    soundVolumes: {
+      ...defaultState.soundVolumes,
+      ...(savedState.soundVolumes || {}),
     },
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
     trailSequence: savedState.trailSequence || defaultState.trailSequence,
@@ -187,6 +207,18 @@ export const buildStateObject = (stateValues) => {
       testSkillResult: stateValues.testSkillResult ?? null,
       diceRollingType: stateValues.diceRollingType ?? null,
     },
+    sounds: {
+      ambience: stateValues.soundUrls?.ambience || '',
+      battle: stateValues.soundUrls?.battle || '',
+      victory: stateValues.soundUrls?.victory || '',
+      defeat: stateValues.soundUrls?.defeat || '',
+    },
+    soundVolumes: {
+      ambience: stateValues.soundVolumes?.ambience ?? 100,
+      battle: stateValues.soundVolumes?.battle ?? 100,
+      victory: stateValues.soundVolumes?.victory ?? 100,
+      defeat: stateValues.soundVolumes?.defeat ?? 100,
+    },
     trailSequence: stateValues.trailSequence || [{ number: 1, color: 'primary-1' }],
   };
 };
@@ -273,6 +305,27 @@ export const applyLoadedState = (savedState, setters) => {
       setters.setTestSkillResult(dice.testSkillResult);
     if (dice.diceRollingType !== undefined)
       setters.setDiceRollingType(dice.diceRollingType);
+  }
+
+  // Restore sounds state
+  if (savedState.sounds) {
+    const sounds = savedState.sounds;
+    if (setters.setSoundUrls) {
+      setters.setSoundUrls({
+        ambience: sounds.ambience || '',
+        battle: sounds.battle || '',
+        victory: sounds.victory || '',
+        defeat: sounds.defeat || '',
+      });
+    }
+  }
+  if (savedState.soundVolumes && setters.setSoundVolumes) {
+    setters.setSoundVolumes({
+      ambience: savedState.soundVolumes.ambience ?? 100,
+      battle: savedState.soundVolumes.battle ?? 100,
+      victory: savedState.soundVolumes.victory ?? 100,
+      defeat: savedState.soundVolumes.defeat ?? 100,
+    });
   }
 
   // Restore trail state

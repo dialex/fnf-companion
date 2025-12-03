@@ -295,3 +295,23 @@ textarea.field-input.notes-handwritten {
     transform: translateX(-50px);
   }
 }
+
+/* Volume slider styling - use Bootstrap primary color */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--bg-primary);
+  border: none;
+  width: 12px;
+  height: 12px;
+}
+
+.form-range::-moz-range-thumb {
+  background-color: var(--bg-primary);
+  border: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* Sound validation message styling */
+.invalid-feedback.sound-error {
+  font-size: 0.875rem;
+}

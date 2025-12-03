@@ -54,7 +54,12 @@
     "saveGame": "Save",
     "loadGame": "Load",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "submit": "Submit",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "delete": "Delete"
   },
   "confirm": {
     "reset": "Do you want to lose all progress and start a new game?"
@@ -67,7 +72,9 @@
     "ambience": "Ambience",
     "battle": "Battle",
     "victory": "Victory",
-    "defeat": "Defeat"
+    "defeat": "Defeat",
+    "invalidUrl": "Please provide a valid YouTube link.",
+    "youtubeUrl": "YouTube URL"
   },
   "inventory": {
     "label": "You carry in your backpack..."

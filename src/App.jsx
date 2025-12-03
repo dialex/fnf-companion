@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '@mdi/react';
-import { mdiChevronDown, mdiChevronUp, mdiBook } from '@mdi/js';
+import {
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiBook,
+  mdiPlay,
+  mdiPause,
+  mdiStop,
+  mdiTrashCan,
+  mdiCheck,
+  mdiVolumeHigh,
+} from '@mdi/js';
 import { t, getCurrentLanguage, setLanguage } from './translations';
+import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import {
   loadState,
   saveState,
@@ -111,6 +122,39 @@ function App() {
     setIsGameExpanded(!isGameExpanded);
   };
 
+  // Sound state
+  const [soundUrls, setSoundUrls] = useState({
+    ambience: '',
+    battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
+    victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
+    defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
+  });
+  const [soundInputs, setSoundInputs] = useState({
+    ambience: '',
+    battle: '',
+    victory: '',
+    defeat: '',
+  });
+  const [soundErrors, setSoundErrors] = useState({
+    ambience: null,
+    battle: null,
+    victory: null,
+    defeat: null,
+  });
+  const [soundPlaying, setSoundPlaying] = useState({
+    ambience: false,
+    battle: false,
+    victory: false,
+    defeat: false,
+  });
+  const [soundVolumes, setSoundVolumes] = useState({
+    ambience: 100,
+    battle: 100,
+    victory: 100,
+    defeat: 100,
+  });
+  const youtubePlayersRef = useRef({});
+
   // State management
   const isInitialMountRef = useRef(true);
   const debouncedSaveRef = useRef(
@@ -162,6 +206,8 @@ function App() {
         setTestSkillResult,
         setDiceRollingType,
         setTrailSequence,
+        setSoundUrls,
+        setSoundVolumes,
       });
     }
 
@@ -215,6 +261,8 @@ function App() {
       testSkillResult,
       diceRollingType,
       trailSequence,
+      soundUrls,
+      soundVolumes,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -259,6 +307,8 @@ function App() {
     testSkillResult,
     diceRollingType,
     trailSequence,
+    soundUrls,
+    soundVolumes,
   ]);
 
   // Utility functions
@@ -323,6 +373,270 @@ function App() {
       return newSequence;
     });
   };
+
+  // Sound handlers
+  const handleSoundInputChange = (soundType, value) => {
+    setSoundInputs((prev) => ({
+      ...prev,
+      [soundType]: value,
+    }));
+    // Clear error when user types
+    if (soundErrors[soundType]) {
+      setSoundErrors((prev) => ({
+        ...prev,
+        [soundType]: null,
+      }));
+    }
+  };
+
+  const handleSoundSubmit = (soundType) => {
+    const url = soundInputs[soundType].trim();
+    if (!url) {
+      return;
+    }
+
+    if (isValidYouTubeUrl(url)) {
+      setSoundUrls((prev) => ({
+        ...prev,
+        [soundType]: url,
+      }));
+      setSoundInputs((prev) => ({
+        ...prev,
+        [soundType]: '',
+      }));
+      setSoundErrors((prev) => ({
+        ...prev,
+        [soundType]: null,
+      }));
+    } else {
+      setSoundErrors((prev) => ({
+        ...prev,
+        [soundType]: t('game.invalidUrl'),
+      }));
+    }
+  };
+
+  const handleSoundDelete = (soundType) => {
+    setSoundUrls((prev) => ({
+      ...prev,
+      [soundType]: '',
+    }));
+    setSoundInputs((prev) => ({
+      ...prev,
+      [soundType]: '',
+    }));
+    setSoundErrors((prev) => ({
+      ...prev,
+      [soundType]: null,
+    }));
+    setSoundPlaying((prev) => ({
+      ...prev,
+      [soundType]: false,
+    }));
+    // Stop and remove player
+    if (youtubePlayersRef.current[soundType]) {
+      try {
+        youtubePlayersRef.current[soundType].stopVideo();
+      } catch (e) {
+        // Ignore errors
+      }
+      delete youtubePlayersRef.current[soundType];
+    }
+  };
+
+  const handleSoundPlayPause = (soundType) => {
+    const player = youtubePlayersRef.current[soundType];
+    if (!player) return;
+
+    try {
+      if (soundPlaying[soundType]) {
+        player.pauseVideo();
+        setSoundPlaying((prev) => ({
+          ...prev,
+          [soundType]: false,
+        }));
+      } else {
+        // Pause all other sounds
+        const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
+        soundTypes.forEach((st) => {
+          if (st !== soundType && soundPlaying[st]) {
+            const otherPlayer = youtubePlayersRef.current[st];
+            if (otherPlayer) {
+              try {
+                otherPlayer.pauseVideo();
+                setSoundPlaying((prev) => ({
+                  ...prev,
+                  [st]: false,
+                }));
+              } catch (e) {
+                // Ignore errors
+              }
+            }
+          }
+        });
+        // Play the selected sound
+        player.playVideo();
+        setSoundPlaying((prev) => ({
+          ...prev,
+          [soundType]: true,
+        }));
+      }
+    } catch (e) {
+      console.error('Error controlling YouTube player:', e);
+    }
+  };
+
+  const handleSoundStop = (soundType) => {
+    const player = youtubePlayersRef.current[soundType];
+    if (!player) return;
+
+    try {
+      player.stopVideo();
+      player.seekTo(0);
+      setSoundPlaying((prev) => ({
+        ...prev,
+        [soundType]: false,
+      }));
+    } catch (e) {
+      console.error('Error stopping YouTube player:', e);
+    }
+  };
+
+  const handleSoundVolumeChange = (soundType, volume) => {
+    setSoundVolumes((prev) => ({
+      ...prev,
+      [soundType]: volume,
+    }));
+    const player = youtubePlayersRef.current[soundType];
+    if (player) {
+      try {
+        player.setVolume(volume);
+      } catch (e) {
+        console.error('Error setting volume:', e);
+      }
+    }
+  };
+
+  // Initialize YouTube player when URL is set
+  useEffect(() => {
+    const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
+
+    // Load YouTube IFrame API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    const initPlayer = (soundType) => {
+      if (!soundUrls[soundType] || youtubePlayersRef.current[soundType]) {
+        return;
+      }
+
+      if (window.YT && window.YT.Player) {
+        const videoId = extractVideoId(soundUrls[soundType]);
+        if (videoId) {
+          const playerId = `youtube-player-${soundType}`;
+          // Create hidden iframe container
+          let container = document.getElementById(playerId);
+          if (!container) {
+            container = document.createElement('div');
+            container.id = playerId;
+            container.style.display = 'none';
+            document.body.appendChild(container);
+          }
+
+          youtubePlayersRef.current[soundType] = new window.YT.Player(
+            playerId,
+            {
+              videoId: videoId,
+              playerVars: {
+                autoplay: 0,
+                controls: 0,
+                disablekb: 1,
+                enablejsapi: 1,
+                fs: 0,
+                iv_load_policy: 3,
+                modestbranding: 1,
+                playsinline: 1,
+                rel: 0,
+                ...(soundType === 'ambience' || soundType === 'battle'
+                  ? { loop: 1, playlist: videoId } // Loop only for ambience and battle
+                  : {}),
+              },
+              events: {
+                onStateChange: (event) => {
+                  // 0 = ended, 1 = playing, 2 = paused
+                  if (event.data === 0) {
+                    // Video ended
+                    if (
+                      (soundType === 'ambience' || soundType === 'battle') &&
+                      soundPlaying[soundType]
+                    ) {
+                      // Restart if it was playing and should loop
+                      try {
+                        youtubePlayersRef.current[soundType].seekTo(0);
+                        youtubePlayersRef.current[soundType].playVideo();
+                      } catch (e) {
+                        setSoundPlaying((prev) => ({
+                          ...prev,
+                          [soundType]: false,
+                        }));
+                      }
+                    } else {
+                      // Stop for victory and defeat
+                      setSoundPlaying((prev) => ({
+                        ...prev,
+                        [soundType]: false,
+                      }));
+                    }
+                  } else if (event.data === 2) {
+                    setSoundPlaying((prev) => ({
+                      ...prev,
+                      [soundType]: false,
+                    }));
+                  } else if (event.data === 1) {
+                    setSoundPlaying((prev) => ({
+                      ...prev,
+                      [soundType]: true,
+                    }));
+                  }
+                },
+              },
+            }
+          );
+
+          // Set initial volume
+          setTimeout(() => {
+            if (youtubePlayersRef.current[soundType]) {
+              youtubePlayersRef.current[soundType].setVolume(
+                soundVolumes[soundType]
+              );
+            }
+          }, 500);
+        }
+      } else {
+        setTimeout(() => initPlayer(soundType), 100);
+      }
+    };
+
+    // Initialize all players
+    soundTypes.forEach((soundType) => {
+      if (soundUrls[soundType] && !youtubePlayersRef.current[soundType]) {
+        if (window.YT && window.YT.Player) {
+          initPlayer(soundType);
+        } else {
+          // Store original callback if it exists
+          const originalCallback = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => {
+            if (originalCallback) originalCallback();
+            soundTypes.forEach((st) => initPlayer(st));
+          };
+        }
+      }
+    });
+  }, [soundUrls, soundVolumes]);
 
   // Character handlers
   const handleRandomStats = () => {
@@ -461,6 +775,45 @@ function App() {
     setDiceRollingType(null);
     setTrailSequence([{ number: 1, color: 'primary-1' }]);
     setTrailInput('');
+    setSoundUrls({
+      ambience: '',
+      battle: '',
+      victory: '',
+      defeat: '',
+    });
+    setSoundInputs({
+      ambience: '',
+      battle: '',
+      victory: '',
+      defeat: '',
+    });
+    setSoundErrors({
+      ambience: null,
+      battle: null,
+      victory: null,
+      defeat: null,
+    });
+    setSoundPlaying({
+      ambience: false,
+      battle: false,
+      victory: false,
+      defeat: false,
+    });
+    setSoundVolumes({
+      ambience: 100,
+      battle: 100,
+      victory: 100,
+      defeat: 100,
+    });
+    // Stop and remove all YouTube players
+    Object.keys(youtubePlayersRef.current).forEach((soundType) => {
+      try {
+        youtubePlayersRef.current[soundType].stopVideo();
+      } catch (e) {
+        // Ignore errors
+      }
+    });
+    youtubePlayersRef.current = {};
     setShouldExpandSections(false);
     // Force all sections to remount with collapsed state
     setSectionResetKey((prev) => prev + 1);
@@ -504,6 +857,8 @@ function App() {
       testSkillResult,
       diceRollingType,
       trailSequence,
+      soundUrls,
+      soundVolumes,
     });
 
     // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
@@ -605,6 +960,8 @@ function App() {
             setTestSkillResult,
             setDiceRollingType,
             setTrailSequence,
+            setSoundUrls,
+            setSoundVolumes,
           });
 
           setNotification({ message: t('game.loaded'), type: 'success' });
@@ -1225,11 +1582,140 @@ function App() {
                     </div>
                     <div className="col-12 col-md-6">
                       <h3 className="heading mb-3">{t('game.sound')}</h3>
-                      <div className="d-flex flex-column gap-2">
-                        <div className="content">{t('game.ambience')}</div>
-                        <div className="content">{t('game.battle')}</div>
-                        <div className="content">{t('game.victory')}</div>
-                        <div className="content">{t('game.defeat')}</div>
+                      <div className="row g-3">
+                        {['ambience', 'battle', 'victory', 'defeat'].map(
+                          (soundType) => (
+                            <div key={soundType} className="col-6">
+                              <label className="content field-label mb-2">
+                                {t(`game.${soundType}`)}
+                              </label>
+                              {!soundUrls[soundType] ? (
+                                <div>
+                                  <div
+                                    className="input-group"
+                                    style={{ flex: 1 }}
+                                  >
+                                    <input
+                                      type="text"
+                                      className={`content field-input form-control ${
+                                        soundErrors[soundType]
+                                          ? 'is-invalid'
+                                          : ''
+                                      }`}
+                                      placeholder={t('game.youtubeUrl')}
+                                      value={soundInputs[soundType]}
+                                      onChange={(e) =>
+                                        handleSoundInputChange(
+                                          soundType,
+                                          e.target.value
+                                        )
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          handleSoundSubmit(soundType);
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      className="btn btn-primary"
+                                      onClick={() =>
+                                        handleSoundSubmit(soundType)
+                                      }
+                                      style={{
+                                        minWidth: 'auto',
+                                        width: 'auto',
+                                        padding: '0.5rem',
+                                      }}
+                                    >
+                                      <Icon path={mdiCheck} size={1} />
+                                    </button>
+                                  </div>
+                                  {soundErrors[soundType] && (
+                                    <div className="invalid-feedback d-block sound-error">
+                                      {soundErrors[soundType]}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="d-flex align-items-center gap-2 flex-wrap">
+                                  <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => handleSoundDelete(soundType)}
+                                    style={{
+                                      minWidth: 'auto',
+                                      width: 'auto',
+                                      padding: '0.5rem',
+                                    }}
+                                    title={t('buttons.delete')}
+                                  >
+                                    <Icon path={mdiTrashCan} size={1} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() =>
+                                      handleSoundPlayPause(soundType)
+                                    }
+                                    style={{
+                                      minWidth: 'auto',
+                                      width: 'auto',
+                                      padding: '0.5rem',
+                                    }}
+                                    title={
+                                      soundPlaying[soundType]
+                                        ? t('buttons.pause')
+                                        : t('buttons.play')
+                                    }
+                                  >
+                                    <Icon
+                                      path={
+                                        soundPlaying[soundType]
+                                          ? mdiPause
+                                          : mdiPlay
+                                      }
+                                      size={1}
+                                    />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => handleSoundStop(soundType)}
+                                    style={{
+                                      minWidth: 'auto',
+                                      width: 'auto',
+                                      padding: '0.5rem',
+                                    }}
+                                    title={t('buttons.stop')}
+                                  >
+                                    <Icon path={mdiStop} size={1} />
+                                  </button>
+                                  <div className="d-flex align-items-center gap-1">
+                                    <Icon path={mdiVolumeHigh} size={0.8} />
+                                    <input
+                                      type="range"
+                                      className="form-range"
+                                      min="0"
+                                      max="100"
+                                      value={soundVolumes[soundType]}
+                                      onChange={(e) =>
+                                        handleSoundVolumeChange(
+                                          soundType,
+                                          parseInt(e.target.value)
+                                        )
+                                      }
+                                      style={{
+                                        width: '50px',
+                                        height: '4px',
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>

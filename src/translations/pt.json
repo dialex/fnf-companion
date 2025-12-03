@@ -54,7 +54,12 @@
     "saveGame": "Guardar",
     "loadGame": "Carregar",
     "yes": "Sim",
-    "no": "Não"
+    "no": "Não",
+    "submit": "Submeter",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "stop": "Parar",
+    "delete": "Eliminar"
   },
   "confirm": {
     "reset": "Queres perder todo o progresso e recomeçar do zero?"
@@ -67,7 +72,9 @@
     "ambience": "Ambiente",
     "battle": "Batalha",
     "victory": "Vitória",
-    "defeat": "Derrota"
+    "defeat": "Derrota",
+    "invalidUrl": "Por favor introduz um link do YouTube.",
+    "youtubeUrl": "URL do YouTube"
   },
   "inventory": {
     "label": "Carregas na tua mochila..."
