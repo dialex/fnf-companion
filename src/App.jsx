@@ -1041,6 +1041,13 @@ function App() {
   };
 
   const handlePurchase = () => {
+    if (actionSoundsEnabled) {
+      const audio = new Audio(`${import.meta.env.BASE_URL}audio/purchase.mp3`);
+      audio.play().catch((error) => {
+        console.warn('Could not play audio:', error);
+      });
+    }
+
     const objectName = transactionObject.trim();
     const cost = parseInt(transactionCost) || 0;
     const currentCoins = parseInt(coins) || 0;
