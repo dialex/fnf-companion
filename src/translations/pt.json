@@ -20,21 +20,51 @@
     "fight": "Combate",
     "notes": "Notas"
   },
-  "fields": {
+  "game": {
     "name": "Nome",
     "book": "Livro",
+    "saveGame": "Guardar",
+    "loadGame": "Carregar",
+    "reset": "Recomeçar",
+    "resetConfirm": "Queres perder todo o progresso e recomeçar do zero?",
+    "saved": "Jogo guardado",
+    "loaded": "Jogo carregado",
+    "sound": "Som",
+    "ambience": "Ambiente",
+    "battle": "Batalha",
+    "victory": "Vitória",
+    "defeat": "Derrota",
+    "actionSoundsTooltip": "Ouvir sons das ações",
+    "invalidUrl": "Por favor introduz um link do YouTube.",
+    "youtubeUrl": "Link do YouTube",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "stop": "Parar",
+    "delete": "Eliminar"
+  },
+  "character": {
+    "name": "Nome",
     "skill": "Perícia",
+    "skillPlaceholder": "1 dado + 6",
     "health": "Força",
+    "healthPlaceholder": "2 dados + 12",
     "luck": "Sorte",
+    "luckPlaceholder": "1 dado + 6",
+    "randomStats": "Aleatório",
+    "lock": "Bloquear",
+    "unlock": "Desbloquear"
+  },
+  "consumables": {
     "coins": "Moedas",
     "meals": "Refeições",
     "potion": "Poção",
-    "chapter": "Capítulo"
-  },
-  "placeholders": {
-    "skill": "1 dado + 6",
-    "health": "2 dados + 12",
-    "luck": "1 dado + 6"
+    "potionSelect": "Escolhe uma",
+    "potionRestoreSkill": "Recuperar perícia",
+    "potionRestoreHealth": "Recuperar força",
+    "potionRestoreLuck": "Recuperar sorte",
+    "buy": "Comprar",
+    "item": "Item",
+    "added": "Comprado"
   },
   "dice": {
     "testYourLuck": "Testar sorte",
@@ -46,51 +76,13 @@
     "youPassedTheTest": "Passaste!",
     "youFailedTheTest": "Falhaste..."
   },
-  "buttons": {
-    "randomStats": "Aleatório",
-    "lock": "Bloquear",
-    "unlock": "Desbloquear",
-    "reset": "Recomeçar",
-    "saveGame": "Guardar",
-    "loadGame": "Carregar",
-    "yes": "Sim",
-    "no": "Não",
-    "submit": "Submeter",
-    "play": "Reproduzir",
-    "pause": "Pausar",
-    "stop": "Parar",
-    "delete": "Eliminar"
-  },
-  "confirm": {
-    "reset": "Queres perder todo o progresso e recomeçar do zero?"
-  },
-  "game": {
-    "saved": "Jogo guardado",
-    "loaded": "Jogo carregado",
-    "book": "Livro",
-    "sound": "Som",
-    "ambience": "Ambiente",
-    "battle": "Batalha",
-    "victory": "Vitória",
-    "defeat": "Derrota",
-    "actionSounds": "Ações",
-    "actionSoundsTooltip": "Ouvir sons das ações",
-    "invalidUrl": "Por favor introduz um link do YouTube.",
-    "youtubeUrl": "Link do YouTube"
-  },
-  "inventory": {
-    "label": "Carregas na tua mochila..."
-  },
-  "transaction": {
-    "buy": "Comprar",
-    "item": "Item",
-    "added": "Comprado"
-  },
-  "potion": {
-    "select": "Escolhe uma",
-    "restoreSkill": "Recuperar perícia",
-    "restoreHealth": "Recuperar força",
-    "restoreLuck": "Recuperar sorte"
+  "trail": {
+    "died": "Morri",
+    "question": "Dúvida",
+    "good": "Bom",
+    "bad": "Mau",
+    "important": "Importante",
+    "chapter": "Capítulo"
   },
   "fight": {
     "graveyard": "Cemitério",
@@ -98,6 +90,9 @@
     "monster": "Monstro",
     "creature": "Criatura",
     "creaturePlaceholder": "Nome",
+    "skill": "Perícia",
+    "health": "Força",
+    "luck": "Sorte",
     "fight": "Combater",
     "attack": "Atacar",
     "useLuck": "Usar sorte",
@@ -114,12 +109,8 @@
     "defeatedBy": "Foste derrotado por",
     "youDied": "MORRESTE"
   },
-  "trail": {
-    "test": "Testar",
-    "died": "Morri",
-    "question": "Dúvida",
-    "good": "Bom",
-    "bad": "Mau",
-    "important": "Importante"
+  "dialog": {
+    "yes": "Sim",
+    "no": "Não"
   }
 }

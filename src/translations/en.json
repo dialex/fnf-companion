@@ -20,21 +20,51 @@
     "fight": "Fight",
     "notes": "Notes"
   },
-  "fields": {
+  "game": {
     "name": "Name",
     "book": "Book",
+    "saveGame": "Save",
+    "loadGame": "Load",
+    "reset": "Restart",
+    "resetConfirm": "Do you want to lose all progress and start a new game?",
+    "saved": "Game saved",
+    "loaded": "Game loaded",
+    "sound": "Sound",
+    "ambience": "Ambience",
+    "battle": "Battle",
+    "victory": "Victory",
+    "defeat": "Defeat",
+    "actionSoundsTooltip": "Play sounds on actions",
+    "invalidUrl": "Please provide a valid YouTube link.",
+    "youtubeUrl": "YouTube link",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "delete": "Delete"
+  },
+  "character": {
+    "name": "Name",
     "skill": "Skill",
+    "skillPlaceholder": "1 die + 6",
     "health": "Health",
+    "healthPlaceholder": "2 dice + 12",
     "luck": "Luck",
+    "luckPlaceholder": "1 die + 6",
+    "randomStats": "Randomize",
+    "lock": "Lock",
+    "unlock": "Unlock"
+  },
+  "consumables": {
     "coins": "Coins",
     "meals": "Meals",
     "potion": "Potion",
-    "chapter": "Chapter"
-  },
-  "placeholders": {
-    "skill": "1 die + 6",
-    "health": "2 dice + 12",
-    "luck": "1 die + 6"
+    "potionSelect": "Select potion",
+    "potionRestoreSkill": "Restore skill",
+    "potionRestoreHealth": "Restore health",
+    "potionRestoreLuck": "Restore luck",
+    "buy": "Buy",
+    "item": "Item",
+    "added": "Bought"
   },
   "dice": {
     "testYourLuck": "Test luck",
@@ -46,51 +76,13 @@
     "youPassedTheTest": "You passed!",
     "youFailedTheTest": "You failed..."
   },
-  "buttons": {
-    "randomStats": "Randomize",
-    "lock": "Lock",
-    "unlock": "Unlock",
-    "reset": "Restart",
-    "saveGame": "Save",
-    "loadGame": "Load",
-    "yes": "Yes",
-    "no": "No",
-    "submit": "Submit",
-    "play": "Play",
-    "pause": "Pause",
-    "stop": "Stop",
-    "delete": "Delete"
-  },
-  "confirm": {
-    "reset": "Do you want to lose all progress and start a new game?"
-  },
-  "game": {
-    "saved": "Game saved",
-    "loaded": "Game loaded",
-    "book": "Book",
-    "sound": "Sound",
-    "ambience": "Ambience",
-    "battle": "Battle",
-    "victory": "Victory",
-    "defeat": "Defeat",
-    "actionSounds": "Actions",
-    "actionSoundsTooltip": "Play sounds on actions",
-    "invalidUrl": "Please provide a valid YouTube link.",
-    "youtubeUrl": "YouTube link"
-  },
-  "inventory": {
-    "label": "You carry in your backpack..."
-  },
-  "transaction": {
-    "buy": "Buy",
-    "item": "Item",
-    "added": "Bought"
-  },
-  "potion": {
-    "select": "Select potion",
-    "restoreSkill": "Restore skill",
-    "restoreHealth": "Restore health",
-    "restoreLuck": "Restore luck"
+  "trail": {
+    "died": "Died",
+    "question": "Question",
+    "good": "Good",
+    "bad": "Bad",
+    "important": "Important",
+    "chapter": "Chapter"
   },
   "fight": {
     "graveyard": "Graveyard",
@@ -98,6 +90,9 @@
     "monster": "Monster",
     "creature": "Creature",
     "creaturePlaceholder": "Name",
+    "skill": "Skill",
+    "health": "Health",
+    "luck": "Luck",
     "fight": "Fight",
     "attack": "Attack",
     "useLuck": "Use luck",
@@ -114,12 +109,8 @@
     "defeatedBy": "You were defeated by",
     "youDied": "YOU DIED"
   },
-  "trail": {
-    "test": "Test",
-    "died": "Died",
-    "question": "Question",
-    "good": "Good",
-    "bad": "Bad",
-    "important": "Important"
+  "dialog": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
