@@ -1,3 +1,5 @@
+MAIN
+
 - Add Game section
   - Allows to manually save game to file
   - Display notif when game is saved
@@ -11,6 +13,12 @@
   - URL from youtube
   - Control volume
   - Play pause restart
+
+TWEAKS
+
+- Make sections collapsible. When clicked the collapse into just the heading.
+- WHen a potion is used it should display an animation saying "+X" whatever the diff was
+- The locked number, or max numbers should be formatted as primary color
 - Fix resolution
   - Fix mobile header size
   - Change app name to be shorter
