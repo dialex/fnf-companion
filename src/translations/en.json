@@ -6,7 +6,7 @@
     "game": "Game",
     "consumables": "Consumables",
     "inventory": "Inventory",
-    "map": "Trail",
+    "trail": "Trail",
     "fight": "Fight",
     "notes": "Notes"
   },
@@ -16,7 +16,7 @@
     "consumables": "Consumables",
     "diceRolls": "Rolls",
     "inventory": "Inventory",
-    "map": "Trail",
+    "trail": "Trail",
     "fight": "Fight",
     "notes": "Notes"
   },

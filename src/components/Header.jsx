@@ -122,7 +122,7 @@ export default function Header({ onLanguageChange }) {
               onMouseLeave={(e) => (e.target.style.color = 'white')}
               onClick={() => setNavbarExpanded(false)}
             >
-              {t('navigation.map')}
+              {t('navigation.trail')}
             </a>
             <a
               href="#fight"

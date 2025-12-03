@@ -6,7 +6,7 @@
     "game": "Jogo",
     "consumables": "Consumíveis",
     "inventory": "Inventário",
-    "map": "Trilho",
+    "trail": "Trilho",
     "fight": "Combate",
     "notes": "Notas"
   },
@@ -16,7 +16,7 @@
     "consumables": "Consumíveis",
     "diceRolls": "Lançamentos",
     "inventory": "Inventário",
-    "map": "Trilho",
+    "trail": "Trilho",
     "fight": "Combate",
     "notes": "Notas"
   },

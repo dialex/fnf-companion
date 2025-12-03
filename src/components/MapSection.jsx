@@ -139,7 +139,7 @@ export default function MapSection({
       >
         <h2 className="heading section-title d-flex align-items-center gap-2">
           <Icon path={mdiMapMarkerDistance} size={1} />
-          {t('sections.map')}
+          {t('sections.trail')}
           <Icon
             path={isExpanded ? mdiChevronDown : mdiChevronUp}
             size={1}
