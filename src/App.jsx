@@ -225,8 +225,11 @@ function App() {
     }, 100);
   }, []);
 
-  // Auto-sync action sounds with master sound state
+  // Auto-sync action sounds with master sound state (only after initial mount)
   useEffect(() => {
+    // Skip auto-sync on initial mount to preserve loaded state
+    if (isInitialMountRef.current) return;
+
     if (allSoundsMuted) {
       setActionSoundsEnabled(false);
     } else {
@@ -1130,6 +1133,8 @@ function App() {
             setTrailSequence,
             setSoundUrls,
             setSoundVolumes,
+            setActionSoundsEnabled,
+            setAllSoundsMuted,
           });
 
           setNotification({ message: t('game.loaded'), type: 'success' });
