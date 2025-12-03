@@ -1233,8 +1233,17 @@ function App() {
       return true;
     } else if (currentHealth <= 0) {
       setFightOutcome('lost');
-      // Auto-play defeat sound
-      autoPlaySound('defeat');
+      // Ensure there's a trail entry, then trigger died button (which will play defeat sound)
+      setTrailSequence((prev) => {
+        if (prev.length === 0) {
+          // If no trail entries, add one with the current input or default to 1
+          const num = parseInt(trailInput) || 1;
+          return [{ number: num, color: 'dark' }];
+        }
+        return prev;
+      });
+      // Trigger died button in trail (which will play defeat sound)
+      handleTrailPillColorChange('dark');
       const currentGraveyard = graveyard.trim();
       const separator = currentGraveyard ? '\n' : '';
       setGraveyard(
