@@ -8,8 +8,12 @@ import {
   mdiPause,
   mdiStop,
   mdiTrashCan,
+  mdiClose,
   mdiCheck,
   mdiVolumeHigh,
+  mdiGestureTap,
+  mdiGestureTapHold,
+  mdiVolumeOff,
 } from '@mdi/js';
 import { t, getCurrentLanguage, setLanguage } from './translations';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
@@ -159,6 +163,7 @@ function App() {
     defeat: 100,
   });
   const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
+  const [allSoundsMuted, setAllSoundsMuted] = useState(false);
   const youtubePlayersRef = useRef({});
   const soundStoppedManuallyRef = useRef({
     ambience: false,
@@ -167,6 +172,7 @@ function App() {
     defeat: false,
   });
   const actionSoundsCheckboxRef = useRef(null);
+  const masterSoundButtonRef = useRef(null);
   const [showYouDied, setShowYouDied] = useState(false);
 
   // State management
@@ -223,6 +229,7 @@ function App() {
         setSoundUrls,
         setSoundVolumes,
         setActionSoundsEnabled,
+        setAllSoundsMuted,
       });
     }
 
@@ -231,6 +238,72 @@ function App() {
       isInitialMountRef.current = false;
     }, 100);
   }, []);
+
+  // Initialize Bootstrap tooltips for action sounds button and master sound button
+  useEffect(() => {
+    import('bootstrap').then((bootstrap) => {
+      const { Tooltip } = bootstrap;
+
+      // Initialize tooltip for action sounds button
+      if (actionSoundsCheckboxRef.current) {
+        const element = actionSoundsCheckboxRef.current;
+        const existingTooltip = bootstrap.Tooltip.getInstance(element);
+        if (existingTooltip) {
+          existingTooltip.dispose();
+        }
+        new Tooltip(element, {
+          placement: 'top',
+          trigger: 'hover focus',
+          html: false,
+        });
+      }
+
+      // Initialize tooltip for master sound button
+      if (masterSoundButtonRef.current) {
+        const element = masterSoundButtonRef.current;
+        const existingTooltip = bootstrap.Tooltip.getInstance(element);
+        if (existingTooltip) {
+          existingTooltip.dispose();
+        }
+        new Tooltip(element, {
+          placement: 'top',
+          trigger: 'hover focus',
+          html: false,
+        });
+      }
+    });
+
+    // Cleanup function
+    return () => {
+      import('bootstrap').then((bootstrap) => {
+        if (actionSoundsCheckboxRef.current) {
+          const tooltip = bootstrap.Tooltip.getInstance(
+            actionSoundsCheckboxRef.current
+          );
+          if (tooltip) {
+            tooltip.dispose();
+          }
+        }
+        if (masterSoundButtonRef.current) {
+          const tooltip = bootstrap.Tooltip.getInstance(
+            masterSoundButtonRef.current
+          );
+          if (tooltip) {
+            tooltip.dispose();
+          }
+        }
+      });
+    };
+  }, [actionSoundsEnabled, allSoundsMuted]);
+
+  // Auto-sync action sounds with master sound state
+  useEffect(() => {
+    if (allSoundsMuted) {
+      setActionSoundsEnabled(false);
+    } else {
+      setActionSoundsEnabled(true);
+    }
+  }, [allSoundsMuted]);
 
   // Debug: Log current Bootstrap breakpoint
   useEffect(() => {
@@ -311,6 +384,7 @@ function App() {
       soundUrls,
       soundVolumes,
       actionSoundsEnabled,
+      allSoundsMuted,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -358,6 +432,7 @@ function App() {
     soundUrls,
     soundVolumes,
     actionSoundsEnabled,
+    allSoundsMuted,
   ]);
 
   // Utility functions
@@ -502,6 +577,9 @@ function App() {
   };
 
   const handleSoundPlayPause = (soundType) => {
+    // Don't play if all sounds are muted
+    if (allSoundsMuted) return;
+
     const player = youtubePlayersRef.current[soundType];
     if (!player) return;
 
@@ -582,6 +660,9 @@ function App() {
 
   // Auto-play sound from the beginning (stop then play)
   const autoPlaySound = (soundType) => {
+    // Don't play if all sounds are muted
+    if (allSoundsMuted) return;
+
     const player = youtubePlayersRef.current[soundType];
     if (!player || !soundUrls[soundType]) return;
 
@@ -1016,6 +1097,7 @@ function App() {
       soundUrls,
       soundVolumes,
       actionSoundsEnabled,
+      allSoundsMuted,
     });
 
     // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
@@ -1674,7 +1756,7 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-          </div>
+        </div>
       )}
       <Header onLanguageChange={handleLanguageChange} />
       {notification && (
@@ -1715,8 +1797,8 @@ function App() {
                     size={1}
                     style={{ marginLeft: 'auto' }}
                   />
-              </h2>
-            </div>
+                </h2>
+              </div>
               <div
                 className={`collapse ${isGameExpanded ? 'show' : ''}`}
                 id="game-collapse"
@@ -1726,11 +1808,11 @@ function App() {
                     <div className="col-12 col-xl-6">
                       <h3 className="heading mb-3">{t('game.book')}</h3>
                       <div className="field-group mb-3">
-                <label className="content field-label">
+                        <label className="content field-label">
                           {t('game.name')}
-                </label>
-                <input
-                  type="text"
+                        </label>
+                        <input
+                          type="text"
                           id="book-input"
                           className="content field-input form-control"
                           placeholder=""
@@ -1748,23 +1830,23 @@ function App() {
                             }
                           }}
                           maxLength={50}
-                />
-              </div>
+                        />
+                      </div>
                       <div className="d-flex justify-content-center gap-3 flex-wrap">
                         <button
                           type="button"
                           className="btn btn-primary"
-                          onClick={handleSaveGame}
-                          disabled={!book.trim()}
+                          onClick={handleLoadGame}
                         >
-                          {t('game.saveGame')}
+                          {t('game.loadGame')}
                         </button>
                         <button
                           type="button"
                           className="btn btn-light"
-                          onClick={handleLoadGame}
+                          onClick={handleSaveGame}
+                          disabled={!book.trim()}
                         >
-                          {t('game.loadGame')}
+                          {t('game.saveGame')}
                         </button>
                         <button
                           type="button"
@@ -1773,39 +1855,103 @@ function App() {
                         >
                           {t('game.reset')}
                         </button>
-                </div>
+                      </div>
                     </div>
                     <div className="col-12 col-xl-6">
                       <div className="d-flex align-items-center gap-2 mb-3">
                         <h3 className="heading mb-0">{t('game.sound')}</h3>
-                <input
-                          ref={actionSoundsCheckboxRef}
-                          type="checkbox"
-                          id="actionSoundsCheckbox"
-                          checked={actionSoundsEnabled}
-                          onChange={(e) =>
-                            setActionSoundsEnabled(e.target.checked)
+                        <button
+                          ref={masterSoundButtonRef}
+                          type="button"
+                          className={
+                            allSoundsMuted ? 'btn btn-light' : 'btn btn-primary'
                           }
+                          onClick={() => {
+                            const newMutedState = !allSoundsMuted;
+                            setAllSoundsMuted(newMutedState);
+                            // If muting, stop all playing sounds and turn off action sounds
+                            if (newMutedState) {
+                              const soundTypes = [
+                                'ambience',
+                                'battle',
+                                'victory',
+                                'defeat',
+                              ];
+                              soundTypes.forEach((st) => {
+                                if (soundPlaying[st]) {
+                                  handleSoundStop(st);
+                                }
+                              });
+                              // Auto-turn off action sounds when master is muted
+                              setActionSoundsEnabled(false);
+                            } else {
+                              // Auto-turn on action sounds when master is unmuted
+                              setActionSoundsEnabled(true);
+                            }
+                          }}
+                          style={{
+                            minWidth: 'auto',
+                            width: 'auto',
+                            padding: '0.5rem',
+                          }}
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-title={
+                            allSoundsMuted
+                              ? t('game.unmuteAll')
+                              : t('game.muteAll')
+                          }
+                        >
+                          <Icon
+                            path={allSoundsMuted ? mdiVolumeOff : mdiVolumeHigh}
+                            size={1}
+                          />
+                        </button>
+                        <button
+                          ref={actionSoundsCheckboxRef}
+                          type="button"
+                          className={
+                            actionSoundsEnabled
+                              ? 'btn btn-primary'
+                              : 'btn btn-light'
+                          }
+                          onClick={() =>
+                            setActionSoundsEnabled(!actionSoundsEnabled)
+                          }
+                          disabled={allSoundsMuted}
+                          style={{
+                            minWidth: 'auto',
+                            width: 'auto',
+                            padding: '0.5rem',
+                          }}
                           data-bs-toggle="tooltip"
                           data-bs-placement="top"
                           data-bs-title={t('game.actionSoundsTooltip')}
-                          style={{ cursor: 'pointer' }}
-                />
-              </div>
+                        >
+                          <Icon
+                            path={
+                              actionSoundsEnabled
+                                ? mdiGestureTapHold
+                                : mdiGestureTap
+                            }
+                            size={1}
+                          />
+                        </button>
+                      </div>
                       <div className="row g-3">
                         {['ambience', 'battle', 'victory', 'defeat'].map(
                           (soundType) => (
                             <div key={soundType} className="col-6">
                               <label className="content field-label mb-2">
                                 {t(`game.${soundType}`)}
-                </label>
+                              </label>
                               {!soundUrls[soundType] ? (
                                 <div>
                                   <div
                                     className="input-group"
                                     style={{ flex: 1 }}
                                   >
-                <input
+                                    <input
                                       type="text"
                                       className={`content field-input form-control ${
                                         soundErrors[soundType]
@@ -1814,7 +1960,7 @@ function App() {
                                       }`}
                                       placeholder={t('game.youtubeUrl')}
                                       value={soundInputs[soundType]}
-                  onChange={(e) =>
+                                      onChange={(e) =>
                                         handleSoundInputChange(
                                           soundType,
                                           e.target.value
@@ -1840,34 +1986,22 @@ function App() {
                                     >
                                       <Icon path={mdiCheck} size={1} />
                                     </button>
-              </div>
+                                  </div>
                                   {soundErrors[soundType] && (
                                     <div className="invalid-feedback d-block sound-error">
                                       {soundErrors[soundType]}
-                </div>
+                                    </div>
                                   )}
                                 </div>
                               ) : (
                                 <div className="d-flex align-items-center gap-2 flex-wrap">
                                   <button
                                     type="button"
-                                    className="btn btn-danger"
-                                    onClick={() => handleSoundDelete(soundType)}
-                                    style={{
-                                      minWidth: 'auto',
-                                      width: 'auto',
-                                      padding: '0.5rem',
-                                    }}
-                                    title={t('game.delete')}
-                                  >
-                                    <Icon path={mdiTrashCan} size={1} />
-                                  </button>
-                                  <button
-                                    type="button"
                                     className="btn btn-primary"
                                     onClick={() =>
                                       handleSoundPlayPause(soundType)
                                     }
+                                    disabled={allSoundsMuted}
                                     style={{
                                       minWidth: 'auto',
                                       width: 'auto',
@@ -1890,8 +2024,9 @@ function App() {
                                   </button>
                                   <button
                                     type="button"
-                                    className="btn btn-secondary"
+                                    className="btn btn-light"
                                     onClick={() => handleSoundStop(soundType)}
+                                    disabled={allSoundsMuted}
                                     style={{
                                       minWidth: 'auto',
                                       width: 'auto',
@@ -1901,12 +2036,26 @@ function App() {
                                   >
                                     <Icon path={mdiStop} size={1} />
                                   </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-light"
+                                    onClick={() => handleSoundDelete(soundType)}
+                                    disabled={allSoundsMuted}
+                                    style={{
+                                      minWidth: 'auto',
+                                      width: 'auto',
+                                      padding: '0.5rem',
+                                    }}
+                                    title={t('game.delete')}
+                                  >
+                                    <Icon path={mdiClose} size={1} />
+                                  </button>
                                   <div className="d-flex align-items-center gap-1">
                                     <Icon path={mdiVolumeHigh} size={0.8} />
-                <input
+                                    <input
                                       type="range"
                                       className="form-range"
-                  min="0"
+                                      min="0"
                                       max="100"
                                       value={soundVolumes[soundType]}
                                       onChange={(e) =>
@@ -1915,25 +2064,26 @@ function App() {
                                           parseInt(e.target.value)
                                         )
                                       }
+                                      disabled={allSoundsMuted}
                                       style={{
                                         width: '50px',
                                         height: '4px',
                                       }}
-                />
-              </div>
-            </div>
+                                    />
+                                  </div>
+                                </div>
                               )}
-            </div>
+                            </div>
                           )
                         )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-                </div>
-              </div>
-            </div>
-          </section>
-            </div>
-            </div>
+            </section>
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <CharacterSection
@@ -1958,7 +2108,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-        </div>
+          </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1988,7 +2138,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-            </div>
+          </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -2006,9 +2156,9 @@ function App() {
               onRollDice={handleRollDice}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-              />
-            </div>
-            </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -2019,7 +2169,7 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-        </div>
+          </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -2031,8 +2181,8 @@ function App() {
               initialExpanded={false}
               autoExpand={shouldExpandSections}
             />
-            </div>
-            </div>
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
