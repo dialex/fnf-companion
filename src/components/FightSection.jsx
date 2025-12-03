@@ -122,7 +122,7 @@ export default function FightSection({
                       <Icon path={mdiClover} size={1} />
                     </div>
                     <label className="content field-label">
-                      {t('fields.luck')}
+                      {t('common.fields.luck')}
                     </label>
                     <input
                       type="number"
@@ -137,7 +137,7 @@ export default function FightSection({
                       <Icon path={mdiSword} size={1} />
                     </div>
                     <label className="content field-label">
-                      {t('fields.skill')}
+                      {t('common.fields.skill')}
                     </label>
                     <input
                       type="number"
@@ -152,7 +152,7 @@ export default function FightSection({
                       <Icon path={mdiHeart} size={1} />
                     </div>
                     <label className="content field-label">
-                      {t('fields.health')}
+                      {t('common.fields.health')}
                     </label>
                     <input
                       type="number"
@@ -197,7 +197,7 @@ export default function FightSection({
                       <Icon path={mdiSword} size={1} />
                     </div>
                     <label className="content field-label">
-                      {t('fields.skill')}
+                      {t('common.fields.skill')}
                     </label>
                     <input
                       type="number"
@@ -214,7 +214,7 @@ export default function FightSection({
                       <Icon path={mdiHeart} size={1} />
                     </div>
                     <label className="content field-label">
-                      {t('fields.health')}
+                      {t('common.fields.health')}
                     </label>
                     <input
                       type="number"

@@ -85,7 +85,7 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiAccount} size={1} />
             </div>
-            <label className="content field-label">{t('fields.name')}</label>
+            <label className="content field-label">{t('common.fields.name')}</label>
             <input
               type="text"
               className="content field-input form-control"
@@ -97,7 +97,7 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiSword} size={1} />
             </div>
-            <label className="content field-label">{t('fields.skill')}</label>
+            <label className="content field-label">{t('common.fields.skill')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxSkill !== null && (
                 <span className="input-group-text locked-number text-white">
@@ -112,7 +112,7 @@ export default function CharacterSection({
                 onChange={(e) =>
                   onNumberChange(onSkillChange, e.target.value, maxSkill)
                 }
-                placeholder={t('placeholders.skill')}
+                placeholder={t('common.placeholders.skill')}
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiHeart} size={1} />
             </div>
-            <label className="content field-label">{t('fields.health')}</label>
+            <label className="content field-label">{t('common.fields.health')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxHealth !== null && (
                 <span className="input-group-text locked-number text-white">
@@ -135,7 +135,7 @@ export default function CharacterSection({
                 onChange={(e) =>
                   onNumberChange(onHealthChange, e.target.value, maxHealth)
                 }
-                placeholder={t('placeholders.health')}
+                placeholder={t('common.placeholders.health')}
               />
             </div>
             {fieldBadges?.health && (
@@ -153,7 +153,7 @@ export default function CharacterSection({
             <div className="field-icon">
               <Icon path={mdiClover} size={1} />
             </div>
-            <label className="content field-label">{t('fields.luck')}</label>
+            <label className="content field-label">{t('common.fields.luck')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxLuck !== null && (
                 <span className="input-group-text locked-number text-white">
@@ -168,7 +168,7 @@ export default function CharacterSection({
                 onChange={(e) =>
                   onNumberChange(onLuckChange, e.target.value, maxLuck)
                 }
-                placeholder={t('placeholders.luck')}
+                placeholder={t('common.placeholders.luck')}
               />
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function CharacterSection({
               }}
               disabled={rollingButton !== null}
             >
-              {t('buttons.randomStats')}
+              {t('common.buttons.randomStats')}
               <Icon
                 path={mdiDice3}
                 size={1}
@@ -206,7 +206,7 @@ export default function CharacterSection({
                 parseInt(luck) <= 0
               }
             >
-              {isLocked ? t('buttons.unlock') : t('buttons.lock')}
+              {isLocked ? t('common.buttons.unlock') : t('common.buttons.lock')}
               <Icon path={isLocked ? mdiLockOpenVariant : mdiLock} size={1} />
             </button>
           </div>
