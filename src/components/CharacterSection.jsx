@@ -100,7 +100,7 @@ export default function CharacterSection({
             <label className="content field-label">{t('fields.skill')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxSkill !== null && (
-                <span className="input-group-text bg-secondary text-white">
+                <span className="input-group-text locked-number text-white">
                   {maxSkill}
                 </span>
               )}
@@ -123,7 +123,7 @@ export default function CharacterSection({
             <label className="content field-label">{t('fields.health')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxHealth !== null && (
-                <span className="input-group-text bg-secondary text-white">
+                <span className="input-group-text locked-number text-white">
                   {maxHealth}
                 </span>
               )}
@@ -156,7 +156,7 @@ export default function CharacterSection({
             <label className="content field-label">{t('fields.luck')}</label>
             <div className="input-group" style={{ flex: 1 }}>
               {maxLuck !== null && (
-                <span className="input-group-text bg-secondary text-white">
+                <span className="input-group-text locked-number text-white">
                   {maxLuck}
                 </span>
               )}

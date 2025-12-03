@@ -316,6 +316,15 @@ textarea.field-input.notes-handwritten {
   font-size: 0.875rem;
 }
 
+/* Locked number fields - use primary color 1 and fixed width for 2 digits */
+.input-group-text.locked-number {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
+  min-width: 3rem;
+  text-align: center;
+  justify-content: center;
+}
+
 /* Action sounds toggle - use primary color 1, override all Bootstrap primary colors */
 .form-check.form-switch .action-sounds-toggle {
   border-color: var(--primary-color-1) !important;
