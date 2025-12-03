@@ -209,7 +209,7 @@ export default function GameSection({
                   ref={masterSoundButtonRef}
                   type="button"
                   className={
-                    allSoundsMuted ? 'btn btn-light' : 'btn btn-primary'
+                    allSoundsMuted ? 'btn btn-light' : 'btn btn-success'
                   }
                   onClick={handleMasterSoundToggle}
                   style={{
@@ -220,9 +220,7 @@ export default function GameSection({
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title={
-                    allSoundsMuted
-                      ? t('game.unmuteAll')
-                      : t('game.muteAll')
+                    allSoundsMuted ? t('game.unmuteAll') : t('game.muteAll')
                   }
                 >
                   <Icon
@@ -234,9 +232,7 @@ export default function GameSection({
                   ref={actionSoundsCheckboxRef}
                   type="button"
                   className={
-                    actionSoundsEnabled
-                      ? 'btn btn-primary'
-                      : 'btn btn-light'
+                    actionSoundsEnabled ? 'btn btn-success' : 'btn btn-light'
                   }
                   onClick={() =>
                     onActionSoundsEnabledChange(!actionSoundsEnabled)
@@ -253,9 +249,7 @@ export default function GameSection({
                 >
                   <Icon
                     path={
-                      actionSoundsEnabled
-                        ? mdiGestureTapHold
-                        : mdiGestureTap
+                      actionSoundsEnabled ? mdiGestureTapHold : mdiGestureTap
                     }
                     size={1}
                   />
@@ -270,16 +264,11 @@ export default function GameSection({
                       </label>
                       {!soundUrls[soundType] ? (
                         <div>
-                          <div
-                            className="input-group"
-                            style={{ flex: 1 }}
-                          >
+                          <div className="input-group" style={{ flex: 1 }}>
                             <input
                               type="text"
                               className={`content field-input form-control ${
-                                soundErrors[soundType]
-                                  ? 'is-invalid'
-                                  : ''
+                                soundErrors[soundType] ? 'is-invalid' : ''
                               }`}
                               placeholder={t('game.youtubeUrl')}
                               value={soundInputs[soundType]}
@@ -331,9 +320,7 @@ export default function GameSection({
                           >
                             <Icon
                               path={
-                                soundPlaying[soundType]
-                                  ? mdiPause
-                                  : mdiPlay
+                                soundPlaying[soundType] ? mdiPause : mdiPlay
                               }
                               size={1}
                             />
