@@ -1170,59 +1170,68 @@ function App() {
                 id="game-collapse"
               >
                 <div className="section-content" style={{ minHeight: 'auto' }}>
-                  <div className="d-flex justify-content-center mb-3">
-                    <div
-                      className="field-group"
-                      style={{ maxWidth: '500px', width: '100%' }}
-                    >
-                      <label className="content field-label">
-                        {t('fields.book')}
-                      </label>
-                      <input
-                        type="text"
-                        id="book-input"
-                        className="content field-input form-control"
-                        placeholder={t('fields.name')}
-                        value={book}
-                        onChange={(e) => {
-                          const newValue = e.target.value;
-                          setBook(newValue);
-                          // Check if user typed a word (letters followed by space)
-                          const wordPattern = /[a-zA-Z]+\s/;
-                          if (
-                            wordPattern.test(newValue) &&
-                            !shouldExpandSections
-                          ) {
-                            setShouldExpandSections(true);
-                          }
-                        }}
-                        maxLength={50}
-                      />
+                  <div className="row gx-4">
+                    <div className="col-12 col-md-6">
+                      <h3 className="heading mb-3">{t('game.book')}</h3>
+                      <div className="field-group mb-3">
+                        <label className="content field-label">
+                          {t('fields.name')}
+                        </label>
+                        <input
+                          type="text"
+                          id="book-input"
+                          className="content field-input form-control"
+                          placeholder=""
+                          value={book}
+                          onChange={(e) => {
+                            const newValue = e.target.value;
+                            setBook(newValue);
+                            // Check if user typed a word (letters followed by space)
+                            const wordPattern = /[a-zA-Z]+\s/;
+                            if (
+                              wordPattern.test(newValue) &&
+                              !shouldExpandSections
+                            ) {
+                              setShouldExpandSections(true);
+                            }
+                          }}
+                          maxLength={50}
+                        />
+                      </div>
+                      <div className="d-flex justify-content-center gap-3 flex-wrap">
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleSaveGame}
+                          disabled={!book.trim()}
+                        >
+                          {t('buttons.saveGame')}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={handleLoadGame}
+                        >
+                          {t('buttons.loadGame')}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          onClick={handleReset}
+                        >
+                          {t('buttons.reset')}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="d-flex justify-content-center gap-3 flex-wrap">
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleSaveGame}
-                      disabled={!book.trim()}
-                    >
-                      {t('buttons.saveGame')}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={handleLoadGame}
-                    >
-                      {t('buttons.loadGame')}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={handleReset}
-                    >
-                      {t('buttons.reset')}
-                    </button>
+                    <div className="col-12 col-md-6">
+                      <h3 className="heading mb-3">{t('game.sound')}</h3>
+                      <div className="d-flex flex-column gap-2">
+                        <div className="content">{t('game.ambience')}</div>
+                        <div className="content">{t('game.battle')}</div>
+                        <div className="content">{t('game.victory')}</div>
+                        <div className="content">{t('game.defeat')}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

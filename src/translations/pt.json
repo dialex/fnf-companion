@@ -61,7 +61,13 @@
   },
   "game": {
     "saved": "Jogo guardado",
-    "loaded": "Jogo carregado"
+    "loaded": "Jogo carregado",
+    "book": "Livro",
+    "sound": "Som",
+    "ambience": "Ambiente",
+    "battle": "Batalha",
+    "victory": "Vitória",
+    "defeat": "Derrota"
   },
   "inventory": {
     "label": "Carregas na tua mochila..."

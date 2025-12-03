@@ -61,7 +61,13 @@
   },
   "game": {
     "saved": "Game saved",
-    "loaded": "Game loaded"
+    "loaded": "Game loaded",
+    "book": "Book",
+    "sound": "Sound",
+    "ambience": "Ambience",
+    "battle": "Battle",
+    "victory": "Victory",
+    "defeat": "Defeat"
   },
   "inventory": {
     "label": "You carry in your backpack..."

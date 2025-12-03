@@ -1,5 +1,6 @@
 MAIN
 
+- 2 cols in game section: Book / Sound
 - Add Game section
   - Display notif when game is saved
   - Load game from file
