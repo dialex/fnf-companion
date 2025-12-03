@@ -105,6 +105,7 @@ export default function FightSection({
                   className="content field-input form-control"
                   value={graveyard}
                   readOnly
+                  disabled
                   style={{
                     resize: 'none',
                     height: '100%',
