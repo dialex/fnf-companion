@@ -3,9 +3,8 @@
     "title": "Aventuras Fantásticas"
   },
   "navigation": {
-    "character": "Personagem",
+    "game": "Jogo",
     "consumables": "Consumíveis",
-    "diceRolls": "Lançamentos",
     "inventory": "Inventário",
     "map": "Trilho",
     "fight": "Combate",

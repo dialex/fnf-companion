@@ -85,14 +85,14 @@ export default function Header({ onLanguageChange }) {
         >
           <div className="navbar-nav d-flex align-items-center gap-4 ms-auto flex-wrap">
             <a
-              href="#character"
+              href="#game"
               className="nav-link content text-white text-decoration-none"
               style={{ transition: 'color 0.2s' }}
               onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
               onMouseLeave={(e) => (e.target.style.color = 'white')}
               onClick={() => setNavbarExpanded(false)}
             >
-              {t('navigation.character')}
+              {t('navigation.game')}
             </a>
             <a
               href="#consumables"
@@ -103,16 +103,6 @@ export default function Header({ onLanguageChange }) {
               onClick={() => setNavbarExpanded(false)}
             >
               {t('navigation.consumables')}
-            </a>
-            <a
-              href="#dice-rolls"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.diceRolls')}
             </a>
             <a
               href="#inventory"

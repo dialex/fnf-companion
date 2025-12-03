@@ -3,9 +3,8 @@
     "title": "Fight & Fantasy Companion"
   },
   "navigation": {
-    "character": "Character",
+    "game": "Game",
     "consumables": "Consumables",
-    "diceRolls": "Rolls",
     "inventory": "Inventory",
     "map": "Trail",
     "fight": "Fight",
