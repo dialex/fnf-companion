@@ -35,6 +35,8 @@
     "victory": "Victory",
     "defeat": "Defeat",
     "actionSoundsTooltip": "Play sounds on actions",
+    "muteAll": "Mute all",
+    "unmuteAll": "Unmute all",
     "invalidUrl": "Please provide a valid YouTube link.",
     "youtubeUrl": "YouTube link",
     "play": "Play",

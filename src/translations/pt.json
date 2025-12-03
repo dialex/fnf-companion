@@ -35,6 +35,8 @@
     "victory": "Vitória",
     "defeat": "Derrota",
     "actionSoundsTooltip": "Ouvir sons das ações",
+    "muteAll": "Sem som",
+    "unmuteAll": "Com som",
     "invalidUrl": "Por favor introduz um link do YouTube.",
     "youtubeUrl": "Link do YouTube",
     "play": "Reproduzir",

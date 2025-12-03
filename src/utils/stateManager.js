@@ -71,6 +71,7 @@ export const getDefaultState = () => ({
     defeat: 100,
   },
   actionSoundsEnabled: true,
+  allSoundsMuted: false,
   trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
 });
 
@@ -117,6 +118,10 @@ export const loadState = () => {
       savedState.actionSoundsEnabled !== undefined
         ? savedState.actionSoundsEnabled
         : defaultState.actionSoundsEnabled,
+    allSoundsMuted:
+      savedState.allSoundsMuted !== undefined
+        ? savedState.allSoundsMuted
+        : defaultState.allSoundsMuted,
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
     trailSequence: savedState.trailSequence || defaultState.trailSequence,
     metadata: {
@@ -225,6 +230,7 @@ export const buildStateObject = (stateValues) => {
       defeat: stateValues.soundVolumes?.defeat ?? 100,
     },
     actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
+    allSoundsMuted: stateValues.allSoundsMuted ?? false,
     trailSequence: stateValues.trailSequence || [{ number: 1, color: 'primary-1' }],
   };
 };
@@ -338,6 +344,12 @@ export const applyLoadedState = (savedState, setters) => {
     setters.setActionSoundsEnabled
   ) {
     setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
+  }
+  if (
+    savedState.allSoundsMuted !== undefined &&
+    setters.setAllSoundsMuted
+  ) {
+    setters.setAllSoundsMuted(savedState.allSoundsMuted);
   }
 
   // Restore trail state

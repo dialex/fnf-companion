@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '@mdi/react';
 import {
-  mdiChevronDown,
-  mdiChevronUp,
-  mdiBook,
   mdiPlay,
   mdiPause,
   mdiStop,
@@ -11,9 +8,6 @@ import {
   mdiClose,
   mdiCheck,
   mdiVolumeHigh,
-  mdiGestureTap,
-  mdiGestureTapHold,
-  mdiVolumeOff,
 } from '@mdi/js';
 import { t, getCurrentLanguage, setLanguage } from './translations';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
@@ -39,6 +33,7 @@ import InventorySection from './components/InventorySection';
 import MapSection from './components/MapSection';
 import FightSection from './components/FightSection';
 import NotesSection from './components/NotesSection';
+import GameSection from './components/GameSection';
 import NotificationBanner from './components/NotificationBanner';
 import ConfirmationDialog from './components/ConfirmationDialog';
 
@@ -124,13 +119,6 @@ function App() {
   const [shouldExpandSections, setShouldExpandSections] = useState(false);
   const [sectionResetKey, setSectionResetKey] = useState(0);
 
-  // Game section collapse state
-  const [isGameExpanded, setIsGameExpanded] = useState(true);
-
-  const toggleGameCollapse = () => {
-    setIsGameExpanded(!isGameExpanded);
-  };
-
   // Sound state
   const [soundUrls, setSoundUrls] = useState({
     ambience: '',
@@ -171,8 +159,6 @@ function App() {
     victory: false,
     defeat: false,
   });
-  const actionSoundsCheckboxRef = useRef(null);
-  const masterSoundButtonRef = useRef(null);
   const [showYouDied, setShowYouDied] = useState(false);
 
   // State management
@@ -238,63 +224,6 @@ function App() {
       isInitialMountRef.current = false;
     }, 100);
   }, []);
-
-  // Initialize Bootstrap tooltips for action sounds button and master sound button
-  useEffect(() => {
-    import('bootstrap').then((bootstrap) => {
-      const { Tooltip } = bootstrap;
-
-      // Initialize tooltip for action sounds button
-      if (actionSoundsCheckboxRef.current) {
-        const element = actionSoundsCheckboxRef.current;
-        const existingTooltip = bootstrap.Tooltip.getInstance(element);
-        if (existingTooltip) {
-          existingTooltip.dispose();
-        }
-        new Tooltip(element, {
-          placement: 'top',
-          trigger: 'hover focus',
-          html: false,
-        });
-      }
-
-      // Initialize tooltip for master sound button
-      if (masterSoundButtonRef.current) {
-        const element = masterSoundButtonRef.current;
-        const existingTooltip = bootstrap.Tooltip.getInstance(element);
-        if (existingTooltip) {
-          existingTooltip.dispose();
-        }
-        new Tooltip(element, {
-          placement: 'top',
-          trigger: 'hover focus',
-          html: false,
-        });
-      }
-    });
-
-    // Cleanup function
-    return () => {
-      import('bootstrap').then((bootstrap) => {
-        if (actionSoundsCheckboxRef.current) {
-          const tooltip = bootstrap.Tooltip.getInstance(
-            actionSoundsCheckboxRef.current
-          );
-          if (tooltip) {
-            tooltip.dispose();
-          }
-        }
-        if (masterSoundButtonRef.current) {
-          const tooltip = bootstrap.Tooltip.getInstance(
-            masterSoundButtonRef.current
-          );
-          if (tooltip) {
-            tooltip.dispose();
-          }
-        }
-      });
-    };
-  }, [actionSoundsEnabled, allSoundsMuted]);
 
   // Auto-sync action sounds with master sound state
   useEffect(() => {
@@ -1776,312 +1705,31 @@ function App() {
       <main className="container mx-auto py-4">
         <div className="row gx-4 mb-4">
           <div className="col-12">
-            <section id="game" className="section-container mb-4">
-              <div
-                className="section-header"
-                onClick={toggleGameCollapse}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleGameCollapse();
-                  }
-                }}
-              >
-                <h2 className="heading section-title d-flex align-items-center gap-2">
-                  <Icon path={mdiBook} size={1} />
-                  {book.trim().length > 0 ? book : t('sections.game')}
-                  <Icon
-                    path={isGameExpanded ? mdiChevronDown : mdiChevronUp}
-                    size={1}
-                    style={{ marginLeft: 'auto' }}
-                  />
-                </h2>
-              </div>
-              <div
-                className={`collapse ${isGameExpanded ? 'show' : ''}`}
-                id="game-collapse"
-              >
-                <div className="section-content" style={{ minHeight: 'auto' }}>
-                  <div className="row gx-4">
-                    <div className="col-12 col-xl-6">
-                      <h3 className="heading mb-3">{t('game.book')}</h3>
-                      <div className="field-group mb-3">
-                        <label className="content field-label">
-                          {t('game.name')}
-                        </label>
-                        <input
-                          type="text"
-                          id="book-input"
-                          className="content field-input form-control"
-                          placeholder=""
-                          value={book}
-                          onChange={(e) => {
-                            const newValue = e.target.value;
-                            setBook(newValue);
-                            // Check if user typed a word (letters followed by space)
-                            const wordPattern = /[a-zA-Z]+\s/;
-                            if (
-                              wordPattern.test(newValue) &&
-                              !shouldExpandSections
-                            ) {
-                              setShouldExpandSections(true);
-                            }
-                          }}
-                          maxLength={50}
-                        />
-                      </div>
-                      <div className="d-flex justify-content-center gap-3 flex-wrap">
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={handleLoadGame}
-                        >
-                          {t('game.loadGame')}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-light"
-                          onClick={handleSaveGame}
-                          disabled={!book.trim()}
-                        >
-                          {t('game.saveGame')}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          onClick={handleReset}
-                        >
-                          {t('game.reset')}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="col-12 col-xl-6">
-                      <div className="d-flex align-items-center gap-2 mb-3">
-                        <h3 className="heading mb-0">{t('game.sound')}</h3>
-                        <button
-                          ref={masterSoundButtonRef}
-                          type="button"
-                          className={
-                            allSoundsMuted ? 'btn btn-light' : 'btn btn-primary'
-                          }
-                          onClick={() => {
-                            const newMutedState = !allSoundsMuted;
-                            setAllSoundsMuted(newMutedState);
-                            // If muting, stop all playing sounds and turn off action sounds
-                            if (newMutedState) {
-                              const soundTypes = [
-                                'ambience',
-                                'battle',
-                                'victory',
-                                'defeat',
-                              ];
-                              soundTypes.forEach((st) => {
-                                if (soundPlaying[st]) {
-                                  handleSoundStop(st);
-                                }
-                              });
-                              // Auto-turn off action sounds when master is muted
-                              setActionSoundsEnabled(false);
-                            } else {
-                              // Auto-turn on action sounds when master is unmuted
-                              setActionSoundsEnabled(true);
-                            }
-                          }}
-                          style={{
-                            minWidth: 'auto',
-                            width: 'auto',
-                            padding: '0.5rem',
-                          }}
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-title={
-                            allSoundsMuted
-                              ? t('game.unmuteAll')
-                              : t('game.muteAll')
-                          }
-                        >
-                          <Icon
-                            path={allSoundsMuted ? mdiVolumeOff : mdiVolumeHigh}
-                            size={1}
-                          />
-                        </button>
-                        <button
-                          ref={actionSoundsCheckboxRef}
-                          type="button"
-                          className={
-                            actionSoundsEnabled
-                              ? 'btn btn-primary'
-                              : 'btn btn-light'
-                          }
-                          onClick={() =>
-                            setActionSoundsEnabled(!actionSoundsEnabled)
-                          }
-                          disabled={allSoundsMuted}
-                          style={{
-                            minWidth: 'auto',
-                            width: 'auto',
-                            padding: '0.5rem',
-                          }}
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-title={t('game.actionSoundsTooltip')}
-                        >
-                          <Icon
-                            path={
-                              actionSoundsEnabled
-                                ? mdiGestureTapHold
-                                : mdiGestureTap
-                            }
-                            size={1}
-                          />
-                        </button>
-                      </div>
-                      <div className="row g-3">
-                        {['ambience', 'battle', 'victory', 'defeat'].map(
-                          (soundType) => (
-                            <div key={soundType} className="col-6">
-                              <label className="content field-label mb-2">
-                                {t(`game.${soundType}`)}
-                              </label>
-                              {!soundUrls[soundType] ? (
-                                <div>
-                                  <div
-                                    className="input-group"
-                                    style={{ flex: 1 }}
-                                  >
-                                    <input
-                                      type="text"
-                                      className={`content field-input form-control ${
-                                        soundErrors[soundType]
-                                          ? 'is-invalid'
-                                          : ''
-                                      }`}
-                                      placeholder={t('game.youtubeUrl')}
-                                      value={soundInputs[soundType]}
-                                      onChange={(e) =>
-                                        handleSoundInputChange(
-                                          soundType,
-                                          e.target.value
-                                        )
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                          handleSoundSubmit(soundType);
-                                        }
-                                      }}
-                                    />
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary"
-                                      onClick={() =>
-                                        handleSoundSubmit(soundType)
-                                      }
-                                      style={{
-                                        minWidth: 'auto',
-                                        width: 'auto',
-                                        padding: '0.5rem',
-                                      }}
-                                    >
-                                      <Icon path={mdiCheck} size={1} />
-                                    </button>
-                                  </div>
-                                  {soundErrors[soundType] && (
-                                    <div className="invalid-feedback d-block sound-error">
-                                      {soundErrors[soundType]}
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() =>
-                                      handleSoundPlayPause(soundType)
-                                    }
-                                    disabled={allSoundsMuted}
-                                    style={{
-                                      minWidth: 'auto',
-                                      width: 'auto',
-                                      padding: '0.5rem',
-                                    }}
-                                    title={
-                                      soundPlaying[soundType]
-                                        ? t('game.pause')
-                                        : t('game.play')
-                                    }
-                                  >
-                                    <Icon
-                                      path={
-                                        soundPlaying[soundType]
-                                          ? mdiPause
-                                          : mdiPlay
-                                      }
-                                      size={1}
-                                    />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn btn-light"
-                                    onClick={() => handleSoundStop(soundType)}
-                                    disabled={allSoundsMuted}
-                                    style={{
-                                      minWidth: 'auto',
-                                      width: 'auto',
-                                      padding: '0.5rem',
-                                    }}
-                                    title={t('game.stop')}
-                                  >
-                                    <Icon path={mdiStop} size={1} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn btn-light"
-                                    onClick={() => handleSoundDelete(soundType)}
-                                    disabled={allSoundsMuted}
-                                    style={{
-                                      minWidth: 'auto',
-                                      width: 'auto',
-                                      padding: '0.5rem',
-                                    }}
-                                    title={t('game.delete')}
-                                  >
-                                    <Icon path={mdiClose} size={1} />
-                                  </button>
-                                  <div className="d-flex align-items-center gap-1">
-                                    <Icon path={mdiVolumeHigh} size={0.8} />
-                                    <input
-                                      type="range"
-                                      className="form-range"
-                                      min="0"
-                                      max="100"
-                                      value={soundVolumes[soundType]}
-                                      onChange={(e) =>
-                                        handleSoundVolumeChange(
-                                          soundType,
-                                          parseInt(e.target.value)
-                                        )
-                                      }
-                                      disabled={allSoundsMuted}
-                                      style={{
-                                        width: '50px',
-                                        height: '4px',
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <GameSection
+              book={book}
+              onBookChange={setBook}
+              onShouldExpandSections={() => setShouldExpandSections(true)}
+              onLoadGame={handleLoadGame}
+              onSaveGame={handleSaveGame}
+              onReset={handleReset}
+              allSoundsMuted={allSoundsMuted}
+              onAllSoundsMutedChange={setAllSoundsMuted}
+              actionSoundsEnabled={actionSoundsEnabled}
+              onActionSoundsEnabledChange={setActionSoundsEnabled}
+              soundUrls={soundUrls}
+              soundInputs={soundInputs}
+              soundErrors={soundErrors}
+              soundPlaying={soundPlaying}
+              soundVolumes={soundVolumes}
+              onSoundInputChange={handleSoundInputChange}
+              onSoundSubmit={handleSoundSubmit}
+              onSoundDelete={handleSoundDelete}
+              onSoundPlayPause={handleSoundPlayPause}
+              onSoundStop={handleSoundStop}
+              onSoundVolumeChange={handleSoundVolumeChange}
+              initialExpanded={true}
+              autoExpand={shouldExpandSections}
+            />
           </div>
         </div>
         <div className="row gx-4 mb-4">
