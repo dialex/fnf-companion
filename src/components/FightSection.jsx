@@ -89,7 +89,7 @@ export default function FightSection({
         <div className="section-content d-flex flex-column">
           <div className="row gx-4 flex-grow-1" style={{ minHeight: 0 }}>
             <div
-              className="col-12 col-md-4 d-flex flex-column"
+              className="col-12 col-xl-4 d-flex flex-column"
               style={{ minHeight: 0 }}
             >
               <h3 className="heading mb-3">{t('fight.graveyard')}</h3>
@@ -113,9 +113,9 @@ export default function FightSection({
                 />
               </div>
             </div>
-            <div className="col-12 col-md-8">
+            <div className="col-12 col-xl-8">
               <div className="row gx-4">
-                <div className="col-12 col-md-6 d-flex flex-column">
+                <div className="col-12 col-xl-6 d-flex flex-column">
                   <h3 className="heading mb-3">{t('fight.hero')}</h3>
                   <div className="field-group">
                     <div className="field-icon">
@@ -175,7 +175,7 @@ export default function FightSection({
                     )}
                   </div>
                 </div>
-                <div className="col-12 col-md-6 d-flex flex-column">
+                <div className="col-12 col-xl-6 d-flex flex-column">
                   <h3 className="heading mb-3">{t('fight.monster')}</h3>
                   <div className="field-group">
                     <div className="field-icon">
@@ -286,7 +286,7 @@ export default function FightSection({
                 </div>
               </div>
               <div className="row gx-4 mt-3">
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-xl-6">
                   <div
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: '80px' }}
@@ -370,7 +370,7 @@ export default function FightSection({
                       )}
                   </div>
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-xl-6">
                   <div
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: '80px' }}

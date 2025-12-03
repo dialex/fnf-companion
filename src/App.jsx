@@ -1719,7 +1719,7 @@ function App() {
               >
                 <div className="section-content" style={{ minHeight: 'auto' }}>
                   <div className="row gx-4">
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-xl-6">
                       <h3 className="heading mb-3">{t('game.book')}</h3>
                       <div className="field-group mb-3">
                         <label className="content field-label">
@@ -1771,7 +1771,7 @@ function App() {
                         </button>
                       </div>
                     </div>
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-xl-6">
                       <div className="d-flex align-items-center gap-2 mb-3">
                         <h3 className="heading mb-0">{t('game.sound')}</h3>
                         <input
@@ -1931,7 +1931,7 @@ function App() {
           </div>
         </div>
         <div className="row gx-4 mb-4">
-          <div className="col-12 col-md-4">
+          <div className="col-12 col-xl-4">
             <CharacterSection
               key={`character-${sectionResetKey}`}
               name={name}
@@ -1955,7 +1955,7 @@ function App() {
               autoExpand={shouldExpandSections}
             />
           </div>
-          <div className="col-12 col-md-4">
+          <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
               coins={coins}
@@ -1985,7 +1985,7 @@ function App() {
               autoExpand={shouldExpandSections}
             />
           </div>
-          <div className="col-12 col-md-4">
+          <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
               skill={skill}
@@ -2006,7 +2006,7 @@ function App() {
           </div>
         </div>
         <div className="row gx-4 mb-4">
-          <div className="col-12 col-md-4">
+          <div className="col-12 col-xl-4">
             <InventorySection
               key={`inventory-${sectionResetKey}`}
               inventory={inventory}
@@ -2016,7 +2016,7 @@ function App() {
               autoExpand={shouldExpandSections}
             />
           </div>
-          <div className="col-12 col-md-8">
+          <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
               trailSequence={trailSequence}

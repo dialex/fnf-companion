@@ -11,11 +11,11 @@ import {
 export default function Header({ onLanguageChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 992);
+      setIsDesktop(window.innerWidth >= 1200);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -52,7 +52,7 @@ export default function Header({ onLanguageChange }) {
 
   return (
     <header
-      className="navbar navbar-expand-lg sticky-top text-white shadow"
+      className="navbar navbar-expand-xl sticky-top text-white shadow"
       style={{ backgroundColor: 'var(--header-bg)', zIndex: 1050 }}
     >
       <div className="container mx-auto px-4 py-3 d-flex justify-content-between align-items-center">
@@ -61,7 +61,7 @@ export default function Header({ onLanguageChange }) {
           <h1 className="heading fs-1 mb-0">{t('app.title')}</h1>
         </div>
         <button
-          className="navbar-toggler d-lg-none"
+          className="navbar-toggler d-xl-none"
           type="button"
           onClick={() => setNavbarExpanded(!navbarExpanded)}
           aria-controls="navbarNav"
