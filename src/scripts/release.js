@@ -53,7 +53,7 @@ try {
 
   // Create tag
   console.log(`🏷️  Creating tag v${newVersion}...`);
-  execSync(`git tag v${newVersion}`, { stdio: 'inherit', cwd: rootDir });
+  execSync(`git tag -m "" v${newVersion}`, { stdio: 'inherit', cwd: rootDir });
 
   // Push commit and tag
   console.log('📤 Pushing commit...');
