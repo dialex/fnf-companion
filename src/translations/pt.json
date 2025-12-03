@@ -59,8 +59,7 @@
     "play": "Reproduzir",
     "pause": "Pausar",
     "stop": "Parar",
-    "delete": "Eliminar",
-    "debugYouDied": "Debug: Morreste"
+    "delete": "Eliminar"
   },
   "confirm": {
     "reset": "Queres perder todo o progresso e recomeçar do zero?"
@@ -111,7 +110,8 @@
     "battleWon": "Ganhaste!",
     "battleLost": "Perdeste... Fim da aventura",
     "defeatCreature": "Derrotaste",
-    "defeatedBy": "Foste derrotado por"
+    "defeatedBy": "Foste derrotado por",
+    "youDied": "MORRESTE"
   },
   "trail": {
     "test": "Testar",

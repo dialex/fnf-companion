@@ -1624,7 +1624,7 @@ function App() {
     <div className="min-vh-100 bg-beige">
       {showYouDied && (
         <div className="you-died-overlay">
-          <div className="you-died-text">YOU DIED</div>
+          <div className="you-died-text">{t('fight.youDied')}</div>
         </div>
       )}
       <Header onLanguageChange={handleLanguageChange} />
