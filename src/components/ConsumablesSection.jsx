@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import {
   mdiHandCoin,
@@ -37,15 +37,26 @@ export default function ConsumablesSection({
   onPotionTypeChange,
   onConsumePotion,
   onNumberChange,
+  initialExpanded = true,
+  autoExpand = false,
 }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
+
+  useEffect(() => {
+    if (autoExpand && !isExpanded) {
+      setIsExpanded(true);
+    }
+  }, [autoExpand, isExpanded]);
 
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
   };
 
   return (
-    <section id="consumables" className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}>
+    <section
+      id="consumables"
+      className={`section-container mb-4 ${isExpanded ? 'h-100' : ''}`}
+    >
       <div
         className="section-header"
         onClick={toggleCollapse}
@@ -67,154 +78,54 @@ export default function ConsumablesSection({
           />
         </h2>
       </div>
-      <div className={`collapse ${isExpanded ? 'show' : ''}`} id="consumables-collapse">
+      <div
+        className={`collapse ${isExpanded ? 'show' : ''}`}
+        id="consumables-collapse"
+      >
         <div className="section-content">
-        <div className="field-group" style={{ position: 'relative' }}>
-          <div className="field-icon">
-            <Icon path={mdiHandCoin} size={1} />
-          </div>
-          <label className="content field-label">{t('fields.coins')}</label>
-          <input
-            type="number"
-            className="content field-input form-control"
-            min="0"
-            value={coins}
-            onChange={(e) => onNumberChange(onCoinsChange, e.target.value)}
-          />
-          {fieldBadges?.coins && (
-            <span
-              className={`badge rounded-pill bg-${
-                fieldBadges.coins.type === 'success' ? 'success' : 'danger'
-              } field-badge`}
-              key={fieldBadges.coins.id}
-            >
-              {fieldBadges.coins.value}
-            </span>
-          )}
-        </div>
-        <div className="field-group" style={{ position: 'relative' }}>
-          <div className="field-icon">
-            <Icon path={mdiFoodApple} size={1} />
-          </div>
-          <label className="content field-label">{t('fields.meals')}</label>
-          <div className="input-group" style={{ flex: 1 }}>
-            <input
-              type="number"
-              className="content field-input form-control"
-              min="0"
-              value={meals}
-              onChange={(e) => onNumberChange(onMealsChange, e.target.value)}
-            />
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onConsumeMeal}
-              disabled={
-                parseInt(meals) <= 0 ||
-                (maxHealth !== null && parseInt(health) >= maxHealth)
-              }
-              style={{
-                minWidth: 'auto',
-                width: 'auto',
-                padding: '0.5rem',
-              }}
-            >
-              <Icon path={mdiSilverwareForkKnife} size={1} />
-            </button>
-          </div>
-          {fieldBadges?.meals && (
-            <span
-              className={`badge rounded-pill bg-${
-                fieldBadges.meals.type === 'success' ? 'success' : 'danger'
-              } field-badge`}
-              key={fieldBadges.meals.id}
-            >
-              {fieldBadges.meals.value}
-            </span>
-          )}
-        </div>
-        <div className="field-group">
-          <div className="field-icon">
-            <Icon path={mdiBagPersonalPlus} size={1} />
-          </div>
-          <label className="content field-label">{t('transaction.buy')}</label>
-          <div className="input-group" style={{ flex: 1 }}>
-            <input
-              type="text"
-              className="content field-input form-control"
-              placeholder={t('transaction.item')}
-              value={transactionObject}
-              onChange={(e) => onTransactionObjectChange(e.target.value)}
-            />
-            <input
-              type="number"
-              className="content field-input form-control transaction-cost-input"
-              min="0"
-              max="9"
-              placeholder="0"
-              value={transactionCost}
-              onChange={(e) => onTransactionCostChange(e.target.value)}
-              onFocus={(e) => {
-                if (e.target.value === '0') {
-                  onTransactionCostChange('');
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onPurchase}
-              disabled={
-                !transactionObject.trim() ||
-                !transactionCost ||
-                parseInt(transactionCost) <= 0 ||
-                parseInt(coins) < parseInt(transactionCost)
-              }
-              style={{
-                minWidth: 'auto',
-                width: 'auto',
-                padding: '0.5rem',
-              }}
-            >
-              <Icon path={mdiHandCoin} size={1} />
-            </button>
-          </div>
-        </div>
-        {isLocked && (
-          <div className="field-group">
+          <div className="field-group" style={{ position: 'relative' }}>
             <div className="field-icon">
-              <Icon path={mdiBottleTonicPlus} size={1} />
+              <Icon path={mdiHandCoin} size={1} />
             </div>
-            <label className="content field-label">{t('fields.potion')}</label>
-            <div className="input-group" style={{ flex: 1 }}>
-              <select
-                className="content field-input form-control"
-                value={potionType}
-                onChange={(e) => onPotionTypeChange(e.target.value)}
-                disabled={potionUsed}
-                style={potionUsed ? { textDecoration: 'line-through' } : {}}
+            <label className="content field-label">{t('fields.coins')}</label>
+            <input
+              type="number"
+              className="content field-input form-control"
+              min="0"
+              value={coins}
+              onChange={(e) => onNumberChange(onCoinsChange, e.target.value)}
+            />
+            {fieldBadges?.coins && (
+              <span
+                className={`badge rounded-pill bg-${
+                  fieldBadges.coins.type === 'success' ? 'success' : 'danger'
+                } field-badge`}
+                key={fieldBadges.coins.id}
               >
-                <option value="">{t('potion.select')}</option>
-                <option value="skill">{t('potion.restoreSkill')}</option>
-                <option value="health">{t('potion.restoreHealth')}</option>
-                <option value="luck">{t('potion.restoreLuck')}</option>
-              </select>
+                {fieldBadges.coins.value}
+              </span>
+            )}
+          </div>
+          <div className="field-group" style={{ position: 'relative' }}>
+            <div className="field-icon">
+              <Icon path={mdiFoodApple} size={1} />
+            </div>
+            <label className="content field-label">{t('fields.meals')}</label>
+            <div className="input-group" style={{ flex: 1 }}>
+              <input
+                type="number"
+                className="content field-input form-control"
+                min="0"
+                value={meals}
+                onChange={(e) => onNumberChange(onMealsChange, e.target.value)}
+              />
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={onConsumePotion}
+                onClick={onConsumeMeal}
                 disabled={
-                  !potionType ||
-                  potionUsed ||
-                  (potionType === 'skill' &&
-                    maxSkill !== null &&
-                    parseInt(skill) >= maxSkill) ||
-                  (potionType === 'health' &&
-                    maxHealth !== null &&
-                    parseInt(health) >= maxHealth) ||
-                  (potionType === 'luck' &&
-                    maxLuck !== null &&
-                    parseInt(luck) >= maxLuck)
+                  parseInt(meals) <= 0 ||
+                  (maxHealth !== null && parseInt(health) >= maxHealth)
                 }
                 style={{
                   minWidth: 'auto',
@@ -222,12 +133,119 @@ export default function ConsumablesSection({
                   padding: '0.5rem',
                 }}
               >
-                <Icon path={potionUsed ? mdiCupOutline : mdiCup} size={1} />
+                <Icon path={mdiSilverwareForkKnife} size={1} />
+              </button>
+            </div>
+            {fieldBadges?.meals && (
+              <span
+                className={`badge rounded-pill bg-${
+                  fieldBadges.meals.type === 'success' ? 'success' : 'danger'
+                } field-badge`}
+                key={fieldBadges.meals.id}
+              >
+                {fieldBadges.meals.value}
+              </span>
+            )}
+          </div>
+          <div className="field-group">
+            <div className="field-icon">
+              <Icon path={mdiBagPersonalPlus} size={1} />
+            </div>
+            <label className="content field-label">
+              {t('transaction.buy')}
+            </label>
+            <div className="input-group" style={{ flex: 1 }}>
+              <input
+                type="text"
+                className="content field-input form-control"
+                placeholder={t('transaction.item')}
+                value={transactionObject}
+                onChange={(e) => onTransactionObjectChange(e.target.value)}
+              />
+              <input
+                type="number"
+                className="content field-input form-control transaction-cost-input"
+                min="0"
+                max="9"
+                placeholder="0"
+                value={transactionCost}
+                onChange={(e) => onTransactionCostChange(e.target.value)}
+                onFocus={(e) => {
+                  if (e.target.value === '0') {
+                    onTransactionCostChange('');
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onPurchase}
+                disabled={
+                  !transactionObject.trim() ||
+                  !transactionCost ||
+                  parseInt(transactionCost) <= 0 ||
+                  parseInt(coins) < parseInt(transactionCost)
+                }
+                style={{
+                  minWidth: 'auto',
+                  width: 'auto',
+                  padding: '0.5rem',
+                }}
+              >
+                <Icon path={mdiHandCoin} size={1} />
               </button>
             </div>
           </div>
-        )}
-      </div>
+          {isLocked && (
+            <div className="field-group">
+              <div className="field-icon">
+                <Icon path={mdiBottleTonicPlus} size={1} />
+              </div>
+              <label className="content field-label">
+                {t('fields.potion')}
+              </label>
+              <div className="input-group" style={{ flex: 1 }}>
+                <select
+                  className="content field-input form-control"
+                  value={potionType}
+                  onChange={(e) => onPotionTypeChange(e.target.value)}
+                  disabled={potionUsed}
+                  style={potionUsed ? { textDecoration: 'line-through' } : {}}
+                >
+                  <option value="">{t('potion.select')}</option>
+                  <option value="skill">{t('potion.restoreSkill')}</option>
+                  <option value="health">{t('potion.restoreHealth')}</option>
+                  <option value="luck">{t('potion.restoreLuck')}</option>
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={onConsumePotion}
+                  disabled={
+                    !potionType ||
+                    potionUsed ||
+                    (potionType === 'skill' &&
+                      maxSkill !== null &&
+                      parseInt(skill) >= maxSkill) ||
+                    (potionType === 'health' &&
+                      maxHealth !== null &&
+                      parseInt(health) >= maxHealth) ||
+                    (potionType === 'luck' &&
+                      maxLuck !== null &&
+                      parseInt(luck) >= maxLuck)
+                  }
+                  style={{
+                    minWidth: 'auto',
+                    width: 'auto',
+                    padding: '0.5rem',
+                  }}
+                >
+                  <Icon path={potionUsed ? mdiCupOutline : mdiCup} size={1} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -23,6 +23,7 @@
   },
   "fields": {
     "name": "Name",
+    "book": "Book",
     "skill": "Skill",
     "health": "Health",
     "luck": "Luck",
@@ -50,7 +51,18 @@
     "randomStats": "Randomize",
     "lock": "Lock",
     "unlock": "Unlock",
-    "reset": "Reset"
+    "reset": "Restart",
+    "saveGame": "Save",
+    "loadGame": "Load",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "confirm": {
+    "reset": "Do you want to lose all progress and start a new game?"
+  },
+  "game": {
+    "saved": "Game saved",
+    "loaded": "Game loaded"
   },
   "inventory": {
     "label": "You carry in your backpack..."

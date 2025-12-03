@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Icon from '@mdi/react';
+import { mdiChevronDown, mdiChevronUp, mdiBook } from '@mdi/js';
 import { t, getCurrentLanguage, setLanguage } from './translations';
 import {
   loadState,
@@ -18,6 +20,8 @@ import InventorySection from './components/InventorySection';
 import MapSection from './components/MapSection';
 import FightSection from './components/FightSection';
 import NotesSection from './components/NotesSection';
+import NotificationBanner from './components/NotificationBanner';
+import ConfirmationDialog from './components/ConfirmationDialog';
 
 function App() {
   // Language state to trigger re-renders when language changes
@@ -29,6 +33,9 @@ function App() {
     setLanguage(lang);
     setCurrentLang(lang);
   };
+  // Game state
+  const [book, setBook] = useState('');
+
   // Character state
   const [name, setName] = useState('');
   const [skill, setSkill] = useState('');
@@ -52,7 +59,9 @@ function App() {
   const [notes, setNotes] = useState('');
 
   // Trail state - each item is { number: number, color: string }
-  const [trailSequence, setTrailSequence] = useState([{ number: 1, color: 'primary-1' }]);
+  const [trailSequence, setTrailSequence] = useState([
+    { number: 1, color: 'primary-1' },
+  ]);
   const [trailInput, setTrailInput] = useState('');
 
   // Fight state
@@ -85,6 +94,22 @@ function App() {
   // Field badges
   const [fieldBadges, setFieldBadges] = useState({});
 
+  // Notification banner
+  const [notification, setNotification] = useState(null);
+
+  // Confirmation dialog
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Section expansion control
+  const [shouldExpandSections, setShouldExpandSections] = useState(false);
+
+  // Game section collapse state
+  const [isGameExpanded, setIsGameExpanded] = useState(true);
+
+  const toggleGameCollapse = () => {
+    setIsGameExpanded(!isGameExpanded);
+  };
+
   // State management
   const isInitialMountRef = useRef(true);
   const debouncedSaveRef = useRef(
@@ -97,6 +122,9 @@ function App() {
   useEffect(() => {
     const savedState = loadState();
     if (savedState) {
+      if (savedState.metadata?.bookname) {
+        setBook(savedState.metadata.bookname);
+      }
       applyLoadedState(savedState, {
         setName,
         setSkill,
@@ -150,6 +178,7 @@ function App() {
     }
 
     const stateToSave = buildStateObject({
+      book,
       name,
       skill,
       health,
@@ -388,7 +417,13 @@ function App() {
   };
 
   const handleReset = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmReset = () => {
+    setShowResetConfirm(false);
     // Reset all state to defaults
+    setBook('');
     setName('');
     setSkill('');
     setHealth('');
@@ -425,6 +460,158 @@ function App() {
     setDiceRollingType(null);
     setTrailSequence([{ number: 1, color: 'primary-1' }]);
     setTrailInput('');
+    setShouldExpandSections(false);
+  };
+
+  const handleSaveGame = () => {
+    const stateToSave = buildStateObject({
+      book,
+      name,
+      skill,
+      health,
+      luck,
+      isLocked,
+      maxSkill,
+      maxHealth,
+      maxLuck,
+      coins,
+      meals,
+      transactionObject,
+      transactionCost,
+      potionType,
+      potionUsed,
+      inventory,
+      notes,
+      monsterSkill,
+      monsterHealth,
+      monsterCreature,
+      graveyard,
+      showUseLuck,
+      luckUsed,
+      isFighting,
+      fightResult,
+      fightOutcome,
+      heroDiceRolls,
+      monsterDiceRolls,
+      rollingButton,
+      rollDieResult,
+      rollDiceResults,
+      testLuckResult,
+      isTestingLuck,
+      testSkillResult,
+      diceRollingType,
+      trailSequence,
+    });
+
+    // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
+    const now = new Date();
+    const datePart =
+      now.getFullYear().toString() +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      String(now.getDate()).padStart(2, '0');
+    const timePart =
+      String(now.getHours()).padStart(2, '0') +
+      String(now.getMinutes()).padStart(2, '0') +
+      String(now.getSeconds()).padStart(2, '0');
+
+    const sanitizeFilename = (str) => {
+      return str.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    };
+
+    const bookPart = sanitizeFilename(book || 'book');
+    const namePart = sanitizeFilename(name || 'character');
+    const filename = `${bookPart}-${namePart}-${datePart}-${timePart}.json`;
+
+    const jsonString = JSON.stringify(stateToSave, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setNotification({ message: t('game.saved'), type: 'success' });
+  };
+
+  const handleLoadGame = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file extension
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const jsonContent = event.target.result;
+          const loadedState = JSON.parse(jsonContent);
+
+          // Validate it's a valid state object
+          if (!loadedState || typeof loadedState !== 'object') {
+            return;
+          }
+
+          // Restore book name
+          if (loadedState.metadata?.bookname) {
+            setBook(loadedState.metadata.bookname);
+          }
+
+          // Apply loaded state
+          applyLoadedState(loadedState, {
+            setName,
+            setSkill,
+            setHealth,
+            setLuck,
+            setIsLocked,
+            setMaxSkill,
+            setMaxHealth,
+            setMaxLuck,
+            setCoins,
+            setMeals,
+            setTransactionObject,
+            setTransactionCost,
+            setPotionType,
+            setPotionUsed,
+            setInventory,
+            setNotes,
+            setMonsterSkill,
+            setMonsterHealth,
+            setMonsterCreature,
+            setGraveyard,
+            setShowUseLuck,
+            setLuckUsed,
+            setIsFighting,
+            setFightResult,
+            setFightOutcome,
+            setHeroDiceRolls,
+            setMonsterDiceRolls,
+            setRollingButton,
+            setRollDieResult,
+            setRollDiceResults,
+            setTestLuckResult,
+            setIsTestingLuck,
+            setTestSkillResult,
+            setDiceRollingType,
+            setTrailSequence,
+          });
+
+          setNotification({ message: t('game.loaded'), type: 'success' });
+        } catch (error) {
+          console.error('Error loading game file:', error);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   };
 
   const handlePurchase = () => {
@@ -840,7 +1027,7 @@ function App() {
         metadata: {
           version: '1.0.0',
           savedAt: new Date().toISOString(),
-          bookname: '',
+          bookname: book || '',
         },
         character: {
           name,
@@ -886,7 +1073,7 @@ function App() {
         },
         trailSequence,
       };
-      saveStateToStorage(stateToSave);
+      saveState(stateToSave);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -894,6 +1081,7 @@ function App() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [
+    book,
     name,
     skill,
     health,
@@ -934,27 +1122,110 @@ function App() {
   return (
     <div className="min-vh-100 bg-beige">
       <Header onLanguageChange={handleLanguageChange} />
+      {notification && (
+        <NotificationBanner
+          message={notification.message}
+          type={notification.type}
+          onDismiss={() => setNotification(null)}
+        />
+      )}
+      {showResetConfirm && (
+        <ConfirmationDialog
+          message={t('confirm.reset')}
+          onConfirm={confirmReset}
+          onCancel={() => setShowResetConfirm(false)}
+        />
+      )}
       <main className="container mx-auto py-4">
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <section id="game" className="section-container mb-4">
-            <div className="section-header">
-                <h2 className="heading section-title">{t('sections.game')}</h2>
+              <div
+                className="section-header"
+                onClick={toggleGameCollapse}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleGameCollapse();
+                  }
+                }}
+              >
+                <h2 className="heading section-title d-flex align-items-center gap-2">
+                  <Icon path={mdiBook} size={1} />
+                  {book.trim().length > 0 ? book : t('sections.game')}
+                  <Icon
+                    path={isGameExpanded ? mdiChevronDown : mdiChevronUp}
+                    size={1}
+                    style={{ marginLeft: 'auto' }}
+                  />
+                </h2>
               </div>
-              <div className="section-content" style={{ minHeight: 'auto' }}>
-                <div className="d-flex justify-content-center">
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={handleReset}
-                  >
-                    {t('buttons.reset')}
-                  </button>
+              <div
+                className={`collapse ${isGameExpanded ? 'show' : ''}`}
+                id="game-collapse"
+              >
+                <div className="section-content" style={{ minHeight: 'auto' }}>
+                  <div className="d-flex justify-content-center mb-3">
+                    <div
+                      className="field-group"
+                      style={{ maxWidth: '500px', width: '100%' }}
+                    >
+                      <label className="content field-label">
+                        {t('fields.book')}
+                      </label>
+                      <input
+                        type="text"
+                        id="book-input"
+                        className="content field-input form-control"
+                        placeholder={t('fields.name')}
+                        value={book}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          setBook(newValue);
+                          // Check if user typed a word (letters followed by space)
+                          const wordPattern = /[a-zA-Z]+\s/;
+                          if (
+                            wordPattern.test(newValue) &&
+                            !shouldExpandSections
+                          ) {
+                            setShouldExpandSections(true);
+                          }
+                        }}
+                        maxLength={50}
+                      />
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-center gap-3 flex-wrap">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleSaveGame}
+                      disabled={!book.trim()}
+                    >
+                      {t('buttons.saveGame')}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={handleLoadGame}
+                    >
+                      {t('buttons.loadGame')}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={handleReset}
+                    >
+                      {t('buttons.reset')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
           </div>
-                </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <CharacterSection
@@ -975,8 +1246,10 @@ function App() {
               onRandomStats={handleRandomStatsWithAnimation}
               onToggleLock={handleToggleLock}
               onNumberChange={handleNumberChange}
-                />
-              </div>
+              initialExpanded={false}
+              autoExpand={shouldExpandSections}
+            />
+          </div>
           <div className="col-12 col-md-4">
             <ConsumablesSection
               coins={coins}
@@ -1002,8 +1275,10 @@ function App() {
               onPotionTypeChange={setPotionType}
               onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
+              initialExpanded={false}
+              autoExpand={shouldExpandSections}
             />
-                </div>
+          </div>
           <div className="col-12 col-md-4">
             <DiceRollsSection
               skill={skill}
@@ -1018,17 +1293,21 @@ function App() {
               onTestYourSkill={handleTestYourSkill}
               onRollDie={handleRollDie}
               onRollDice={handleRollDice}
-                />
-              </div>
-            </div>
+              initialExpanded={false}
+              autoExpand={shouldExpandSections}
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-md-4">
             <InventorySection
               inventory={inventory}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
-                />
-              </div>
+              initialExpanded={false}
+              autoExpand={shouldExpandSections}
+            />
+          </div>
           <div className="col-12 col-md-8">
             <MapSection
               trailSequence={trailSequence}
@@ -1036,8 +1315,10 @@ function App() {
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
               onTrailPillColorChange={handleTrailPillColorChange}
-                />
-              </div>
+              initialExpanded={false}
+              autoExpand={shouldExpandSections}
+            />
+          </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
@@ -1066,13 +1347,18 @@ function App() {
               onFight={handleFight}
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
-              />
-            </div>
+              initialExpanded={false}
+            />
+          </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
-            <NotesSection notes={notes} onNotesChange={setNotes} />
-            </div>
+            <NotesSection
+              notes={notes}
+              onNotesChange={setNotes}
+              initialExpanded={false}
+            />
+          </div>
         </div>
       </main>
     </div>

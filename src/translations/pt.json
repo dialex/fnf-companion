@@ -23,6 +23,7 @@
   },
   "fields": {
     "name": "Nome",
+    "book": "Livro",
     "skill": "Perícia",
     "health": "Força",
     "luck": "Sorte",
@@ -50,7 +51,18 @@
     "randomStats": "Aleatório",
     "lock": "Bloquear",
     "unlock": "Desbloquear",
-    "reset": "Reiniciar"
+    "reset": "Recomeçar",
+    "saveGame": "Guardar",
+    "loadGame": "Carregar",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "confirm": {
+    "reset": "Queres perder todo o progresso e recomeçar do zero?"
+  },
+  "game": {
+    "saved": "Jogo guardado",
+    "loaded": "Jogo carregado"
   },
   "inventory": {
     "label": "Carregas na tua mochila..."

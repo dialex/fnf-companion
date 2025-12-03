@@ -143,7 +143,7 @@ export const buildStateObject = (stateValues) => {
     metadata: {
       version: '1.0.0',
       savedAt: new Date().toISOString(),
-      bookname: '',
+      bookname: stateValues.book || '',
     },
     character: {
       name: stateValues.name || '',

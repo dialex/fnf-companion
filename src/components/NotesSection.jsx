@@ -3,8 +3,12 @@ import Icon from '@mdi/react';
 import { mdiLeadPencil, mdiChevronDown, mdiChevronUp } from '@mdi/js';
 import { t } from '../translations';
 
-export default function NotesSection({ notes, onNotesChange }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+export default function NotesSection({ 
+  notes, 
+  onNotesChange,
+  initialExpanded = true,
+}) {
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   const toggleCollapse = () => {
     setIsExpanded(!isExpanded);
