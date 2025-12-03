@@ -23,6 +23,12 @@ textarea.form-control {
   font-family: 'Caudex', serif;
 }
 
+select.form-control,
+select.field-input {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
+}
+
 .badge {
   font-family: 'Caudex', serif;
   font-size: 1.15rem;
@@ -34,9 +40,15 @@ textarea.form-control {
   font-weight: 500;
 }
 
-/* Button group icon alignment */
-.btn-group .btn {
+/* Button icon alignment - all buttons */
+.btn {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Input group text font */
+.input-group-text {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
 }
