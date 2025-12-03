@@ -252,7 +252,7 @@ export default function MapSection({
                     ? 'primary-1'
                     : num === 400
                       ? 'primary-2'
-                      : 'secondary'
+                      : 'light'
                   : item.color;
 
               // Get tooltip text based on color
@@ -340,8 +340,11 @@ export default function MapSection({
                       borderColor: '#ffc107',
                     };
                     break;
+                  case 'light':
+                    pillClass += ' text-bg-light';
+                    break;
                   default:
-                    pillClass += ' text-bg-secondary';
+                    pillClass += ' text-bg-light';
                 }
               }
 

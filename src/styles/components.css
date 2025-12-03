@@ -336,6 +336,36 @@ header h1.heading {
   outline: none;
 }
 
+/* Input group alignment - make inputs and buttons match height */
+/* Bootstrap default button height is ~38px, but with 0.5rem padding it's ~42px */
+.input-group .form-control:not(textarea) {
+  height: 42px; /* Match Bootstrap button height with 0.5rem padding */
+  box-sizing: border-box;
+}
+
+.input-group .btn {
+  height: 42px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure all text input fields have consistent height (not textareas) */
+input.form-control.field-input:not(textarea),
+input[type='text'].form-control.field-input,
+input[type='number'].form-control.field-input {
+  height: 42px;
+  box-sizing: border-box;
+}
+
+/* Special input fields should also match */
+.trail-input,
+.transaction-cost-input {
+  height: 42px !important;
+  box-sizing: border-box;
+}
+
 /* Locked number fields */
 .input-group-text.locked-number {
   background-color: var(--primary-color-1) !important;
