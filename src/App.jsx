@@ -162,6 +162,7 @@ function App() {
     defeat: false,
   });
   const actionSoundsCheckboxRef = useRef(null);
+  const [showYouDied, setShowYouDied] = useState(false);
 
   // State management
   const isInitialMountRef = useRef(true);
@@ -383,9 +384,13 @@ function App() {
       };
       return newSequence;
     });
-    // Auto-play defeat sound when died button is clicked
+    // Auto-play defeat sound and show "You Died" animation when died button is clicked
     if (color === 'dark') {
       autoPlaySound('defeat');
+      setShowYouDied(true);
+      setTimeout(() => {
+        setShowYouDied(false);
+      }, 9000);
     }
   };
 
@@ -1617,6 +1622,11 @@ function App() {
 
   return (
     <div className="min-vh-100 bg-beige">
+      {showYouDied && (
+        <div className="you-died-overlay">
+          <div className="you-died-text">YOU DIED</div>
+        </div>
+      )}
       <Header onLanguageChange={handleLanguageChange} />
       {notification && (
         <NotificationBanner

@@ -59,7 +59,8 @@
     "play": "Play",
     "pause": "Pause",
     "stop": "Stop",
-    "delete": "Delete"
+    "delete": "Delete",
+    "debugYouDied": "Debug: You Died"
   },
   "confirm": {
     "reset": "Do you want to lose all progress and start a new game?"

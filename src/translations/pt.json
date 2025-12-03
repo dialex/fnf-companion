@@ -59,7 +59,8 @@
     "play": "Reproduzir",
     "pause": "Pausar",
     "stop": "Parar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "debugYouDied": "Debug: Morreste"
   },
   "confirm": {
     "reset": "Queres perder todo o progresso e recomeçar do zero?"
