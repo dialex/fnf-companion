@@ -20,6 +20,10 @@ import {
   applyLoadedState,
   createDebouncedSave,
 } from './utils/stateManager';
+import './styles/variables.css';
+import './styles/animations.css';
+import './styles/components.css';
+import './styles/youDied.css';
 import './App.css';
 
 // Components

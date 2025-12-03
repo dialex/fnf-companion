@@ -1,0 +1,20 @@
+/* Theme CSS Variables */
+:root[data-theme='default'] {
+  --bg-primary: #f5f1e8;
+  --header-bg: #1a2f3f;
+  --section-header-bg: #665545;
+  --section-bg: white;
+  --button-bg: #d9d9d9;
+  --button-hover: #c9c9c9;
+  --button-active: #b9b9b9;
+  --text-primary: #333;
+  --text-white: white;
+  --border-color: #ddd;
+  --border-focus: #877b6f;
+}
+
+/* Primary color variables */
+:root {
+  --primary-color-1: #1a303f; /* Dark blue */
+  --primary-color-2: #d4a24b; /* Golden */
+}

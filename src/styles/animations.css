@@ -1,0 +1,88 @@
+/* Dice roll animation */
+@keyframes diceRoll {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.dice-rolling {
+  animation: diceRoll 0.3s linear infinite !important;
+  display: inline-block;
+}
+
+/* Field badge animation */
+@keyframes slideInFadeOut {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.field-badge {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  animation: slideInFadeOut 2.2s ease-out forwards;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+/* Inventory badge animation */
+@keyframes slideInFadeOutInventory {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.inventory-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1000;
+  pointer-events: none;
+  animation: slideInFadeOutInventory 1s ease-out forwards;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}

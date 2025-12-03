@@ -1,0 +1,338 @@
+/* Bootstrap overrides */
+.btn-primary {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
+}
+
+.btn-info {
+  background-color: #0c95b2 !important;
+  border-color: #0c95b2 !important;
+  color: white !important;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+  background-color: #0a7a93 !important;
+  border-color: #0a7a93 !important;
+  color: white !important;
+}
+
+.btn-info:active {
+  background-color: #085f74 !important;
+  border-color: #085f74 !important;
+  color: white !important;
+}
+
+.btn-secondary {
+  background-color: #9ca3af !important;
+  border-color: #9ca3af !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #8b92a0 !important;
+  border-color: #8b92a0 !important;
+}
+
+.btn-secondary:active {
+  background-color: #7a8190 !important;
+  border-color: #7a8190 !important;
+}
+
+.bg-secondary {
+  background-color: #9ca3af !important;
+}
+
+.text-bg-secondary {
+  background-color: #9ca3af !important;
+  color: white !important;
+}
+
+.alert-secondary {
+  background-color: #9ca3af !important;
+  border-color: #9ca3af !important;
+  color: white !important;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  font-family: 'Caudex', serif;
+  font-size: 1.38rem;
+  line-height: 1.5;
+}
+
+.content {
+  font-family: 'Caudex', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.heading {
+  font-family: 'Pirata One', cursive;
+  font-weight: normal;
+}
+
+/* Background utilities */
+.bg-beige {
+  background-color: var(--bg-primary);
+}
+
+/* Section styles */
+.section-container {
+  background: var(--section-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  scroll-margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-container.h-100 {
+  height: 100%;
+}
+
+.section-header {
+  background-color: var(--section-header-bg);
+  padding: 12px 16px;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 36px;
+  padding-right: 36px;
+  width: calc(100% + 40px);
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 1.94rem;
+  color: var(--text-white);
+  margin: 0;
+  flex: 1;
+}
+
+.section-content {
+  padding: 20px;
+  min-height: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bootstrap collapse overrides */
+.collapse:not(.show) {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.collapse.show {
+  display: block !important;
+}
+
+/* Field styles */
+.field-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.field-icon {
+  font-size: 1.94rem;
+  width: 2.38rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.field-label {
+  font-weight: 500;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.field-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+textarea.field-input {
+  width: 100%;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 200px;
+}
+
+/* Notes section - handwritten font */
+.notes-handwritten,
+textarea.field-input.notes-handwritten {
+  font-family: 'Caveat', cursive !important;
+  font-size: 1.6rem !important; /* 50% bigger than base 1.25rem */
+  font-weight: 600 !important; /* semi-bold */
+  line-height: 1.2 !important; /* tighter line spacing */
+}
+
+/* Dice buttons */
+.dice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dice-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--button-bg);
+  color: var(--text-white);
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1.15rem;
+}
+
+.dice-btn:hover {
+  background: var(--button-hover);
+}
+
+.dice-btn:active {
+  background: var(--button-active);
+}
+
+/* Header */
+header h1.heading {
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Transaction cost input */
+.transaction-cost-input {
+  width: 3rem !important;
+  flex: 0 0 3rem !important;
+  text-align: center;
+  padding: 0.5rem 0.25rem !important;
+}
+
+.transaction-cost-input::-webkit-outer-spin-button,
+.transaction-cost-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.transaction-cost-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Trail section */
+.trail-input {
+  width: 3.5rem !important; /* just enough for 3 digits */
+  text-align: center;
+  padding: 0.5rem !important;
+}
+
+.trail-input::-webkit-outer-spin-button,
+.trail-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.trail-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.trail-sequence {
+  min-height: 3rem;
+  width: 100%;
+}
+
+/* Volume slider styling */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--primary-color-1) !important;
+  border: none;
+  width: 12px;
+  height: 12px;
+}
+
+.form-range::-moz-range-thumb {
+  background-color: var(--primary-color-1) !important;
+  border: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* Sound validation message */
+.invalid-feedback.sound-error {
+  font-size: 0.875rem;
+}
+
+/* Action sounds checkbox */
+#actionSoundsCheckbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: var(--primary-color-1);
+}
+
+#actionSoundsCheckbox:checked {
+  background-color: var(--primary-color-1);
+  border-color: var(--primary-color-1);
+}
+
+#actionSoundsCheckbox:focus {
+  border-color: var(--primary-color-1);
+  box-shadow: none;
+  outline: none;
+}
+
+#actionSoundsCheckbox:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Locked number fields */
+.input-group-text.locked-number {
+  background-color: var(--primary-color-1) !important;
+  border-color: var(--primary-color-1) !important;
+  min-width: 3rem;
+  text-align: center;
+  justify-content: center;
+}
