@@ -18,6 +18,7 @@ import {
   applyLoadedState,
   createDebouncedSave,
 } from './utils/stateManager';
+import { initTheme, getCurrentTheme } from './utils/theme';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -42,10 +43,24 @@ function App() {
   // Initialize from localStorage via getCurrentLanguage()
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
 
+  // Theme state to trigger re-renders when theme changes
+  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
+
+  // Initialize theme on mount
+  useEffect(() => {
+    initTheme();
+    setCurrentTheme(getCurrentTheme());
+  }, []);
+
   // Handler to update language and trigger re-render
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
     setCurrentLang(lang);
+  };
+
+  // Handler to update theme and trigger re-render
+  const handleThemeChange = (theme) => {
+    setCurrentTheme(theme);
   };
   // Game state
   const [book, setBook] = useState('');
@@ -1692,7 +1707,10 @@ function App() {
           <div className="you-died-text">{t('fight.youDied')}</div>
         </div>
       )}
-      <Header onLanguageChange={handleLanguageChange} />
+      <Header
+        onLanguageChange={handleLanguageChange}
+        onThemeChange={handleThemeChange}
+      />
       {notification && (
         <NotificationBanner
           message={notification.message}

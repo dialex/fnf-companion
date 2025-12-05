@@ -52,3 +52,30 @@ select.field-input {
   font-family: 'Caudex', serif;
   font-size: 1.15rem;
 }
+
+/* Dark theme form controls */
+:root[data-theme='dark'] .form-control,
+:root[data-theme='dark'] input.form-control,
+:root[data-theme='dark'] textarea.form-control,
+:root[data-theme='dark'] select.form-control {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--border-color);
+}
+
+:root[data-theme='dark'] .form-control:focus {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--border-focus);
+}
+
+:root[data-theme='dark'] textarea.form-control {
+  background-color: var(--textarea-bg);
+  color: var(--textarea-text);
+}
+
+:root[data-theme='dark'] .form-control:disabled {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  opacity: 0.6;
+}

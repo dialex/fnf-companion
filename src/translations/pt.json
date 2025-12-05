@@ -114,5 +114,10 @@
   "dialog": {
     "yes": "Sim",
     "no": "Não"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "auto": "Auto"
   }
 }

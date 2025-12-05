@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
-import { mdiBookAccount, mdiWebBox, mdiChevronDown } from '@mdi/js';
+import { mdiBookAccount, mdiWebBox, mdiChevronDown, mdiThemeLightDark } from '@mdi/js';
 import {
   t,
   setLanguage,
   getCurrentLanguage,
   getAvailableLanguages,
 } from '../translations';
+import {
+  setTheme,
+  getCurrentTheme,
+  getAvailableThemes,
+} from '../utils/theme';
 
-export default function Header({ onLanguageChange }) {
+export default function Header({ onLanguageChange, onThemeChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
+  const [showThemeSelect, setShowThemeSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
+  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,21 +41,38 @@ export default function Header({ onLanguageChange }) {
     setShowLanguageSelect(!showLanguageSelect);
   };
 
+  const handleThemeChange = (theme) => {
+    setTheme(theme);
+    setCurrentTheme(theme);
+    setShowThemeSelect(false);
+    // Notify parent component to trigger re-render
+    if (onThemeChange) {
+      onThemeChange(theme);
+    }
+  };
+
+  const handleThemeIconClick = () => {
+    setShowThemeSelect(!showThemeSelect);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showLanguageSelect && !event.target.closest('.language-selector')) {
         setShowLanguageSelect(false);
       }
+      if (showThemeSelect && !event.target.closest('.theme-selector')) {
+        setShowThemeSelect(false);
+      }
     };
 
-    if (showLanguageSelect) {
+    if (showLanguageSelect || showThemeSelect) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showLanguageSelect]);
+  }, [showLanguageSelect, showThemeSelect]);
 
   return (
     <header
@@ -144,6 +168,62 @@ export default function Header({ onLanguageChange }) {
             >
               {t('navigation.notes')}
             </a>
+            <div className="position-relative theme-selector">
+              <div
+                className="d-flex align-items-center"
+                style={{ cursor: 'pointer', gap: '0.125rem' }}
+                onClick={handleThemeIconClick}
+              >
+                <Icon path={mdiThemeLightDark} size={1} className="text-white" />
+                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
+              </div>
+              {showThemeSelect && (
+                <div
+                  className="position-absolute"
+                  style={{
+                    top: '100%',
+                    right: 0,
+                    marginTop: '0.5rem',
+                    backgroundColor: 'var(--header-bg)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0.25rem',
+                    padding: '0.5rem',
+                    minWidth: '150px',
+                    zIndex: 1000,
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {getAvailableThemes().map((theme) => (
+                    <button
+                      key={theme}
+                      className="btn btn-link text-white text-decoration-none d-block w-100 text-start p-2"
+                      style={{
+                        color: 'white',
+                        transition: 'background-color 0.2s',
+                        backgroundColor: currentTheme === theme ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentTheme !== theme) {
+                          e.target.style.backgroundColor =
+                            'rgba(255, 255, 255, 0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentTheme !== theme) {
+                          e.target.style.backgroundColor = 'transparent';
+                        } else {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                        }
+                      }}
+                      onClick={() => handleThemeChange(theme)}
+                    >
+                      {t(`theme.${theme}`)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="position-relative language-selector">
               <div
                 className="d-flex align-items-center"

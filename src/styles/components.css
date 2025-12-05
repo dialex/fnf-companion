@@ -184,7 +184,8 @@ input[type='text'].field-input {
   border: 1px solid var(--border-color);
   border-radius: 0.25rem;
   font-size: 1.15rem;
-  color: var(--text-primary);
+  color: var(--input-text);
+  background-color: var(--input-bg);
 }
 
 .field-input:focus {
@@ -198,6 +199,9 @@ textarea.field-input.form-control {
   font-size: 1.15rem;
   resize: vertical;
   min-height: 200px;
+  color: var(--textarea-text);
+  background-color: var(--textarea-bg);
+  border-color: var(--border-color);
 }
 
 /* Notes section - handwritten font */
@@ -378,5 +382,16 @@ input[type='number'].form-control.field-input {
 /* Trail pill light color override */
 .badge.text-bg-light {
   background-color: #ededed !important;
-  color: #333 !important;
+  color: var(--text-primary) !important;
+}
+
+/* Dark theme pill adjustments */
+:root[data-theme='dark'] .badge.text-bg-light {
+  background-color: #3a3a3a !important;
+  color: var(--text-white) !important;
+}
+
+:root[data-theme='dark'] .badge.text-bg-dark {
+  background-color: #212529 !important;
+  color: var(--text-white) !important;
 }
