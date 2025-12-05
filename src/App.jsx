@@ -20,6 +20,7 @@ import {
 } from './utils/stateManager';
 import { initTheme, getCurrentTheme, setTheme } from './utils/theme';
 import { annotationToColor, colorToAnnotation } from './utils/trailMapping';
+import yaml from 'js-yaml';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -1018,7 +1019,7 @@ function App() {
       theme: getCurrentTheme(),
     });
 
-    // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
+    // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.yaml
     const now = new Date();
     const datePart =
       now.getFullYear().toString() +
@@ -1035,10 +1036,10 @@ function App() {
 
     const bookPart = sanitizeFilename(book || 'book');
     const namePart = sanitizeFilename(name || 'character');
-    const filename = `${bookPart}-${namePart}-${datePart}-${timePart}.json`;
+    const filename = `${bookPart}-${namePart}-${datePart}-${timePart}.yaml`;
 
-    const jsonString = JSON.stringify(stateToSave, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
+    const yamlString = yaml.dump(stateToSave, { indent: 2, lineWidth: -1 });
+    const blob = new Blob([yamlString], { type: 'text/yaml' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -1054,21 +1055,21 @@ function App() {
   const handleLoadGame = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.yaml';
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       // Validate file extension
-      if (!file.name.toLowerCase().endsWith('.json')) {
+      if (!file.name.toLowerCase().endsWith('.yaml')) {
         return;
       }
 
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
-          const jsonContent = event.target.result;
-          const loadedState = JSON.parse(jsonContent);
+          const fileContent = event.target.result;
+          const loadedState = yaml.load(fileContent);
 
           // Validate it's a valid state object
           if (!loadedState || typeof loadedState !== 'object') {

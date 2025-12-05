@@ -20,6 +20,8 @@ export const getDefaultState = () => ({
     savedAt: new Date().toISOString(),
     bookname: '',
     theme: 'auto',
+    actionSoundsEnabled: true,
+    allSoundsMuted: false,
   },
   character: {
     name: '',
@@ -40,7 +42,6 @@ export const getDefaultState = () => ({
     potionUsed: false,
   },
   inventory: '',
-  notes: '',
   fight: {
     monsterSkill: '',
     monsterHealth: '',
@@ -64,8 +65,7 @@ export const getDefaultState = () => ({
     victoryVolume: 100,
     defeatVolume: 100,
   },
-  actionSoundsEnabled: true,
-  allSoundsMuted: false,
+  notes: '',
   trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
 });
 
@@ -100,19 +100,24 @@ export const loadState = () => {
       ...defaultState.sounds,
       ...(savedState.sounds || {}),
     },
-    actionSoundsEnabled:
-      savedState.actionSoundsEnabled !== undefined
-        ? savedState.actionSoundsEnabled
-        : defaultState.actionSoundsEnabled,
-    allSoundsMuted:
-      savedState.allSoundsMuted !== undefined
-        ? savedState.allSoundsMuted
-        : defaultState.allSoundsMuted,
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
     trailSequence: savedState.trailSequence || defaultState.trailSequence,
     metadata: {
       ...defaultState.metadata,
       ...(savedState.metadata || {}),
+      // Legacy support: migrate actionSoundsEnabled and allSoundsMuted from top-level to metadata
+      actionSoundsEnabled:
+        savedState.metadata?.actionSoundsEnabled !== undefined
+          ? savedState.metadata.actionSoundsEnabled
+          : savedState.actionSoundsEnabled !== undefined
+            ? savedState.actionSoundsEnabled
+            : defaultState.metadata.actionSoundsEnabled,
+      allSoundsMuted:
+        savedState.metadata?.allSoundsMuted !== undefined
+          ? savedState.metadata.allSoundsMuted
+          : savedState.allSoundsMuted !== undefined
+            ? savedState.allSoundsMuted
+            : defaultState.metadata.allSoundsMuted,
     },
   };
 };
@@ -161,6 +166,8 @@ export const buildStateObject = (stateValues) => {
       savedAt: new Date().toISOString(),
       bookname: stateValues.book || '',
       theme: stateValues.theme || 'auto',
+      actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
+      allSoundsMuted: stateValues.allSoundsMuted ?? false,
     },
     character: {
       name: stateValues.name || '',
@@ -181,7 +188,6 @@ export const buildStateObject = (stateValues) => {
       potionUsed: stateValues.potionUsed || false,
     },
     inventory: stateValues.inventory || '',
-    notes: stateValues.notes || '',
     fight: {
       monsterSkill: stateValues.monsterSkill || '',
       monsterHealth: stateValues.monsterHealth || '',
@@ -205,8 +211,7 @@ export const buildStateObject = (stateValues) => {
       victoryVolume: stateValues.soundVolumes?.victory ?? 100,
       defeatVolume: stateValues.soundVolumes?.defeat ?? 100,
     },
-    actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
-    allSoundsMuted: stateValues.allSoundsMuted ?? false,
+    notes: stateValues.notes || '',
     trailSequence: stateValues.trailSequence || [
       { number: 1, color: 'primary-1' },
     ],
@@ -223,11 +228,38 @@ export const applyLoadedState = (savedState, setters) => {
     return;
   }
 
-  // Restore metadata (book name, theme)
+  // Restore metadata (book name, theme, actionSoundsEnabled, allSoundsMuted)
   if (savedState.metadata) {
     if (savedState.metadata.bookname !== undefined && setters.setBook) {
       setters.setBook(savedState.metadata.bookname);
     }
+    if (
+      savedState.metadata.actionSoundsEnabled !== undefined &&
+      setters.setActionSoundsEnabled
+    ) {
+      setters.setActionSoundsEnabled(savedState.metadata.actionSoundsEnabled);
+    }
+    if (
+      savedState.metadata.allSoundsMuted !== undefined &&
+      setters.setAllSoundsMuted
+    ) {
+      setters.setAllSoundsMuted(savedState.metadata.allSoundsMuted);
+    }
+  }
+  // Legacy support: also check top-level for actionSoundsEnabled and allSoundsMuted
+  if (
+    savedState.actionSoundsEnabled !== undefined &&
+    setters.setActionSoundsEnabled &&
+    savedState.metadata?.actionSoundsEnabled === undefined
+  ) {
+    setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
+  }
+  if (
+    savedState.allSoundsMuted !== undefined &&
+    setters.setAllSoundsMuted &&
+    savedState.metadata?.allSoundsMuted === undefined
+  ) {
+    setters.setAllSoundsMuted(savedState.allSoundsMuted);
   }
 
   // Restore character state
@@ -256,10 +288,9 @@ export const applyLoadedState = (savedState, setters) => {
     if (cons.potionUsed !== undefined) setters.setPotionUsed(cons.potionUsed);
   }
 
-  // Restore inventory and notes
+  // Restore inventory
   if (savedState.inventory !== undefined)
     setters.setInventory(savedState.inventory);
-  if (savedState.notes !== undefined) setters.setNotes(savedState.notes);
 
   // Restore fight state
   if (savedState.fight) {
@@ -315,15 +346,8 @@ export const applyLoadedState = (savedState, setters) => {
       defeat: savedState.soundVolumes.defeat ?? 100,
     });
   }
-  if (
-    savedState.actionSoundsEnabled !== undefined &&
-    setters.setActionSoundsEnabled
-  ) {
-    setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
-  }
-  if (savedState.allSoundsMuted !== undefined && setters.setAllSoundsMuted) {
-    setters.setAllSoundsMuted(savedState.allSoundsMuted);
-  }
+  // Restore notes
+  if (savedState.notes !== undefined) setters.setNotes(savedState.notes);
 
   // Restore trail state
   if (savedState.trailSequence !== undefined) {
