@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
-import { mdiBookAccount, mdiWebBox, mdiChevronDown, mdiThemeLightDark } from '@mdi/js';
+import { mdiWebBox, mdiChevronDown, mdiThemeLightDark } from '@mdi/js';
 import {
   t,
   setLanguage,
   getCurrentLanguage,
   getAvailableLanguages,
 } from '../translations';
-import {
-  setTheme,
-  getCurrentTheme,
-  getAvailableThemes,
-} from '../utils/theme';
+import { setTheme, getCurrentTheme, getAvailableThemes } from '../utils/theme';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
@@ -178,7 +174,11 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                 style={{ cursor: 'pointer', gap: '0.125rem' }}
                 onClick={handleThemeIconClick}
               >
-                <Icon path={mdiThemeLightDark} size={1} className="text-white" />
+                <Icon
+                  path={mdiThemeLightDark}
+                  size={1}
+                  className="text-white"
+                />
                 <Icon path={mdiChevronDown} size={0.8} className="text-white" />
               </div>
               {showThemeSelect && (
@@ -205,7 +205,10 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                       style={{
                         color: 'white',
                         transition: 'background-color 0.2s',
-                        backgroundColor: currentTheme === theme ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                        backgroundColor:
+                          currentTheme === theme
+                            ? 'rgba(255, 255, 255, 0.15)'
+                            : 'transparent',
                       }}
                       onMouseEnter={(e) => {
                         if (currentTheme !== theme) {
@@ -217,7 +220,8 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                         if (currentTheme !== theme) {
                           e.target.style.backgroundColor = 'transparent';
                         } else {
-                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                          e.target.style.backgroundColor =
+                            'rgba(255, 255, 255, 0.15)';
                         }
                       }}
                       onClick={() => handleThemeChange(theme)}

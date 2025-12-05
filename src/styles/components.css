@@ -12,6 +12,20 @@
   border-color: var(--primary-color-1) !important;
 }
 
+/* Dark theme: use #0065ac for buttons */
+:root[data-theme='dark'] .btn-primary {
+  background-color: #0065ac !important;
+  border-color: #0065ac !important;
+}
+
+:root[data-theme='dark'] .btn-primary:hover,
+:root[data-theme='dark'] .btn-primary:focus,
+:root[data-theme='dark'] .btn-primary:active,
+:root[data-theme='dark'] .btn-primary:focus-visible {
+  background-color: #0065ac !important;
+  border-color: #0065ac !important;
+}
+
 .btn-info {
   background-color: #0c95b2 !important;
   border-color: #0c95b2 !important;
@@ -72,6 +86,8 @@ body {
   font-family: 'Caudex', serif;
   font-size: 1.38rem;
   line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 }
 
 .content {
@@ -79,11 +95,20 @@ body {
   font-size: 1.15rem;
   font-weight: 500;
   line-height: 1.5;
+  color: var(--text-primary);
 }
 
 .heading {
   font-family: 'Pirata One', cursive;
   font-weight: normal;
+  color: var(--text-primary);
+}
+
+/* Header heading should always be white */
+header .heading,
+header h1.heading,
+header .heading.text-white {
+  color: white !important;
 }
 
 /* Background utilities */
@@ -173,6 +198,7 @@ body {
   font-weight: 500;
   width: 80px;
   flex-shrink: 0;
+  color: var(--text-primary);
 }
 
 .field-input,
@@ -311,6 +337,15 @@ header h1.heading {
   height: 12px;
 }
 
+/* Dark theme: use #0065ac for volume slider */
+:root[data-theme='dark'] .form-range::-webkit-slider-thumb {
+  background-color: #0065ac !important;
+}
+
+:root[data-theme='dark'] .form-range::-moz-range-thumb {
+  background-color: #0065ac !important;
+}
+
 /* Sound validation message */
 .invalid-feedback.sound-error {
   font-size: 0.875rem;
@@ -374,6 +409,7 @@ input[type='number'].form-control.field-input {
 .input-group-text.locked-number {
   background-color: var(--primary-color-1) !important;
   border-color: var(--primary-color-1) !important;
+  color: var(--text-white) !important;
   min-width: 3rem;
   text-align: center;
   justify-content: center;

@@ -51,6 +51,13 @@ select.field-input {
 .input-group-text {
   font-family: 'Caudex', serif;
   font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+/* Labels */
+label,
+.form-label {
+  color: var(--text-primary);
 }
 
 /* Dark theme form controls */
@@ -78,4 +85,93 @@ select.field-input {
   background-color: var(--input-bg);
   color: var(--text-primary);
   opacity: 0.6;
+}
+
+/* Dark theme text colors - override Bootstrap defaults */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] p,
+:root[data-theme='dark'] span,
+:root[data-theme='dark'] div,
+:root[data-theme='dark'] h1,
+:root[data-theme='dark'] h2,
+:root[data-theme='dark'] h3,
+:root[data-theme='dark'] h4,
+:root[data-theme='dark'] h5,
+:root[data-theme='dark'] h6 {
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .input-group-text {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+:root[data-theme='dark'] .text-muted {
+  color: #adb5bd !important;
+}
+
+/* Dark theme for small text and other Bootstrap text utilities */
+:root[data-theme='dark'] small,
+:root[data-theme='dark'] .small {
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .text-body {
+  color: var(--text-primary) !important;
+}
+
+:root[data-theme='dark'] .text-body-secondary {
+  color: #adb5bd !important;
+}
+
+/* Dark theme placeholder text */
+:root[data-theme='dark'] .form-control::placeholder,
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder,
+:root[data-theme='dark'] select::placeholder {
+  color: var(--text-white) !important;
+  opacity: 0.6;
+}
+
+:root[data-theme='dark'] .form-control::-webkit-input-placeholder,
+:root[data-theme='dark'] input::-webkit-input-placeholder,
+:root[data-theme='dark'] textarea::-webkit-input-placeholder {
+  color: var(--text-white) !important;
+  opacity: 0.6;
+}
+
+:root[data-theme='dark'] .form-control::-moz-placeholder,
+:root[data-theme='dark'] input::-moz-placeholder,
+:root[data-theme='dark'] textarea::-moz-placeholder {
+  color: var(--text-white) !important;
+  opacity: 0.6;
+}
+
+:root[data-theme='dark'] .form-control:-ms-input-placeholder,
+:root[data-theme='dark'] input:-ms-input-placeholder,
+:root[data-theme='dark'] textarea:-ms-input-placeholder {
+  color: var(--text-white) !important;
+  opacity: 0.6;
+}
+
+/* Dark theme alert/banner text - black text */
+:root[data-theme='dark'] .alert,
+:root[data-theme='dark'] .alert-success,
+:root[data-theme='dark'] .alert-info,
+:root[data-theme='dark'] .alert-danger,
+:root[data-theme='dark'] .alert-warning,
+:root[data-theme='dark'] .alert-dark,
+:root[data-theme='dark'] .alert-secondary {
+  color: #000 !important;
+}
+
+:root[data-theme='dark'] .alert .content,
+:root[data-theme='dark'] .alert p,
+:root[data-theme='dark'] .alert span,
+:root[data-theme='dark'] .alert div {
+  color: #000 !important;
 }
