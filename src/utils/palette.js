@@ -1,4 +1,5 @@
 import { getFromStorage, saveToStorage } from './localStorage';
+import { setTheme, getEffectiveTheme } from './theme';
 
 const PALETTE_STORAGE_KEY = 'fnf-companion-palette';
 
@@ -12,7 +13,13 @@ const AVAILABLE_PALETTES = Object.keys(themeModules)
     return match ? match[1] : null;
   })
   .filter((name) => name !== null)
-  .sort(); // Sort alphabetically
+  .sort((a, b) => {
+    // Always put 'default' first
+    if (a === 'default') return -1;
+    if (b === 'default') return 1;
+    // Sort others alphabetically (case-insensitive)
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+  });
 
 export { AVAILABLE_PALETTES };
 
@@ -32,8 +39,66 @@ const getStoredPalette = () => {
 let currentPalette = getStoredPalette();
 let paletteLinkElement = null;
 
+// Check which theme variants are available in the loaded palette
+export const checkPaletteVariants = () => {
+  let hasLight = false;
+  let hasDark = false;
+
+  // Find the palette stylesheet
+  const paletteSheet = document.getElementById('palette-stylesheet');
+  if (!paletteSheet || !paletteSheet.sheet) {
+    // Fallback: check if variables exist in computed styles
+    const rootStyles = getComputedStyle(document.documentElement);
+    const navValue = rootStyles.getPropertyValue('--palette-nav').trim();
+    return { hasLight: !!navValue, hasDark: !!navValue };
+  }
+
+  try {
+    const sheet = paletteSheet.sheet;
+    // Check all CSS rules in the stylesheet
+    for (let i = 0; i < sheet.cssRules.length; i++) {
+      const rule = sheet.cssRules[i];
+      if (rule.type === CSSRule.STYLE_RULE) {
+        const selector = rule.selectorText;
+        const cssText = rule.cssText;
+
+        // Check if it defines palette variables
+        const hasPaletteVars = cssText.includes('--palette-nav') ||
+                              cssText.includes('--palette-button-primary') ||
+                              cssText.includes('--palette-section-header') ||
+                              cssText.includes('--palette-bg');
+
+        if (!hasPaletteVars) continue;
+
+        // Check for light variant: :root (without data-theme) or :root[data-theme='light']
+        if (selector === ':root' ||
+            selector.includes(':root[data-theme=\'light\']') ||
+            selector.includes(':root[data-theme="light"]') ||
+            selector.includes(':root,\n:root[data-theme=\'light\']') ||
+            selector.includes(':root,\n:root[data-theme="light"]')) {
+          hasLight = true;
+        }
+
+        // Check for dark variant: :root[data-theme='dark']
+        if (selector.includes('[data-theme=\'dark\']') ||
+            selector.includes('[data-theme="dark"]')) {
+          hasDark = true;
+        }
+      }
+    }
+  } catch (e) {
+    // If we can't access rules (CORS issue), fallback to checking computed styles
+    console.warn('Could not access stylesheet rules, using fallback method', e);
+    const rootStyles = getComputedStyle(document.documentElement);
+    const navValue = rootStyles.getPropertyValue('--palette-nav').trim();
+    return { hasLight: !!navValue, hasDark: !!navValue };
+  }
+
+  return { hasLight, hasDark };
+};
+
 // Load palette CSS dynamically using link element
-const loadPaletteCSS = (paletteName) => {
+const loadPaletteCSS = (paletteName, onLoadCallback = null) => {
   // Remove existing palette link if any
   if (paletteLinkElement) {
     paletteLinkElement.remove();
@@ -49,9 +114,28 @@ const loadPaletteCSS = (paletteName) => {
   link.href = `${baseUrl}src/styles/themes/${paletteName}.css`;
   link.id = 'palette-stylesheet';
 
-  // Wait for load, then set as current
+  // Wait for load, then set as current and check variants
   link.onload = () => {
     paletteLinkElement = link;
+
+    // Wait a bit for CSS to be applied, then check variants
+    setTimeout(() => {
+      const { hasLight, hasDark } = checkPaletteVariants();
+
+      // Auto-switch theme if only one variant is available
+      if (hasLight && !hasDark) {
+        // Only light variant available, switch to light
+        setTheme('light');
+      } else if (hasDark && !hasLight) {
+        // Only dark variant available, switch to dark
+        setTheme('dark');
+      }
+
+      // Call callback if provided (for Header to update state)
+      if (onLoadCallback) {
+        onLoadCallback();
+      }
+    }, 100); // Increased delay to ensure stylesheet is fully parsed
   };
 
   // Handle errors
@@ -59,7 +143,7 @@ const loadPaletteCSS = (paletteName) => {
     console.warn(`Failed to load palette "${paletteName}", using default`);
     // Try loading default as fallback
     if (paletteName !== 'default') {
-      loadPaletteCSS('default');
+      loadPaletteCSS('default', onLoadCallback);
     }
   };
 
@@ -67,24 +151,24 @@ const loadPaletteCSS = (paletteName) => {
 };
 
 // Apply palette
-export const applyPalette = (paletteName = null) => {
+export const applyPalette = (paletteName = null, onLoadCallback = null) => {
   const paletteToApply = paletteName || currentPalette;
 
   if (!AVAILABLE_PALETTES.includes(paletteToApply)) {
     console.warn(`Palette "${paletteToApply}" not found, using default`);
-    loadPaletteCSS('default');
+    loadPaletteCSS('default', onLoadCallback);
     return;
   }
 
-  loadPaletteCSS(paletteToApply);
+  loadPaletteCSS(paletteToApply, onLoadCallback);
 };
 
 // Set palette preference
-export const setPalette = (paletteName) => {
+export const setPalette = (paletteName, onLoadCallback = null) => {
   if (AVAILABLE_PALETTES.includes(paletteName)) {
     currentPalette = paletteName;
     saveToStorage(PALETTE_STORAGE_KEY, paletteName);
-    applyPalette(paletteName);
+    applyPalette(paletteName, onLoadCallback);
   }
 };
 
@@ -95,7 +179,7 @@ export const getCurrentPalette = () => currentPalette;
 export const getAvailablePalettes = () => AVAILABLE_PALETTES;
 
 // Initialize palette on load
-export const initPalette = () => {
+export const initPalette = (onLoadCallback = null) => {
   currentPalette = getStoredPalette();
-  applyPalette();
+  applyPalette(null, onLoadCallback);
 };

@@ -1,27 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
-import { mdiWebBox, mdiChevronDown, mdiThemeLightDark, mdiPaletteSwatch } from '@mdi/js';
+import {
+  mdiWebBox,
+  mdiChevronDown,
+  mdiBrightness4,
+  mdiBrightness5,
+  mdiPalette,
+} from '@mdi/js';
 import {
   t,
   setLanguage,
   getCurrentLanguage,
   getAvailableLanguages,
 } from '../translations';
-import { setTheme, getCurrentTheme, getAvailableThemes } from '../utils/theme';
+import {
+  setTheme,
+  getCurrentTheme,
+  getAvailableThemes,
+  THEMES,
+} from '../utils/theme';
 import {
   setPalette,
   getCurrentPalette,
   getAvailablePalettes,
+  checkPaletteVariants,
 } from '../utils/palette';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
-  const [showThemeSelect, setShowThemeSelect] = useState(false);
   const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
   const [currentPalette, setCurrentPalette] = useState(getCurrentPalette());
+  const [paletteVariants, setPaletteVariants] = useState({
+    hasLight: true,
+    hasDark: true,
+  });
+
+  // Get available themes filtered by palette variants
+  const getFilteredThemes = () => {
+    const allThemes = getAvailableThemes();
+    const { hasLight, hasDark } = paletteVariants;
+
+    // If only one variant is available, hide the opposite variant
+    if (hasLight && !hasDark) {
+      // Only light available - hide dark
+      return allThemes.filter((theme) => theme !== THEMES.DARK);
+    } else if (hasDark && !hasLight) {
+      // Only dark available - hide light
+      return allThemes.filter((theme) => theme !== THEMES.LIGHT);
+    }
+
+    return allThemes;
+  };
+
+  const filteredThemes = getFilteredThemes();
+  const hasOnlyOneTheme = filteredThemes.length === 1;
 
   // Sync theme and palette state on mount (with small delay to ensure they are initialized)
   useEffect(() => {
@@ -29,7 +64,10 @@ export default function Header({ onLanguageChange, onThemeChange }) {
     const timer = setTimeout(() => {
       setCurrentTheme(getCurrentTheme());
       setCurrentPalette(getCurrentPalette());
-    }, 0);
+      // Check palette variants after initial load
+      const variants = checkPaletteVariants();
+      setPaletteVariants(variants);
+    }, 100); // Slightly longer delay to ensure CSS is loaded
     return () => clearTimeout(timer);
   }, []);
 
@@ -54,25 +92,48 @@ export default function Header({ onLanguageChange, onThemeChange }) {
     setShowLanguageSelect(!showLanguageSelect);
   };
 
-  const handleThemeChange = (theme) => {
-    setTheme(theme);
-    setCurrentTheme(theme);
-    setShowThemeSelect(false);
+  const handleThemeToggle = () => {
+    // Don't toggle if only one theme is available
+    if (hasOnlyOneTheme) {
+      return;
+    }
+    // Toggle between light and dark
+    const newTheme = currentTheme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
+    setTheme(newTheme);
+    setCurrentTheme(newTheme);
     // Notify parent component to trigger re-render
     if (onThemeChange) {
-      onThemeChange(theme);
+      onThemeChange(newTheme);
     }
   };
 
-  const handleThemeIconClick = () => {
-    setShowThemeSelect(!showThemeSelect);
-  };
-
   const handlePaletteChange = (palette) => {
-    setPalette(palette);
-    setCurrentPalette(palette);
+    setPalette(palette, () => {
+      // Callback after palette loads - refresh theme state to reflect auto-switch
+      setCurrentPalette(palette);
+      setCurrentTheme(getCurrentTheme());
+
+      // Update palette variants state
+      const variants = checkPaletteVariants();
+      setPaletteVariants(variants);
+
+      // Notify parent component to trigger re-render
+      if (onThemeChange) {
+        onThemeChange(getCurrentTheme());
+      }
+    });
     setShowPaletteSelect(false);
   };
+
+  // Check palette variants on mount and when palette changes
+  useEffect(() => {
+    // Delay to ensure CSS is loaded
+    const timer = setTimeout(() => {
+      const variants = checkPaletteVariants();
+      setPaletteVariants(variants);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [currentPalette]);
 
   const handlePaletteIconClick = () => {
     setShowPaletteSelect(!showPaletteSelect);
@@ -83,22 +144,19 @@ export default function Header({ onLanguageChange, onThemeChange }) {
       if (showLanguageSelect && !event.target.closest('.language-selector')) {
         setShowLanguageSelect(false);
       }
-      if (showThemeSelect && !event.target.closest('.theme-selector')) {
-        setShowThemeSelect(false);
-      }
       if (showPaletteSelect && !event.target.closest('.palette-selector')) {
         setShowPaletteSelect(false);
       }
     };
 
-    if (showLanguageSelect || showThemeSelect || showPaletteSelect) {
+    if (showLanguageSelect || showPaletteSelect) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showLanguageSelect, showThemeSelect, showPaletteSelect]);
+  }, [showLanguageSelect, showPaletteSelect]);
 
   return (
     <header
@@ -209,7 +267,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                 style={{ cursor: 'pointer', gap: '0.125rem' }}
                 onClick={handlePaletteIconClick}
               >
-                <Icon path={mdiPaletteSwatch} size={1} className="text-white" />
+                <Icon path={mdiPalette} size={1} className="text-white" />
                 <Icon path={mdiChevronDown} size={0.8} className="text-white" />
               </div>
               {showPaletteSelect && (
@@ -258,7 +316,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                       }}
                       onClick={() => handlePaletteChange(palette)}
                     >
-                      {palette}
+                      {palette.replace(/-/g, ' ')}
                     </button>
                   ))}
                 </div>
@@ -267,66 +325,22 @@ export default function Header({ onLanguageChange, onThemeChange }) {
             <div className="position-relative theme-selector">
               <div
                 className="d-flex align-items-center"
-                style={{ cursor: 'pointer', gap: '0.125rem' }}
-                onClick={handleThemeIconClick}
+                style={{
+                  cursor: hasOnlyOneTheme ? 'not-allowed' : 'pointer',
+                  opacity: hasOnlyOneTheme ? 0.5 : 1,
+                }}
+                onClick={handleThemeToggle}
               >
                 <Icon
-                  path={mdiThemeLightDark}
+                  path={
+                    currentTheme === THEMES.LIGHT
+                      ? mdiBrightness5
+                      : mdiBrightness4
+                  }
                   size={1}
                   className="text-white"
                 />
-                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
               </div>
-              {showThemeSelect && (
-                <div
-                  className="position-absolute"
-                  style={{
-                    top: '100%',
-                    right: 0,
-                    marginTop: '0.5rem',
-                    backgroundColor: 'var(--header-bg)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '0.25rem',
-                    padding: '0.5rem',
-                    minWidth: '150px',
-                    zIndex: 1000,
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {getAvailableThemes().map((theme) => (
-                    <button
-                      key={theme}
-                      className="btn btn-link text-white text-decoration-none d-block w-100 text-start p-2"
-                      style={{
-                        color: 'white',
-                        transition: 'background-color 0.2s',
-                        backgroundColor:
-                          currentTheme === theme
-                            ? 'rgba(255, 255, 255, 0.15)'
-                            : 'transparent',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (currentTheme !== theme) {
-                          e.target.style.backgroundColor =
-                            'rgba(255, 255, 255, 0.1)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (currentTheme !== theme) {
-                          e.target.style.backgroundColor = 'transparent';
-                        } else {
-                          e.target.style.backgroundColor =
-                            'rgba(255, 255, 255, 0.15)';
-                        }
-                      }}
-                      onClick={() => handleThemeChange(theme)}
-                    >
-                      {t(`theme.${theme}`)}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
             <div className="position-relative language-selector">
               <div

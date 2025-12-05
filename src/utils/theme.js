@@ -2,34 +2,28 @@ import { getFromStorage, saveToStorage } from './localStorage';
 
 const THEME_STORAGE_KEY = 'fnf-companion-theme';
 
-const THEMES = {
+export const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
-  AUTO: 'auto',
 };
 
-// Get stored theme from localStorage or default to 'auto'
+// Get stored theme from localStorage or default to 'light'
 const getStoredTheme = () => {
   try {
-    const stored = getFromStorage(THEME_STORAGE_KEY, THEMES.AUTO);
+    const stored = getFromStorage(THEME_STORAGE_KEY, THEMES.LIGHT);
     if (stored && Object.values(THEMES).includes(stored)) {
       return stored;
     }
   } catch (error) {
     console.warn('Error reading theme from storage:', error);
   }
-  return THEMES.AUTO;
+  return THEMES.LIGHT;
 };
 
 let currentTheme = getStoredTheme();
 
-// Get the effective theme (resolves 'auto' to actual theme based on OS preference)
+// Get the effective theme (same as current theme now that AUTO is removed)
 export const getEffectiveTheme = () => {
-  if (currentTheme === THEMES.AUTO) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? THEMES.DARK
-      : THEMES.LIGHT;
-  }
   return currentTheme;
 };
 
@@ -89,12 +83,5 @@ export const initTheme = () => {
     mediaQuery.removeEventListener('change', mediaQueryListener);
   }
 
-  // Listen for OS theme changes when in auto mode
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  mediaQueryListener = () => {
-    if (currentTheme === THEMES.AUTO) {
-      applyTheme();
-    }
-  };
-  mediaQuery.addEventListener('change', mediaQueryListener);
+  // No longer need to listen for OS theme changes since AUTO is removed
 };

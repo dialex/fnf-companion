@@ -3,8 +3,9 @@
    Edit these 8 colors (4 light + 4 dark) to customize this palette
    ============================================ */
 
-/* Light Variant */
 :root,
+
+/* Light Variant */
 :root[data-theme='light'] {
   --palette-nav: #1a2f3f;
   --palette-section-header: #68544f;
@@ -16,6 +17,6 @@
 :root[data-theme='dark'] {
   --palette-nav: #00375e;
   --palette-section-header: #161616;
-  --palette-button-primary: #00375e;
+  --palette-button-primary: #0066af;
   --palette-bg: #3a465a;
 }

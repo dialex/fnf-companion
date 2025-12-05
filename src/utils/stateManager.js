@@ -19,7 +19,7 @@ export const getDefaultState = () => ({
     version: '1.0.0',
     savedAt: new Date().toISOString(),
     bookname: '',
-    theme: 'auto',
+    theme: 'light',
     actionSoundsEnabled: true,
     allSoundsMuted: false,
   },
@@ -165,7 +165,7 @@ export const buildStateObject = (stateValues) => {
       version: '1.0.0',
       savedAt: new Date().toISOString(),
       bookname: stateValues.book || '',
-      theme: stateValues.theme || 'auto',
+      theme: stateValues.theme || 'light',
       actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
       allSoundsMuted: stateValues.allSoundsMuted ?? false,
     },
@@ -387,12 +387,7 @@ export const applyLoadedState = (savedState, setters) => {
     setters.setTheme &&
     setters.getCurrentTheme
   ) {
-    const currentThemeFromUtility = setters.getCurrentTheme();
-    // Only restore from saved state if theme utility has default 'auto'
-    // This means user hasn't manually selected a theme, so use saved state
-    if (currentThemeFromUtility === 'auto') {
-      setters.setTheme(themeToRestore);
-    }
-    // Otherwise, keep the theme utility's value (user's manual selection)
+    // Restore theme from saved state
+    setters.setTheme(themeToRestore);
   }
 };

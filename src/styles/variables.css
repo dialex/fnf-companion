@@ -42,16 +42,16 @@
   --bg-primary: var(--palette-bg);
   --header-bg: var(--palette-nav);
   --section-header-bg: var(--palette-section-header);
-  --section-bg: #2f2f2f;
+  --section-bg: #272727;
   --button-bg: #495057;
   --button-hover: #5a6268;
   --button-active: #6c757d;
-  --text-primary: #f8f9fa;
-  --text-white: #f8f9fa;
-  --border-color: #495057;
+  --text-primary: white;
+  --text-white: white;
+  --border-color: #ddd;
   --border-focus: #877b6f;
-  --input-bg: #495057;
-  --input-text: #f8f9fa;
-  --textarea-bg: #495057;
-  --textarea-text: #f8f9fa;
+  --input-bg: #22252a;
+  --input-text: white;
+  --textarea-bg: #22252a;
+  --textarea-text: white;
 }
