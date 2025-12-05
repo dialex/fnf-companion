@@ -12,20 +12,6 @@
   border-color: var(--primary-color-1) !important;
 }
 
-/* Dark theme: use #0065ac for buttons */
-:root[data-theme='dark'] .btn-primary {
-  background-color: #0065ac !important;
-  border-color: #0065ac !important;
-}
-
-:root[data-theme='dark'] .btn-primary:hover,
-:root[data-theme='dark'] .btn-primary:focus,
-:root[data-theme='dark'] .btn-primary:active,
-:root[data-theme='dark'] .btn-primary:focus-visible {
-  background-color: #0065ac !important;
-  border-color: #0065ac !important;
-}
-
 .btn-info {
   background-color: #0c95b2 !important;
   border-color: #0c95b2 !important;
@@ -337,13 +323,13 @@ header h1.heading {
   height: 12px;
 }
 
-/* Dark theme: use #0065ac for volume slider */
+/* Dark theme volume slider uses palette color */
 :root[data-theme='dark'] .form-range::-webkit-slider-thumb {
-  background-color: #0065ac !important;
+  background-color: var(--primary-color-1) !important;
 }
 
 :root[data-theme='dark'] .form-range::-moz-range-thumb {
-  background-color: #0065ac !important;
+  background-color: var(--primary-color-1) !important;
 }
 
 /* Sound validation message */

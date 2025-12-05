@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
-import { mdiWebBox, mdiChevronDown, mdiThemeLightDark } from '@mdi/js';
+import { mdiWebBox, mdiChevronDown, mdiThemeLightDark, mdiPaletteSwatch } from '@mdi/js';
 import {
   t,
   setLanguage,
@@ -8,19 +8,27 @@ import {
   getAvailableLanguages,
 } from '../translations';
 import { setTheme, getCurrentTheme, getAvailableThemes } from '../utils/theme';
+import {
+  setPalette,
+  getCurrentPalette,
+  getAvailablePalettes,
+} from '../utils/palette';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [showThemeSelect, setShowThemeSelect] = useState(false);
+  const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
+  const [currentPalette, setCurrentPalette] = useState(getCurrentPalette());
 
-  // Sync theme state on mount (with small delay to ensure theme is initialized)
+  // Sync theme and palette state on mount (with small delay to ensure they are initialized)
   useEffect(() => {
-    // Use setTimeout to ensure theme is initialized from main.jsx
+    // Use setTimeout to ensure theme and palette are initialized from main.jsx
     const timer = setTimeout(() => {
       setCurrentTheme(getCurrentTheme());
+      setCurrentPalette(getCurrentPalette());
     }, 0);
     return () => clearTimeout(timer);
   }, []);
@@ -60,6 +68,16 @@ export default function Header({ onLanguageChange, onThemeChange }) {
     setShowThemeSelect(!showThemeSelect);
   };
 
+  const handlePaletteChange = (palette) => {
+    setPalette(palette);
+    setCurrentPalette(palette);
+    setShowPaletteSelect(false);
+  };
+
+  const handlePaletteIconClick = () => {
+    setShowPaletteSelect(!showPaletteSelect);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showLanguageSelect && !event.target.closest('.language-selector')) {
@@ -68,16 +86,19 @@ export default function Header({ onLanguageChange, onThemeChange }) {
       if (showThemeSelect && !event.target.closest('.theme-selector')) {
         setShowThemeSelect(false);
       }
+      if (showPaletteSelect && !event.target.closest('.palette-selector')) {
+        setShowPaletteSelect(false);
+      }
     };
 
-    if (showLanguageSelect || showThemeSelect) {
+    if (showLanguageSelect || showThemeSelect || showPaletteSelect) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showLanguageSelect, showThemeSelect]);
+  }, [showLanguageSelect, showThemeSelect, showPaletteSelect]);
 
   return (
     <header
@@ -181,7 +202,68 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                 {t('navigation.notes')}
               </a>
             </div>
-            {/* Theme and Language selectors - visible on both desktop and mobile */}
+            {/* Palette, Theme and Language selectors - visible on both desktop and mobile */}
+            <div className="position-relative palette-selector">
+              <div
+                className="d-flex align-items-center"
+                style={{ cursor: 'pointer', gap: '0.125rem' }}
+                onClick={handlePaletteIconClick}
+              >
+                <Icon path={mdiPaletteSwatch} size={1} className="text-white" />
+                <Icon path={mdiChevronDown} size={0.8} className="text-white" />
+              </div>
+              {showPaletteSelect && (
+                <div
+                  className="position-absolute"
+                  style={{
+                    top: '100%',
+                    right: 0,
+                    marginTop: '0.5rem',
+                    backgroundColor: 'var(--header-bg)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0.25rem',
+                    padding: '0.5rem',
+                    minWidth: '150px',
+                    zIndex: 1000,
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {getAvailablePalettes().map((palette) => (
+                    <button
+                      key={palette}
+                      className="btn btn-link text-white text-decoration-none d-block w-100 text-start p-2"
+                      style={{
+                        color: 'white',
+                        transition: 'background-color 0.2s',
+                        backgroundColor:
+                          currentPalette === palette
+                            ? 'rgba(255, 255, 255, 0.15)'
+                            : 'transparent',
+                        textTransform: 'capitalize',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentPalette !== palette) {
+                          e.target.style.backgroundColor =
+                            'rgba(255, 255, 255, 0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPalette !== palette) {
+                          e.target.style.backgroundColor = 'transparent';
+                        } else {
+                          e.target.style.backgroundColor =
+                            'rgba(255, 255, 255, 0.15)';
+                        }
+                      }}
+                      onClick={() => handlePaletteChange(palette)}
+                    >
+                      {palette}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="position-relative theme-selector">
               <div
                 className="d-flex align-items-center"

@@ -1,15 +1,28 @@
+/* ============================================
+   ACTIVE THEME IMPORT
+   Note: The active palette is loaded dynamically via JavaScript
+   This import is a fallback - the palette.js will override it
+   ============================================ */
+@import './themes/default.css';
+
+/* ============================================
+   COLOR MAPPING
+   Maps palette colors to UI element variables
+   (Do not edit these - they reference palette above)
+   ============================================ */
+
 /* Primary color variables - always available */
 :root {
-  --primary-color-1: #1a303f; /* Dark blue */
-  --primary-color-2: #d4a24b; /* Golden */
+  --primary-color-1: var(--palette-button-primary);
+  --primary-color-2: #d4a24b; /* Golden - not part of palette */
 }
 
 /* Light theme (default) */
 :root,
 :root[data-theme='light'] {
-  --bg-primary: #f5f1e8;
-  --header-bg: #1a2f3f;
-  --section-header-bg: #68544f;
+  --bg-primary: var(--palette-bg);
+  --header-bg: var(--palette-nav);
+  --section-header-bg: var(--palette-section-header);
   --section-bg: white;
   --button-bg: #d9d9d9;
   --button-hover: #c9c9c9;
@@ -26,10 +39,9 @@
 
 /* Dark theme */
 :root[data-theme='dark'] {
-  --primary-color-1: #00375e; /* Darker blue for dark theme */
-  --bg-primary: #3a465a;
-  --header-bg: #00375e;
-  --section-header-bg: #161616;
+  --bg-primary: var(--palette-bg);
+  --header-bg: var(--palette-nav);
+  --section-header-bg: var(--palette-section-header);
   --section-bg: #2f2f2f;
   --button-bg: #495057;
   --button-hover: #5a6268;
