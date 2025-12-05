@@ -76,6 +76,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
       style={{ backgroundColor: 'var(--header-bg)', zIndex: 1050 }}
     >
       <div className="container mx-auto px-4 py-3 d-flex justify-content-between align-items-center">
+        {/* Title and logo - visible on both desktop and mobile */}
         <div className="d-flex align-items-center gap-3">
           <img
             src={`${import.meta.env.BASE_URL}favicon/web-app-manifest-192x192.png`}
@@ -108,66 +109,70 @@ export default function Header({ onLanguageChange, onThemeChange }) {
           id="navbarNav"
         >
           <div className="navbar-nav d-flex align-items-center gap-4 ms-auto flex-wrap">
-            <a
-              href="#game"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.game')}
-            </a>
-            <a
-              href="#consumables"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.consumables')}
-            </a>
-            <a
-              href="#inventory"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.inventory')}
-            </a>
-            <a
-              href="#map"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.trail')}
-            </a>
-            <a
-              href="#fight"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.fight')}
-            </a>
-            <a
-              href="#notes"
-              className="nav-link content text-white text-decoration-none"
-              style={{ transition: 'color 0.2s' }}
-              onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-              onClick={() => setNavbarExpanded(false)}
-            >
-              {t('navigation.notes')}
-            </a>
+            {/* Navigation links - only visible on mobile */}
+            <div className="d-xl-none d-flex flex-column gap-2 w-100 mb-3">
+              <a
+                href="#game"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.game')}
+              </a>
+              <a
+                href="#consumables"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.consumables')}
+              </a>
+              <a
+                href="#inventory"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.inventory')}
+              </a>
+              <a
+                href="#map"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.trail')}
+              </a>
+              <a
+                href="#fight"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.fight')}
+              </a>
+              <a
+                href="#notes"
+                className="nav-link content text-white text-decoration-none"
+                style={{ transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
+                onMouseLeave={(e) => (e.target.style.color = 'white')}
+                onClick={() => setNavbarExpanded(false)}
+              >
+                {t('navigation.notes')}
+              </a>
+            </div>
+            {/* Theme and Language selectors - visible on both desktop and mobile */}
             <div className="position-relative theme-selector">
               <div
                 className="d-flex align-items-center"
