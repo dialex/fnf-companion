@@ -16,7 +16,7 @@
 }
 
 .you-died-text {
-  color: #790002;
+  color: #790002 !important;
   font-family: 'Times New Roman', serif;
   font-size: 10rem;
   text-transform: uppercase;
@@ -26,6 +26,11 @@
   animation:
     fadeInGrowText 5s ease-in 1s forwards,
     fadeOutText 0.3s linear 7s forwards;
+}
+
+/* Ensure red color in dark mode */
+:root[data-theme='dark'] .you-died-text {
+  color: #790002 !important;
 }
 
 @keyframes fadeInBlack {
