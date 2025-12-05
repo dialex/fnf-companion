@@ -198,10 +198,10 @@ export default function Header({ onLanguageChange, onThemeChange }) {
         >
           <div className="navbar-nav d-flex align-items-center gap-4 ms-auto flex-wrap">
             {/* Navigation links - only visible on mobile */}
-            <div className="d-xl-none d-flex flex-column gap-2 w-100 mb-3">
+            <div className="d-xl-none d-flex flex-column gap-2 w-100 mb-3 align-items-center">
               <a
                 href="#game"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
@@ -211,7 +211,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               </a>
               <a
                 href="#consumables"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
@@ -221,7 +221,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               </a>
               <a
                 href="#inventory"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
@@ -231,7 +231,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               </a>
               <a
                 href="#map"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
@@ -241,7 +241,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               </a>
               <a
                 href="#fight"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
@@ -251,7 +251,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               </a>
               <a
                 href="#notes"
-                className="nav-link content text-white text-decoration-none"
+                className="nav-link content text-white text-decoration-none text-center"
                 style={{ transition: 'color 0.2s' }}
                 onMouseEnter={(e) => (e.target.style.color = '#ffc107')}
                 onMouseLeave={(e) => (e.target.style.color = 'white')}
