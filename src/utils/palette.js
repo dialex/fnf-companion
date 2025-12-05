@@ -3,23 +3,24 @@ import { setTheme, getEffectiveTheme } from './theme';
 
 const PALETTE_STORAGE_KEY = 'fnf-companion-palette';
 
-// Dynamically discover all theme files in the themes folder
-// This uses Vite's import.meta.glob to automatically find all CSS files
-const themeModules = import.meta.glob('../styles/themes/*.css', { eager: false });
-const AVAILABLE_PALETTES = Object.keys(themeModules)
-  .map((path) => {
-    // Extract filename from path like '../styles/themes/default.css'
-    const match = path.match(/\/([^/]+)\.css$/);
-    return match ? match[1] : null;
-  })
-  .filter((name) => name !== null)
-  .sort((a, b) => {
-    // Always put 'default' first
-    if (a === 'default') return -1;
-    if (b === 'default') return 1;
-    // Sort others alphabetically (case-insensitive)
-    return a.toLowerCase().localeCompare(b.toLowerCase());
-  });
+// List of available palettes (files are in public/themes/)
+const AVAILABLE_PALETTES = [
+  'default',
+  'beach',
+  'brown',
+  'forest',
+  'gothic',
+  'kurtteal',
+  'monokai',
+  'purplorange',
+  'redvash',
+].sort((a, b) => {
+  // Always put 'default' first
+  if (a === 'default') return -1;
+  if (b === 'default') return 1;
+  // Sort others alphabetically (case-insensitive)
+  return a.toLowerCase().localeCompare(b.toLowerCase());
+});
 
 export { AVAILABLE_PALETTES };
 
@@ -46,7 +47,7 @@ export const checkPaletteVariants = () => {
 
   // Find the palette stylesheet
   const paletteSheet = document.getElementById('palette-stylesheet');
-  if (!paletteSheet || !paletteSheet.sheet) {
+  if (!paletteSheet) {
     // Fallback: check if variables exist in computed styles
     const rootStyles = getComputedStyle(document.documentElement);
     const navValue = rootStyles.getPropertyValue('--palette-nav').trim();
@@ -54,7 +55,28 @@ export const checkPaletteVariants = () => {
   }
 
   try {
+    // For style elements, parse CSS text directly (more reliable)
+    if (paletteSheet.tagName === 'STYLE') {
+      const cssText = paletteSheet.textContent || paletteSheet.innerHTML;
+      if (cssText) {
+        const hasLight =
+          cssText.includes(":root[data-theme='light']") ||
+          cssText.includes(':root[data-theme="light"]') ||
+          (cssText.includes(':root') &&
+            !cssText.includes("[data-theme='dark']"));
+        const hasDark =
+          cssText.includes("[data-theme='dark']") ||
+          cssText.includes('[data-theme="dark"]');
+        return { hasLight, hasDark };
+      }
+      return { hasLight: true, hasDark: true };
+    }
+
+    // For link elements, use the stylesheet API
     const sheet = paletteSheet.sheet;
+    if (!sheet) {
+      return { hasLight: true, hasDark: true };
+    }
     // Check all CSS rules in the stylesheet
     for (let i = 0; i < sheet.cssRules.length; i++) {
       const rule = sheet.cssRules[i];
@@ -63,25 +85,30 @@ export const checkPaletteVariants = () => {
         const cssText = rule.cssText;
 
         // Check if it defines palette variables
-        const hasPaletteVars = cssText.includes('--palette-nav') ||
-                              cssText.includes('--palette-button-primary') ||
-                              cssText.includes('--palette-section-header') ||
-                              cssText.includes('--palette-bg');
+        const hasPaletteVars =
+          cssText.includes('--palette-nav') ||
+          cssText.includes('--palette-button-primary') ||
+          cssText.includes('--palette-section-header') ||
+          cssText.includes('--palette-bg');
 
         if (!hasPaletteVars) continue;
 
         // Check for light variant: :root (without data-theme) or :root[data-theme='light']
-        if (selector === ':root' ||
-            selector.includes(':root[data-theme=\'light\']') ||
-            selector.includes(':root[data-theme="light"]') ||
-            selector.includes(':root,\n:root[data-theme=\'light\']') ||
-            selector.includes(':root,\n:root[data-theme="light"]')) {
+        if (
+          selector === ':root' ||
+          selector.includes(":root[data-theme='light']") ||
+          selector.includes(':root[data-theme="light"]') ||
+          selector.includes(":root,\n:root[data-theme='light']") ||
+          selector.includes(':root,\n:root[data-theme="light"]')
+        ) {
           hasLight = true;
         }
 
         // Check for dark variant: :root[data-theme='dark']
-        if (selector.includes('[data-theme=\'dark\']') ||
-            selector.includes('[data-theme="dark"]')) {
+        if (
+          selector.includes("[data-theme='dark']") ||
+          selector.includes('[data-theme="dark"]')
+        ) {
           hasDark = true;
         }
       }
@@ -98,6 +125,7 @@ export const checkPaletteVariants = () => {
 };
 
 // Load palette CSS dynamically using link element
+// Works in both dev (via Vite dev server) and production (as static asset)
 const loadPaletteCSS = (paletteName, onLoadCallback = null) => {
   // Remove existing palette link if any
   if (paletteLinkElement) {
@@ -106,13 +134,14 @@ const loadPaletteCSS = (paletteName, onLoadCallback = null) => {
   }
 
   // Create new link element for the palette
-  // In Vite, CSS files in src/ are handled by the dev server
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  // Use absolute path from base URL
-  const baseUrl = import.meta.env.BASE_URL || '/';
-  link.href = `${baseUrl}src/styles/themes/${paletteName}.css`;
   link.id = 'palette-stylesheet';
+
+  // Use public path for both dev and production
+  // Theme files are copied to public/themes/ during build
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  link.href = `${baseUrl}themes/${paletteName}.css`;
 
   // Wait for load, then set as current and check variants
   link.onload = () => {
@@ -135,10 +164,10 @@ const loadPaletteCSS = (paletteName, onLoadCallback = null) => {
       if (onLoadCallback) {
         onLoadCallback();
       }
-    }, 100); // Increased delay to ensure stylesheet is fully parsed
+    }, 100); // Delay to ensure stylesheet is fully parsed
   };
 
-  // Handle errors
+  // Handle errors - fallback to default
   link.onerror = () => {
     console.warn(`Failed to load palette "${paletteName}", using default`);
     // Try loading default as fallback

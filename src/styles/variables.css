@@ -1,9 +1,8 @@
 /* ============================================
    ACTIVE THEME IMPORT
    Note: The active palette is loaded dynamically via JavaScript
-   This import is a fallback - the palette.js will override it
+   The default palette is loaded from public/themes/default.css
    ============================================ */
-@import './themes/default.css';
 
 /* ============================================
    COLOR MAPPING
