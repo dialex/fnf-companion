@@ -431,3 +431,22 @@ input[type='number'].form-control.field-input {
   background-color: #212529 !important;
   color: var(--text-white) !important;
 }
+
+/* Dark theme: modal/dialog styling */
+:root[data-theme='dark'] .modal-content {
+  background-color: var(--section-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+:root[data-theme='dark'] .modal-body {
+  color: var(--text-white) !important;
+}
+
+:root[data-theme='dark'] .modal-body p,
+:root[data-theme='dark'] .modal-body .content {
+  color: var(--text-white) !important;
+}
+
+:root[data-theme='dark'] .modal-footer {
+  border-top-color: var(--border-color) !important;
+}

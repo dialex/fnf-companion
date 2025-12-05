@@ -73,6 +73,7 @@ export const getDefaultState = () => ({
   actionSoundsEnabled: true,
   allSoundsMuted: false,
   trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
+  theme: 'auto', // Theme preference
 });
 
 /**
@@ -234,6 +235,7 @@ export const buildStateObject = (stateValues) => {
     trailSequence: stateValues.trailSequence || [
       { number: 1, color: 'primary-1' },
     ],
+    theme: stateValues.theme || 'auto',
   };
 };
 
@@ -374,5 +376,18 @@ export const applyLoadedState = (savedState, setters) => {
     } else {
       setters.setTrailSequence(normalizedSequence);
     }
+  }
+
+  // Restore theme from saved state
+  // Note: Theme utility's localStorage takes precedence over saved state
+  // This ensures user's manual theme selection is preserved
+  if (savedState.theme !== undefined && setters.setTheme && setters.getCurrentTheme) {
+    const currentThemeFromUtility = setters.getCurrentTheme();
+    // Only restore from saved state if theme utility has default 'auto'
+    // This means user hasn't manually selected a theme, so use saved state
+    if (currentThemeFromUtility === 'auto') {
+      setters.setTheme(savedState.theme);
+    }
+    // Otherwise, keep the theme utility's value (user's manual selection)
   }
 };

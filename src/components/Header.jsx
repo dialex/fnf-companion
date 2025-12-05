@@ -16,6 +16,15 @@ export default function Header({ onLanguageChange, onThemeChange }) {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
 
+  // Sync theme state on mount (with small delay to ensure theme is initialized)
+  useEffect(() => {
+    // Use setTimeout to ensure theme is initialized from main.jsx
+    const timer = setTimeout(() => {
+      setCurrentTheme(getCurrentTheme());
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1200);

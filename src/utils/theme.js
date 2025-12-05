@@ -10,9 +10,13 @@ const THEMES = {
 
 // Get stored theme from localStorage or default to 'auto'
 const getStoredTheme = () => {
-  const stored = getFromStorage(THEME_STORAGE_KEY, THEMES.AUTO);
-  if (Object.values(THEMES).includes(stored)) {
-    return stored;
+  try {
+    const stored = getFromStorage(THEME_STORAGE_KEY, THEMES.AUTO);
+    if (stored && Object.values(THEMES).includes(stored)) {
+      return stored;
+    }
+  } catch (error) {
+    console.warn('Error reading theme from storage:', error);
   }
   return THEMES.AUTO;
 };
@@ -32,7 +36,9 @@ export const getEffectiveTheme = () => {
 // Apply theme to document
 export const applyTheme = (theme = null) => {
   const themeToApply = theme || getEffectiveTheme();
-  document.documentElement.setAttribute('data-theme', themeToApply);
+  if (document && document.documentElement) {
+    document.documentElement.setAttribute('data-theme', themeToApply);
+  }
 };
 
 // Set theme preference
@@ -55,7 +61,27 @@ let mediaQueryListener = null;
 
 // Initialize theme on load
 export const initTheme = () => {
-  applyTheme();
+  // Ensure currentTheme is set correctly
+  currentTheme = getStoredTheme();
+
+  // Apply theme immediately and also on DOM ready
+  const applyThemeNow = () => {
+    const effectiveTheme = getEffectiveTheme();
+    if (document && document.documentElement) {
+      document.documentElement.setAttribute('data-theme', effectiveTheme);
+    }
+  };
+
+  // Apply immediately
+  applyThemeNow();
+
+  // Also apply when DOM is ready (in case it wasn't ready yet)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyThemeNow);
+  } else {
+    // DOM is ready, but apply again after a tiny delay to ensure it sticks
+    setTimeout(applyThemeNow, 10);
+  }
 
   // Remove existing listener if any
   if (mediaQueryListener) {

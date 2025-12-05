@@ -18,7 +18,7 @@ import {
   applyLoadedState,
   createDebouncedSave,
 } from './utils/stateManager';
-import { initTheme, getCurrentTheme } from './utils/theme';
+import { initTheme, getCurrentTheme, setTheme } from './utils/theme';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -46,9 +46,8 @@ function App() {
   // Theme state to trigger re-renders when theme changes
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
 
-  // Initialize theme on mount
+  // Sync theme state on mount (theme is already initialized in main.jsx)
   useEffect(() => {
-    initTheme();
     setCurrentTheme(getCurrentTheme());
   }, []);
 
@@ -231,6 +230,8 @@ function App() {
         setSoundVolumes,
         setActionSoundsEnabled,
         setAllSoundsMuted,
+        setTheme,
+        getCurrentTheme,
       });
     }
 
@@ -252,37 +253,6 @@ function App() {
     }
   }, [allSoundsMuted]);
 
-  // Debug: Log current Bootstrap breakpoint
-  useEffect(() => {
-    const getBreakpoint = () => {
-      const width = window.innerWidth;
-      if (width >= 1400) return 'xxl (≥1400px)';
-      if (width >= 1200) return 'xl (≥1200px)';
-      if (width >= 992) return 'lg (≥992px)';
-      if (width >= 768) return 'md (≥768px)';
-      if (width >= 576) return 'sm (≥576px)';
-      return 'xs (<576px)';
-    };
-
-    const logBreakpoint = () => {
-      const breakpoint = getBreakpoint();
-      const width = window.innerWidth;
-      console.log(
-        `[Bootstrap Breakpoint] Current: ${breakpoint} | Width: ${width}px`
-      );
-    };
-
-    // Log on mount
-    logBreakpoint();
-
-    // Log on resize
-    const handleResize = () => {
-      logBreakpoint();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Save state on changes (debounced)
   useEffect(() => {
@@ -332,6 +302,7 @@ function App() {
       soundVolumes,
       actionSoundsEnabled,
       allSoundsMuted,
+      theme: getCurrentTheme(),
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -1045,6 +1016,7 @@ function App() {
       soundVolumes,
       actionSoundsEnabled,
       allSoundsMuted,
+      theme: getCurrentTheme(),
     });
 
     // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.json
@@ -1150,6 +1122,7 @@ function App() {
             setSoundVolumes,
             setActionSoundsEnabled,
             setAllSoundsMuted,
+            setTheme,
           });
 
           setNotification({ message: t('game.loaded'), type: 'success' });
