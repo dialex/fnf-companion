@@ -3,6 +3,10 @@
  */
 
 import { getFromStorage, saveToStorage } from './localStorage';
+import {
+  convertItemColorToAnnotation,
+  annotationToColor,
+} from './trailMapping';
 
 const STORAGE_KEY = 'fnf-companion-state';
 const DEBOUNCE_DELAY = 2000; // 2 seconds
@@ -62,7 +66,7 @@ export const getDefaultState = () => ({
   },
   actionSoundsEnabled: true,
   allSoundsMuted: false,
-  trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
+  trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
 });
 
 /**
@@ -219,6 +223,13 @@ export const applyLoadedState = (savedState, setters) => {
     return;
   }
 
+  // Restore metadata (book name, theme)
+  if (savedState.metadata) {
+    if (savedState.metadata.bookname !== undefined && setters.setBook) {
+      setters.setBook(savedState.metadata.bookname);
+    }
+  }
+
   // Restore character state
   if (savedState.character) {
     const char = savedState.character;
@@ -318,20 +329,24 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.trailSequence !== undefined) {
     // Ensure sequence always starts with 1
     const sequence = savedState.trailSequence;
-    // Handle migration from old format (just numbers) to new format (objects)
+    // Handle migration from old format (just numbers or color-based) to new format (annotation-based)
     const normalizedSequence = sequence.map((item) => {
       if (typeof item === 'number') {
         return {
           number: item,
-          color:
-            item === 1 ? 'primary-1' : item === 400 ? 'primary-2' : 'secondary',
+          annotation: null,
         };
       }
+      // If item has 'color', convert to 'annotation'
+      if (item.color !== undefined) {
+        return convertItemColorToAnnotation(item);
+      }
+      // If item already has 'annotation', use it as-is
       return item;
     });
     if (normalizedSequence.length === 0 || normalizedSequence[0].number !== 1) {
       setters.setTrailSequence([
-        { number: 1, color: 'primary-1' },
+        { number: 1, annotation: null },
         ...normalizedSequence.filter((item) => item.number !== 1),
       ]);
     } else {

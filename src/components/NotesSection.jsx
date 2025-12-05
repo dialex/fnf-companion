@@ -49,14 +49,14 @@ export default function NotesSection({
         className={`collapse ${isExpanded ? 'show' : ''}`}
         id="notes-collapse"
       >
-      <div className="section-content">
-        <textarea
-          className="content field-input form-control notes-handwritten"
-          value={notes}
-          onChange={(e) => onNotesChange(e.target.value)}
-          rows={10}
-          style={{ resize: 'vertical', minHeight: '200px' }}
-        />
+        <div className="section-content">
+          <textarea
+            className="content field-input form-control notes-handwritten"
+            value={notes}
+            onChange={(e) => onNotesChange(e.target.value)}
+            rows={10}
+            style={{ resize: 'vertical', minHeight: '200px' }}
+          />
         </div>
       </div>
     </section>

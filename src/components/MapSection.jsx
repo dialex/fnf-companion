@@ -12,6 +12,10 @@ import {
   mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
+import {
+  convertItemAnnotationToColor,
+  annotationToColor,
+} from '../utils/trailMapping';
 
 export default function MapSection({
   trailSequence,
@@ -40,14 +44,19 @@ export default function MapSection({
     setIsExpanded(!isExpanded);
   };
 
+  // Convert annotations to colors for display
+  const displaySequence = trailSequence.map((item) =>
+    convertItemAnnotationToColor(item)
+  );
+
   // Ensure sequence always starts with 1
-  const displaySequence =
-    trailSequence.length === 0 || trailSequence[0]?.number !== 1
+  const normalizedDisplaySequence =
+    displaySequence.length === 0 || displaySequence[0]?.number !== 1
       ? [
-          { number: 1, color: 'primary-2' },
-          ...trailSequence.filter((item) => item.number !== 1),
+          { number: 1, color: 'light' },
+          ...displaySequence.filter((item) => item.number !== 1),
         ]
-      : trailSequence;
+      : displaySequence;
 
   // Initialize Bootstrap tooltips
   useEffect(() => {
@@ -244,16 +253,9 @@ export default function MapSection({
 
           {/* Sequence display */}
           <div className="d-flex flex-wrap justify-content-center gap-2">
-            {displaySequence.map((item, index) => {
+            {normalizedDisplaySequence.map((item, index) => {
               const num = typeof item === 'number' ? item : item.number;
-              const color =
-                typeof item === 'number'
-                  ? num === 1
-                    ? 'primary-2'
-                    : num === 400
-                      ? 'primary-2'
-                      : 'light'
-                  : item.color;
+              const color = typeof item === 'number' ? 'light' : item.color;
 
               // Get tooltip text based on color
               const getTooltipText = (color, number) => {
@@ -278,71 +280,55 @@ export default function MapSection({
               let customStyle = {};
               const tooltipText = getTooltipText(color, num);
 
-              if (num === 1) {
-                // Number 1 always uses primary-2 (golden)
-                pillClass += ' text-white';
-                customStyle = {
-                  backgroundColor: '#D4A24B',
-                  borderColor: '#D4A24B',
-                };
-              } else if (num === 400) {
-                // Number 400 always uses primary-2 (golden)
-                pillClass += ' text-white';
-                customStyle = {
-                  backgroundColor: '#D4A24B',
-                  borderColor: '#D4A24B',
-                };
-              } else {
-                // Other numbers use their assigned color
-                switch (color) {
-                  case 'primary-1':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#1a303f',
-                      borderColor: '#1a303f',
-                    };
-                    break;
-                  case 'primary-2':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#D4A24B',
-                      borderColor: '#D4A24B',
-                    };
-                    break;
-                  case 'dark':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#212529',
-                      borderColor: '#212529',
-                    };
-                    break;
-                  case 'info':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#0c95b2',
-                      borderColor: '#0c95b2',
-                    };
-                    break;
-                  case 'success':
-                    pillClass += ' text-bg-success';
-                    break;
-                  case 'danger':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#dc3545', // Lighter danger red (Bootstrap default)
-                      borderColor: '#dc3545',
-                    };
-                    break;
-                  case 'warning':
-                    pillClass += ' text-white';
-                    customStyle = {
-                      backgroundColor: '#ffc107', // Lighter warning yellow
-                      borderColor: '#ffc107',
-                    };
-                    break;
-                  default:
-                    pillClass += ' text-bg-light';
-                }
+              // Use assigned color
+              switch (color) {
+                case 'primary-1':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#1a303f',
+                    borderColor: '#1a303f',
+                  };
+                  break;
+                case 'primary-2':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#D4A24B',
+                    borderColor: '#D4A24B',
+                  };
+                  break;
+                case 'dark':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#212529',
+                    borderColor: '#212529',
+                  };
+                  break;
+                case 'info':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#0c95b2',
+                    borderColor: '#0c95b2',
+                  };
+                  break;
+                case 'success':
+                  pillClass += ' text-bg-success';
+                  break;
+                case 'danger':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#dc3545', // Lighter danger red (Bootstrap default)
+                    borderColor: '#dc3545',
+                  };
+                  break;
+                case 'warning':
+                  pillClass += ' text-white';
+                  customStyle = {
+                    backgroundColor: '#ffc107', // Lighter warning yellow
+                    borderColor: '#ffc107',
+                  };
+                  break;
+                default:
+                  pillClass += ' text-bg-light';
               }
 
               const pillId = `trail-pill-${index}`;

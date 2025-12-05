@@ -19,6 +19,7 @@ import {
   createDebouncedSave,
 } from './utils/stateManager';
 import { initTheme, getCurrentTheme, setTheme } from './utils/theme';
+import { annotationToColor, colorToAnnotation } from './utils/trailMapping';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -88,7 +89,7 @@ function App() {
 
   // Trail state - each item is { number: number, color: string }
   const [trailSequence, setTrailSequence] = useState([
-    { number: 1, color: 'primary-1' },
+    { number: 1, annotation: null },
   ]);
   const [trailInput, setTrailInput] = useState('');
 
@@ -187,9 +188,6 @@ function App() {
   useEffect(() => {
     const savedState = loadState();
     if (savedState) {
-      if (savedState.metadata?.bookname) {
-        setBook(savedState.metadata.bookname);
-      }
       applyLoadedState(savedState, {
         setName,
         setSkill,
@@ -232,6 +230,7 @@ function App() {
         setAllSoundsMuted,
         setTheme,
         getCurrentTheme,
+        setBook,
       });
     }
 
@@ -252,7 +251,6 @@ function App() {
       setActionSoundsEnabled(true);
     }
   }, [allSoundsMuted]);
-
 
   // Save state on changes (debounced)
   useEffect(() => {
@@ -386,36 +384,37 @@ function App() {
       return;
     }
 
-    // Add number to sequence with default color
-    setTrailSequence((prev) => [...prev, { number: num, color: 'secondary' }]);
+    // Add number to sequence with default annotation
+    setTrailSequence((prev) => [...prev, { number: num, annotation: null }]);
     // Clear input
     setTrailInput('');
   };
 
   const handleTrailTest = () => {
-    // Available colors for random selection
-    const colors = ['dark', 'info', 'success', 'danger', 'warning'];
-    // Generate 20 random numbers between 1 and 400 with random colors
+    // Available annotations for random selection
+    const annotations = ['died', 'question', 'good', 'bad', 'important'];
+    // Generate 20 random numbers between 1 and 400 with random annotations
     const randomNumbers = Array.from({ length: 20 }, () => ({
       number: Math.floor(Math.random() * 400) + 1,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      annotation: annotations[Math.floor(Math.random() * annotations.length)],
     }));
     setTrailSequence((prev) => [...prev, ...randomNumbers]);
   };
 
   const handleTrailPillColorChange = (color) => {
+    const annotation = colorToAnnotation(color);
     setTrailSequence((prev) => {
       if (prev.length === 0) return prev;
       const newSequence = [...prev];
       const lastIndex = newSequence.length - 1;
       newSequence[lastIndex] = {
         ...newSequence[lastIndex],
-        color: color,
+        annotation: annotation,
       };
       return newSequence;
     });
     // Auto-play defeat sound and show "You Died" animation when died button is clicked
-    if (color === 'dark') {
+    if (annotation === 'died') {
       autoPlaySound('defeat');
       setShowYouDied(true);
       setTimeout(() => {
@@ -920,7 +919,7 @@ function App() {
     setIsTestingLuck(false);
     setTestSkillResult(null);
     setDiceRollingType(null);
-    setTrailSequence([{ number: 1, color: 'primary-1' }]);
+    setTrailSequence([{ number: 1, annotation: null }]);
     setTrailInput('');
     setActionSoundsEnabled(true);
     setSoundUrls({
@@ -1291,7 +1290,7 @@ function App() {
         if (prev.length === 0) {
           // If no trail entries, add one with the current input or default to 1
           const num = parseInt(trailInput) || 1;
-          return [{ number: num, color: 'dark' }];
+          return [{ number: num, annotation: 'died' }];
         }
         return prev;
       });
