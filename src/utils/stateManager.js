@@ -15,6 +15,7 @@ export const getDefaultState = () => ({
     version: '1.0.0',
     savedAt: new Date().toISOString(),
     bookname: '',
+    theme: 'auto',
   },
   character: {
     name: '',
@@ -49,31 +50,19 @@ export const getDefaultState = () => ({
     heroDiceRolls: null,
     monsterDiceRolls: null,
   },
-  diceRolls: {
-    rollingButton: null,
-    rollDieResult: null,
-    rollDiceResults: null,
-    testLuckResult: null,
-    isTestingLuck: false,
-    testSkillResult: null,
-    diceRollingType: null,
-  },
   sounds: {
     ambience: '',
     battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
     victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
     defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-  },
-  soundVolumes: {
-    ambience: 100,
-    battle: 100,
-    victory: 100,
-    defeat: 100,
+    ambienceVolume: 100,
+    battleVolume: 100,
+    victoryVolume: 100,
+    defeatVolume: 100,
   },
   actionSoundsEnabled: true,
   allSoundsMuted: false,
   trailSequence: [{ number: 1, color: 'primary-1' }], // Always starts with 1
-  theme: 'auto', // Theme preference
 });
 
 /**
@@ -103,17 +92,9 @@ export const loadState = () => {
       ...defaultState.fight,
       ...(savedState.fight || {}),
     },
-    diceRolls: {
-      ...defaultState.diceRolls,
-      ...(savedState.diceRolls || {}),
-    },
     sounds: {
       ...defaultState.sounds,
       ...(savedState.sounds || {}),
-    },
-    soundVolumes: {
-      ...defaultState.soundVolumes,
-      ...(savedState.soundVolumes || {}),
     },
     actionSoundsEnabled:
       savedState.actionSoundsEnabled !== undefined
@@ -175,6 +156,7 @@ export const buildStateObject = (stateValues) => {
       version: '1.0.0',
       savedAt: new Date().toISOString(),
       bookname: stateValues.book || '',
+      theme: stateValues.theme || 'auto',
     },
     character: {
       name: stateValues.name || '',
@@ -209,33 +191,21 @@ export const buildStateObject = (stateValues) => {
       heroDiceRolls: stateValues.heroDiceRolls ?? null,
       monsterDiceRolls: stateValues.monsterDiceRolls ?? null,
     },
-    diceRolls: {
-      rollingButton: stateValues.rollingButton ?? null,
-      rollDieResult: stateValues.rollDieResult ?? null,
-      rollDiceResults: stateValues.rollDiceResults ?? null,
-      testLuckResult: stateValues.testLuckResult ?? null,
-      isTestingLuck: stateValues.isTestingLuck || false,
-      testSkillResult: stateValues.testSkillResult ?? null,
-      diceRollingType: stateValues.diceRollingType ?? null,
-    },
     sounds: {
       ambience: stateValues.soundUrls?.ambience || '',
       battle: stateValues.soundUrls?.battle || '',
       victory: stateValues.soundUrls?.victory || '',
       defeat: stateValues.soundUrls?.defeat || '',
-    },
-    soundVolumes: {
-      ambience: stateValues.soundVolumes?.ambience ?? 100,
-      battle: stateValues.soundVolumes?.battle ?? 100,
-      victory: stateValues.soundVolumes?.victory ?? 100,
-      defeat: stateValues.soundVolumes?.defeat ?? 100,
+      ambienceVolume: stateValues.soundVolumes?.ambience ?? 100,
+      battleVolume: stateValues.soundVolumes?.battle ?? 100,
+      victoryVolume: stateValues.soundVolumes?.victory ?? 100,
+      defeatVolume: stateValues.soundVolumes?.defeat ?? 100,
     },
     actionSoundsEnabled: stateValues.actionSoundsEnabled ?? true,
     allSoundsMuted: stateValues.allSoundsMuted ?? false,
     trailSequence: stateValues.trailSequence || [
       { number: 1, color: 'primary-1' },
     ],
-    theme: stateValues.theme || 'auto',
   };
 };
 
@@ -304,25 +274,6 @@ export const applyLoadedState = (savedState, setters) => {
       setters.setMonsterDiceRolls(fight.monsterDiceRolls);
   }
 
-  // Restore dice rolls state
-  if (savedState.diceRolls) {
-    const dice = savedState.diceRolls;
-    if (dice.rollingButton !== undefined)
-      setters.setRollingButton(dice.rollingButton);
-    if (dice.rollDieResult !== undefined)
-      setters.setRollDieResult(dice.rollDieResult);
-    if (dice.rollDiceResults !== undefined)
-      setters.setRollDiceResults(dice.rollDiceResults);
-    if (dice.testLuckResult !== undefined)
-      setters.setTestLuckResult(dice.testLuckResult);
-    if (dice.isTestingLuck !== undefined)
-      setters.setIsTestingLuck(dice.isTestingLuck);
-    if (dice.testSkillResult !== undefined)
-      setters.setTestSkillResult(dice.testSkillResult);
-    if (dice.diceRollingType !== undefined)
-      setters.setDiceRollingType(dice.diceRollingType);
-  }
-
   // Restore sounds state
   if (savedState.sounds) {
     const sounds = savedState.sounds;
@@ -334,8 +285,18 @@ export const applyLoadedState = (savedState, setters) => {
         defeat: sounds.defeat || '',
       });
     }
+    // Restore sound volumes from sounds object (new structure)
+    if (setters.setSoundVolumes) {
+      setters.setSoundVolumes({
+        ambience: sounds.ambienceVolume ?? 100,
+        battle: sounds.battleVolume ?? 100,
+        victory: sounds.victoryVolume ?? 100,
+        defeat: sounds.defeatVolume ?? 100,
+      });
+    }
   }
-  if (savedState.soundVolumes && setters.setSoundVolumes) {
+  // Legacy support: also check old soundVolumes structure
+  else if (savedState.soundVolumes && setters.setSoundVolumes) {
     setters.setSoundVolumes({
       ambience: savedState.soundVolumes.ambience ?? 100,
       battle: savedState.soundVolumes.battle ?? 100,
@@ -378,15 +339,20 @@ export const applyLoadedState = (savedState, setters) => {
     }
   }
 
-  // Restore theme from saved state
+  // Restore theme from metadata (new structure)
   // Note: Theme utility's localStorage takes precedence over saved state
   // This ensures user's manual theme selection is preserved
-  if (savedState.theme !== undefined && setters.setTheme && setters.getCurrentTheme) {
+  const themeToRestore = savedState.metadata?.theme || savedState.theme;
+  if (
+    themeToRestore !== undefined &&
+    setters.setTheme &&
+    setters.getCurrentTheme
+  ) {
     const currentThemeFromUtility = setters.getCurrentTheme();
     // Only restore from saved state if theme utility has default 'auto'
     // This means user hasn't manually selected a theme, so use saved state
     if (currentThemeFromUtility === 'auto') {
-      setters.setTheme(savedState.theme);
+      setters.setTheme(themeToRestore);
     }
     // Otherwise, keep the theme utility's value (user's manual selection)
   }
