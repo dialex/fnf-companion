@@ -1,0 +1,18 @@
+/* ============================================
+   Edit these 8 colors (4 light + 4 dark) to customize this palette
+   ============================================ */
+
+:root,
+:root[data-theme='light'] {
+  --palette-nav: #631615;
+  --palette-section-header: #a2292a;
+  --palette-button-primary: #4e322f;
+  --palette-bg: #bab390;
+}
+
+:root[data-theme='dark'] {
+  --palette-nav: #631615;
+  --palette-section-header: #a2292a;
+  --palette-button-primary: #ba9500;
+  --palette-bg: #8b4e4e;
+}
