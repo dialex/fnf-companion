@@ -81,8 +81,12 @@ export default function Header({ onLanguageChange, onThemeChange }) {
     >
       <div className="container mx-auto px-4 py-3 d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center gap-3">
-          <Icon path={mdiBookAccount} size={2} className="text-white" />
-          <h1 className="heading fs-1 mb-0">{t('app.title')}</h1>
+          <img
+            src={`${import.meta.env.BASE_URL}favicon/web-app-manifest-192x192.png`}
+            alt="FNF Companion"
+            style={{ maxHeight: '2.8rem', width: 'auto', height: 'auto' }}
+          />
+          <h1 className="heading fs-1 mb-0 text-white">{t('app.title')}</h1>
         </div>
         <button
           className="navbar-toggler d-xl-none"
