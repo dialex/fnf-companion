@@ -29,6 +29,7 @@ import './App.css';
 
 // Components
 import Header from './components/Header';
+import Footer from './components/Footer';
 import CharacterSection from './components/CharacterSection';
 import ConsumablesSection from './components/ConsumablesSection';
 import DiceRollsSection from './components/DiceRollsSection';
@@ -1674,12 +1675,12 @@ function App() {
   ]);
 
   return (
-    <div className="min-vh-100 bg-beige">
+    <div className="min-vh-100 bg-beige d-flex flex-column">
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-        </div>
-      )}
+                </div>
+              )}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
@@ -1698,7 +1699,7 @@ function App() {
           onCancel={() => setShowResetConfirm(false)}
         />
       )}
-      <main className="container mx-auto py-4">
+      <main className="container mx-auto py-4 flex-grow-1">
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <GameSection
@@ -1726,7 +1727,7 @@ function App() {
               initialExpanded={true}
               autoExpand={shouldExpandSections}
             />
-          </div>
+            </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
@@ -1751,8 +1752,8 @@ function App() {
               onNumberChange={handleNumberChange}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1781,8 +1782,8 @@ function App() {
               onNumberChange={handleNumberChange}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -1800,9 +1801,9 @@ function App() {
               onRollDice={handleRollDice}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-            />
-          </div>
-        </div>
+                />
+              </div>
+                </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -1812,8 +1813,8 @@ function App() {
               fieldBadges={fieldBadges}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -1824,9 +1825,9 @@ function App() {
               onTrailPillColorChange={handleTrailPillColorChange}
               initialExpanded={false}
               autoExpand={shouldExpandSections}
-            />
-          </div>
-        </div>
+                />
+              </div>
+                </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
@@ -1857,9 +1858,9 @@ function App() {
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
               initialExpanded={false}
-            />
-          </div>
-        </div>
+                />
+              </div>
+            </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
@@ -1867,10 +1868,11 @@ function App() {
               notes={notes}
               onNotesChange={setNotes}
               initialExpanded={false}
-            />
-          </div>
+              />
+            </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
