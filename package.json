@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\" \"*.{js,json,html}\" \"*.config.{js,ts}\"",
     "release": "node src/scripts/release.js patch",
+    "release:patch": "node src/scripts/release.js patch",
     "release:minor": "node src/scripts/release.js minor",
     "release:major": "node src/scripts/release.js major"
   },
