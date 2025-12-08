@@ -28,7 +28,7 @@ export default function Footer() {
           >
             v{packageJson.version}
           </a>
-          {' • '}
+          <span className="text-white"> • </span>
           <a
             href="https://diogonunes.com/"
             target="_blank"
