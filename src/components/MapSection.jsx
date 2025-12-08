@@ -8,6 +8,7 @@ import {
   mdiMapMarkerRemoveVariant,
   mdiMapMarkerStar,
   mdiMapMarkerQuestion,
+  mdiMapMarker,
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
@@ -195,14 +196,14 @@ export default function MapSection({
             <div className="btn-group" role="group">
               <button
                 type="button"
-                className={`btn btn-dark btn-sm text-white ${selectedButton === 'died' ? 'active' : ''}`}
+                className={`btn btn-light btn-sm ${selectedButton === 'default' ? 'active' : ''}`}
                 onClick={() => {
-                  setSelectedButton('died');
-                  onTrailPillColorChange('dark');
+                  setSelectedButton('default');
+                  onTrailPillColorChange('light');
                 }}
-                title={t('trail.died')}
+                title={t('trail.default')}
               >
-                <Icon path={mdiCoffin} size={1} />
+                <Icon path={mdiMapMarker} size={1} />
               </button>
               <button
                 type="button"
@@ -247,6 +248,17 @@ export default function MapSection({
                 title={t('trail.important')}
               >
                 <Icon path={mdiMapMarkerStar} size={1} />
+              </button>
+              <button
+                type="button"
+                className={`btn btn-dark btn-sm text-white ${selectedButton === 'died' ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedButton('died');
+                  onTrailPillColorChange('dark');
+                }}
+                title={t('trail.died')}
+              >
+                <Icon path={mdiCoffin} size={1} />
               </button>
             </div>
           </div>

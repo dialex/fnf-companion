@@ -84,7 +84,8 @@
     "good": "Good",
     "bad": "Bad",
     "important": "Important",
-    "chapter": "Chapter"
+    "chapter": "Chapter",
+    "default": "Normal"
   },
   "fight": {
     "graveyard": "Graveyard",

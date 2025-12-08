@@ -1,4 +1,3 @@
-- falta o botao branco nos capitulos
 - falta o botao de luck no fight no primeiro ataque
 - bug: depois de eliminar e tentar meter outra ambience
 - bug: depois de refresh o state nos volumes eh actualizado, mas os volumes em si nao
