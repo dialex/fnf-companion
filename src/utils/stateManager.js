@@ -215,10 +215,22 @@ export const buildStateObject = (stateValues) => {
       battle: stateValues.soundUrls?.battle || '',
       victory: stateValues.soundUrls?.victory || '',
       defeat: stateValues.soundUrls?.defeat || '',
-      ambienceVolume: stateValues.soundVolumes?.ambience ?? 100,
-      battleVolume: stateValues.soundVolumes?.battle ?? 100,
-      victoryVolume: stateValues.soundVolumes?.victory ?? 100,
-      defeatVolume: stateValues.soundVolumes?.defeat ?? 100,
+      ambienceVolume:
+        typeof stateValues.soundVolumes?.ambience === 'number'
+          ? stateValues.soundVolumes.ambience
+          : 100,
+      battleVolume:
+        typeof stateValues.soundVolumes?.battle === 'number'
+          ? stateValues.soundVolumes.battle
+          : 100,
+      victoryVolume:
+        typeof stateValues.soundVolumes?.victory === 'number'
+          ? stateValues.soundVolumes.victory
+          : 100,
+      defeatVolume:
+        typeof stateValues.soundVolumes?.defeat === 'number'
+          ? stateValues.soundVolumes.defeat
+          : 100,
     },
     notes: stateValues.notes || '',
     trailSequence: stateValues.trailSequence || [

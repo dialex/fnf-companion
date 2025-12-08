@@ -308,11 +308,6 @@ function App() {
     });
 
     debouncedSaveRef.current(stateToSave);
-
-    // Cleanup: save immediately on unmount
-    return () => {
-      saveState(stateToSave);
-    };
   }, [
     name,
     skill,
@@ -579,7 +574,7 @@ function App() {
       [soundType]: volume,
     }));
     const player = youtubePlayersRef.current[soundType];
-    if (player) {
+    if (player && typeof player.setVolume === 'function') {
       try {
         player.setVolume(volume);
       } catch (e) {
@@ -684,6 +679,17 @@ function App() {
                   : {}),
               },
               events: {
+                onReady: (event) => {
+                  // Player is ready, set the volume
+                  const player = event.target;
+                  if (player && typeof player.setVolume === 'function') {
+                    try {
+                      player.setVolume(soundVolumes[soundType]);
+                    } catch (e) {
+                      console.error('Error setting initial volume:', e);
+                    }
+                  }
+                },
                 onStateChange: (event) => {
                   // 0 = ended, 1 = playing, 2 = paused
                   const shouldLoop =
@@ -749,15 +755,6 @@ function App() {
               },
             }
           );
-
-          // Set initial volume
-          setTimeout(() => {
-            if (youtubePlayersRef.current[soundType]) {
-              youtubePlayersRef.current[soundType].setVolume(
-                soundVolumes[soundType]
-              );
-            }
-          }, 500);
         }
       } else {
         setTimeout(() => initPlayer(soundType), 100);
@@ -780,6 +777,21 @@ function App() {
       }
     });
   }, [soundUrls, soundVolumes]);
+
+  // Update volumes on existing YouTube players when soundVolumes changes
+  useEffect(() => {
+    const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
+    soundTypes.forEach((soundType) => {
+      const player = youtubePlayersRef.current[soundType];
+      if (player && typeof player.setVolume === 'function') {
+        try {
+          player.setVolume(soundVolumes[soundType]);
+        } catch (e) {
+          console.error('Error setting volume on existing player:', e);
+        }
+      }
+    });
+  }, [soundVolumes]);
 
   // Character handlers
   const handleRandomStats = () => {
@@ -1590,57 +1602,51 @@ function App() {
   // Save immediately when page is closing
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Save immediately with current state
-      const stateToSave = {
-        metadata: {
-          version: '1.0.0',
-          savedAt: new Date().toISOString(),
-          bookname: book || '',
-        },
-        character: {
-          name,
-          skill,
-          health,
-          luck,
-          isLocked,
-          maxSkill,
-          maxHealth,
-          maxLuck,
-        },
-        consumables: {
-          coins,
-          meals,
-          transactionObject,
-          transactionCost,
-          potionType,
-          potionUsed,
-        },
+      // Save immediately with current state using buildStateObject to ensure all fields are included
+      const stateToSave = buildStateObject({
+        book,
+        name,
+        skill,
+        health,
+        luck,
+        isLocked,
+        maxSkill,
+        maxHealth,
+        maxLuck,
+        coins,
+        meals,
+        transactionObject,
+        transactionCost,
+        potionType,
+        potionUsed,
         inventory,
         notes,
-        fight: {
-          monsterSkill,
-          monsterHealth,
-          monsterCreature,
-          graveyard,
-          showUseLuck,
-          luckUsed,
-          isFighting,
-          fightResult,
-          fightOutcome,
-          heroDiceRolls,
-          monsterDiceRolls,
-        },
-        diceRolls: {
-          rollingButton,
-          rollDieResult,
-          rollDiceResults,
-          testLuckResult,
-          isTestingLuck,
-          testSkillResult,
-          diceRollingType,
-        },
+        monsterSkill,
+        monsterHealth,
+        monsterCreature,
+        graveyard,
+        showUseLuck,
+        luckUsed,
+        isFighting,
+        fightResult,
+        fightOutcome,
+        heroDiceRolls,
+        monsterDiceRolls,
+        rollingButton,
+        rollDieResult,
+        rollDiceResults,
+        testLuckResult,
+        isTestingLuck,
+        testSkillResult,
+        diceRollingType,
         trailSequence,
-      };
+        soundUrls,
+        soundVolumes,
+        actionSoundsEnabled,
+        allSoundsMuted,
+        theme: getCurrentTheme(),
+        sectionsExpanded,
+      });
       saveState(stateToSave);
     };
 
@@ -1685,6 +1691,11 @@ function App() {
     testSkillResult,
     diceRollingType,
     trailSequence,
+    soundUrls,
+    soundVolumes,
+    actionSoundsEnabled,
+    allSoundsMuted,
+    sectionsExpanded,
   ]);
 
   return (
