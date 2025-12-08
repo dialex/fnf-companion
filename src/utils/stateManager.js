@@ -8,6 +8,7 @@ import {
   annotationToColor,
 } from './trailMapping';
 import { migrateState } from './migrations';
+import { CURRENT_VERSION } from './migrations';
 
 const STORAGE_KEY = 'fnf-companion-state';
 const DEBOUNCE_DELAY = 1000; // 1 second
@@ -17,7 +18,7 @@ const DEBOUNCE_DELAY = 1000; // 1 second
  */
 export const getDefaultState = () => ({
   metadata: {
-    version: '1.0.0',
+    version: CURRENT_VERSION,
     savedAt: new Date().toISOString(),
     bookname: '',
     theme: 'light',
@@ -170,7 +171,7 @@ export const createDebouncedSave = (saveFn) => {
 export const buildStateObject = (stateValues) => {
   return {
     metadata: {
-      version: '1.0.0',
+      version: CURRENT_VERSION,
       savedAt: new Date().toISOString(),
       bookname: stateValues.book || '',
       theme: stateValues.theme || 'light',

@@ -5,9 +5,11 @@
 
 import { getDefaultState } from './stateManager';
 import { convertItemColorToAnnotation } from './trailMapping';
+import packageJson from '../../package.json';
 
-// Current version - increment this when making breaking changes
-export const CURRENT_VERSION = '1.3.0';
+// Current version - synced with package.json version
+// When making save file structure changes, add a migration and bump package.json version
+export const CURRENT_VERSION = packageJson.version;
 
 /**
  * Get version from saved state (handles missing or old formats)

@@ -18,3 +18,13 @@ When adding user-facing text:
 - The same key must be added to the Portuguese translation file (`src/translations/pt.json`) with the Portuguese translation
 - Use the `t()` function from `./translations` to display translated text in components
 - Never hardcode user-facing strings directly in components
+
+# Save File Structure Changes
+
+When modifying the save file structure (adding, removing, or renaming fields):
+
+- Add a new migration function in `src/utils/migrations.js` (e.g., `migrateTo1_4_0`)
+- Add the migration call in the `migrateState` function to run it sequentially
+- Bump the version in `package.json` (patch/minor/major as appropriate)
+- The `CURRENT_VERSION` in `migrations.js` automatically syncs with `package.json` version
+- This ensures we can track which app version changed the save file structure
