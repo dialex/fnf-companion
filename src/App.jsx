@@ -453,6 +453,18 @@ function App() {
     }
 
     if (isValidYouTubeUrl(url)) {
+      // Destroy old player if URL is changing
+      const oldPlayer = youtubePlayersRef.current[soundType];
+      if (oldPlayer) {
+        try {
+          oldPlayer.stopVideo();
+          oldPlayer.destroy();
+        } catch (e) {
+          // Ignore errors
+        }
+        delete youtubePlayersRef.current[soundType];
+      }
+
       setSoundUrls((prev) => ({
         ...prev,
         [soundType]: url,
@@ -474,6 +486,18 @@ function App() {
   };
 
   const handleSoundDelete = (soundType) => {
+    // Stop and destroy the player
+    const player = youtubePlayersRef.current[soundType];
+    if (player) {
+      try {
+        player.stopVideo();
+        player.destroy();
+      } catch (e) {
+        // Ignore errors
+      }
+      delete youtubePlayersRef.current[soundType];
+    }
+
     setSoundUrls((prev) => ({
       ...prev,
       [soundType]: '',
@@ -643,8 +667,19 @@ function App() {
     }
 
     const initPlayer = (soundType) => {
-      if (!soundUrls[soundType] || youtubePlayersRef.current[soundType]) {
+      if (!soundUrls[soundType]) {
         return;
+      }
+
+      // If player already exists, destroy it first (URL might have changed)
+      if (youtubePlayersRef.current[soundType]) {
+        const existingPlayer = youtubePlayersRef.current[soundType];
+        try {
+          existingPlayer.destroy();
+        } catch (e) {
+          // Ignore errors
+        }
+        delete youtubePlayersRef.current[soundType];
       }
 
       if (window.YT && window.YT.Player) {
