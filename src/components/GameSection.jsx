@@ -46,7 +46,7 @@ export default function GameSection({
 
   useEffect(() => {
     setIsExpanded(initialExpanded);
-}, [initialExpanded]);
+  }, [initialExpanded]);
 
   useEffect(() => {
     import('bootstrap').then((bootstrap) => {

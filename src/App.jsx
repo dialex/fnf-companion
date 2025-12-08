@@ -1,14 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Icon from '@mdi/react';
-import {
-  mdiPlay,
-  mdiPause,
-  mdiStop,
-  mdiTrashCan,
-  mdiClose,
-  mdiCheck,
-  mdiVolumeHigh,
-} from '@mdi/js';
 import { t, getCurrentLanguage, setLanguage } from './translations';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import {
@@ -19,8 +9,8 @@ import {
   createDebouncedSave,
 } from './utils/stateManager';
 import { migrateState } from './utils/migrations';
-import { initTheme, getCurrentTheme, setTheme } from './utils/theme';
-import { annotationToColor, colorToAnnotation } from './utils/trailMapping';
+import { getCurrentTheme, setTheme } from './utils/theme';
+import { colorToAnnotation } from './utils/trailMapping';
 import yaml from 'js-yaml';
 import './styles/variables.css';
 import './styles/animations.css';
@@ -45,10 +35,10 @@ import ConfirmationDialog from './components/ConfirmationDialog';
 function App() {
   // Language state to trigger re-renders when language changes
   // Initialize from localStorage via getCurrentLanguage()
-  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
+  const [, setCurrentLang] = useState(getCurrentLanguage());
 
   // Theme state to trigger re-renders when theme changes
-  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
+  const [, setCurrentTheme] = useState(getCurrentTheme());
 
   // Sync theme state on mount (theme is already initialized in main.jsx)
   useEffect(() => {
@@ -1600,10 +1590,6 @@ function App() {
   // Save immediately when page is closing
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Clear any pending debounced save
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
       // Save immediately with current state
       const stateToSave = {
         metadata: {
