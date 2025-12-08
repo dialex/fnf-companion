@@ -32,15 +32,8 @@ export default function CharacterSection({
   onToggleLock,
   onNumberChange,
   initialExpanded = true,
-  autoExpand = false,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
-
-  useEffect(() => {
-    if (autoExpand && !isExpanded) {
-      setIsExpanded(true);
-    }
-  }, [autoExpand, isExpanded]);
 
   useEffect(() => {
     setIsExpanded(initialExpanded);

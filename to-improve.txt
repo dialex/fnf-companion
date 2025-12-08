@@ -1,7 +1,6 @@
 - falta o botao de luck no fight no primeiro ataque
 - bug: depois de eliminar e tentar meter outra ambience
 - bug: depois de refresh o state nos volumes eh actualizado, mas os volumes em si nao
-- sugestao: tirar o colapsar das boxes, keep it simple
 - sugestao: botao para adicionar sons extra custom, com a tag editavel
 - sugestao: qdo avancamos para a proxima step depois duma fight ele devia parar a victory song e meter a ambience automaticamente
 - sugestao: fade out na musica quando para

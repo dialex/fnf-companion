@@ -132,8 +132,7 @@ function App() {
   // Confirmation dialog
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  // Section expansion control
-  const [shouldExpandSections, setShouldExpandSections] = useState(false);
+  // Section reset key for remounting sections
   const [sectionResetKey, setSectionResetKey] = useState(0);
 
   // Sound state
@@ -970,8 +969,7 @@ function App() {
       }
     });
     youtubePlayersRef.current = {};
-    setShouldExpandSections(false);
-    // Force all sections to remount with collapsed state
+    // Force all sections to remount
     setSectionResetKey((prev) => prev + 1);
   };
 
@@ -1679,8 +1677,8 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-                </div>
-              )}
+        </div>
+      )}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
@@ -1705,7 +1703,6 @@ function App() {
             <GameSection
               book={book}
               onBookChange={setBook}
-              onShouldExpandSections={() => setShouldExpandSections(true)}
               onLoadGame={handleLoadGame}
               onSaveGame={handleSaveGame}
               onReset={handleReset}
@@ -1725,9 +1722,8 @@ function App() {
               onSoundStop={handleSoundStop}
               onSoundVolumeChange={handleSoundVolumeChange}
               initialExpanded={true}
-              autoExpand={shouldExpandSections}
             />
-            </div>
+          </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
@@ -1750,10 +1746,9 @@ function App() {
               onRandomStats={handleRandomStatsWithAnimation}
               onToggleLock={handleToggleLock}
               onNumberChange={handleNumberChange}
-              initialExpanded={false}
-              autoExpand={shouldExpandSections}
-                />
-              </div>
+              initialExpanded={true}
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1780,10 +1775,9 @@ function App() {
               onPotionTypeChange={setPotionType}
               onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
-              initialExpanded={false}
-              autoExpand={shouldExpandSections}
-                />
-              </div>
+              initialExpanded={true}
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -1799,11 +1793,10 @@ function App() {
               onTestYourSkill={handleTestYourSkill}
               onRollDie={handleRollDie}
               onRollDice={handleRollDice}
-              initialExpanded={false}
-              autoExpand={shouldExpandSections}
-                />
-              </div>
-                </div>
+              initialExpanded={true}
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -1811,10 +1804,9 @@ function App() {
               inventory={inventory}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
-              initialExpanded={false}
-              autoExpand={shouldExpandSections}
-                />
-              </div>
+              initialExpanded={true}
+            />
+          </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -1823,11 +1815,10 @@ function App() {
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
               onTrailPillColorChange={handleTrailPillColorChange}
-              initialExpanded={false}
-              autoExpand={shouldExpandSections}
-                />
-              </div>
-                </div>
+              initialExpanded={true}
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
@@ -1858,9 +1849,9 @@ function App() {
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
               initialExpanded={false}
-                />
-              </div>
-            </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
@@ -1868,8 +1859,8 @@ function App() {
               notes={notes}
               onNotesChange={setNotes}
               initialExpanded={false}
-              />
-            </div>
+            />
+          </div>
         </div>
       </main>
       <Footer />

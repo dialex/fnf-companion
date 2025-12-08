@@ -19,7 +19,6 @@ import { t } from '../translations';
 export default function GameSection({
   book,
   onBookChange,
-  onShouldExpandSections,
   onLoadGame,
   onSaveGame,
   onReset,
@@ -39,21 +38,14 @@ export default function GameSection({
   onSoundStop,
   onSoundVolumeChange,
   initialExpanded = true,
-  autoExpand = false,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const masterSoundButtonRef = useRef(null);
   const actionSoundsCheckboxRef = useRef(null);
 
   useEffect(() => {
-    if (autoExpand && !isExpanded) {
-      setIsExpanded(true);
-    }
-  }, [autoExpand, isExpanded]);
-
-  useEffect(() => {
     setIsExpanded(initialExpanded);
-  }, [initialExpanded]);
+}, [initialExpanded]);
 
   useEffect(() => {
     import('bootstrap').then((bootstrap) => {
@@ -107,11 +99,6 @@ export default function GameSection({
   const handleBookChange = (e) => {
     const newValue = e.target.value;
     onBookChange(newValue);
-    // Check if user typed a word (letters followed by space)
-    const wordPattern = /[a-zA-Z]+\s/;
-    if (wordPattern.test(newValue) && onShouldExpandSections) {
-      onShouldExpandSections();
-    }
   };
 
   const handleMasterSoundToggle = () => {

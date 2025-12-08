@@ -25,17 +25,10 @@ export default function MapSection({
   onTrailSubmit,
   onTrailPillColorChange,
   initialExpanded = true,
-  autoExpand = false,
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
-
-  useEffect(() => {
-    if (autoExpand && !isExpanded) {
-      setIsExpanded(true);
-    }
-  }, [autoExpand, isExpanded]);
 
   useEffect(() => {
     setIsExpanded(initialExpanded);
