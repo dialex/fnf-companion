@@ -32,6 +32,7 @@ export default function CharacterSection({
   onToggleLock,
   onNumberChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
@@ -40,7 +41,11 @@ export default function CharacterSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   return (

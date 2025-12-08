@@ -44,6 +44,7 @@ export default function FightSection({
   onUseLuck,
   onNumberChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
@@ -52,7 +53,11 @@ export default function FightSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   return (

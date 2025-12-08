@@ -38,6 +38,7 @@ export default function GameSection({
   onSoundStop,
   onSoundVolumeChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const masterSoundButtonRef = useRef(null);
@@ -93,7 +94,11 @@ export default function GameSection({
   }, [actionSoundsEnabled, allSoundsMuted]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   const handleBookChange = (e) => {

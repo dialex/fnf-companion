@@ -25,6 +25,7 @@ export default function DiceRollsSection({
   onRollDie,
   onRollDice,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
@@ -33,7 +34,11 @@ export default function DiceRollsSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   return (

@@ -67,6 +67,16 @@ export const getDefaultState = () => ({
   },
   notes: '',
   trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
+  sectionsExpanded: {
+    game: true,
+    character: true,
+    consumables: true,
+    diceRolls: true,
+    inventory: true,
+    map: true,
+    fight: false,
+    notes: false,
+  },
 });
 
 /**
@@ -215,6 +225,16 @@ export const buildStateObject = (stateValues) => {
     trailSequence: stateValues.trailSequence || [
       { number: 1, color: 'primary-1' },
     ],
+    sectionsExpanded: stateValues.sectionsExpanded || {
+      game: true,
+      character: true,
+      consumables: true,
+      diceRolls: true,
+      inventory: true,
+      map: true,
+      fight: false,
+      notes: false,
+    },
   };
 };
 

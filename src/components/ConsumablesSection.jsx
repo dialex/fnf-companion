@@ -38,6 +38,7 @@ export default function ConsumablesSection({
   onConsumePotion,
   onNumberChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
@@ -46,7 +47,11 @@ export default function ConsumablesSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   return (

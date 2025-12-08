@@ -232,6 +232,7 @@ function App() {
         setTheme,
         getCurrentTheme,
         setBook,
+        setSectionsExpanded,
       });
     }
 
@@ -302,6 +303,7 @@ function App() {
       actionSoundsEnabled,
       allSoundsMuted,
       theme: getCurrentTheme(),
+      sectionsExpanded,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -350,7 +352,16 @@ function App() {
     soundVolumes,
     actionSoundsEnabled,
     allSoundsMuted,
+    sectionsExpanded,
   ]);
+
+  // Section expanded state handler
+  const handleSectionExpandedChange = (sectionName, isExpanded) => {
+    setSectionsExpanded((prev) => ({
+      ...prev,
+      [sectionName]: isExpanded,
+    }));
+  };
 
   // Utility functions
   const handleNumberChange = (setter, value, maxValue) => {
@@ -1721,7 +1732,10 @@ function App() {
               onSoundPlayPause={handleSoundPlayPause}
               onSoundStop={handleSoundStop}
               onSoundVolumeChange={handleSoundVolumeChange}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.game}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('game', expanded)
+              }
             />
           </div>
         </div>
@@ -1746,7 +1760,10 @@ function App() {
               onRandomStats={handleRandomStatsWithAnimation}
               onToggleLock={handleToggleLock}
               onNumberChange={handleNumberChange}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.character}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('character', expanded)
+              }
             />
           </div>
           <div className="col-12 col-xl-4">
@@ -1775,7 +1792,10 @@ function App() {
               onPotionTypeChange={setPotionType}
               onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.consumables}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('consumables', expanded)
+              }
             />
           </div>
           <div className="col-12 col-xl-4">
@@ -1793,7 +1813,10 @@ function App() {
               onTestYourSkill={handleTestYourSkill}
               onRollDie={handleRollDie}
               onRollDice={handleRollDice}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.diceRolls}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('diceRolls', expanded)
+              }
             />
           </div>
         </div>
@@ -1804,7 +1827,10 @@ function App() {
               inventory={inventory}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.inventory}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('inventory', expanded)
+              }
             />
           </div>
           <div className="col-12 col-xl-8">
@@ -1815,7 +1841,10 @@ function App() {
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
               onTrailPillColorChange={handleTrailPillColorChange}
-              initialExpanded={true}
+              initialExpanded={sectionsExpanded.map}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('map', expanded)
+              }
             />
           </div>
         </div>
@@ -1848,7 +1877,10 @@ function App() {
               onFight={handleFight}
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
-              initialExpanded={false}
+              initialExpanded={sectionsExpanded.fight}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('fight', expanded)
+              }
             />
           </div>
         </div>
@@ -1858,7 +1890,10 @@ function App() {
               key={`notes-${sectionResetKey}`}
               notes={notes}
               onNotesChange={setNotes}
-              initialExpanded={false}
+              initialExpanded={sectionsExpanded.notes}
+              onExpandedChange={(expanded) =>
+                handleSectionExpandedChange('notes', expanded)
+              }
             />
           </div>
         </div>

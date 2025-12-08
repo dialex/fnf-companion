@@ -7,6 +7,7 @@ export default function NotesSection({
   notes,
   onNotesChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
@@ -15,7 +16,11 @@ export default function NotesSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   return (

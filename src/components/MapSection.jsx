@@ -25,6 +25,7 @@ export default function MapSection({
   onTrailSubmit,
   onTrailPillColorChange,
   initialExpanded = true,
+  onExpandedChange,
 }) {
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
@@ -35,7 +36,11 @@ export default function MapSection({
   }, [initialExpanded]);
 
   const toggleCollapse = () => {
-    setIsExpanded(!isExpanded);
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (onExpandedChange) {
+      onExpandedChange(newExpanded);
+    }
   };
 
   // Convert annotations to colors for display
