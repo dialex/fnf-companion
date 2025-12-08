@@ -9,7 +9,7 @@ import {
 } from './trailMapping';
 
 const STORAGE_KEY = 'fnf-companion-state';
-const DEBOUNCE_DELAY = 2000; // 2 seconds
+const DEBOUNCE_DELAY = 1000; // 1 second
 
 /**
  * Get the default/initial state structure
