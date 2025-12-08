@@ -7,6 +7,7 @@ import {
   convertItemColorToAnnotation,
   annotationToColor,
 } from './trailMapping';
+import { migrateState } from './migrations';
 
 const STORAGE_KEY = 'fnf-companion-state';
 const DEBOUNCE_DELAY = 1000; // 1 second
@@ -89,45 +90,42 @@ export const loadState = () => {
     return null;
   }
 
+  // Run migrations first to ensure compatibility
+  const migratedState = migrateState(savedState);
+  if (!migratedState) {
+    return null;
+  }
+
   // Merge with default state to ensure all fields exist
   const defaultState = getDefaultState();
   return {
     ...defaultState,
-    ...savedState,
+    ...migratedState,
     character: {
       ...defaultState.character,
-      ...(savedState.character || {}),
+      ...(migratedState.character || {}),
     },
     consumables: {
       ...defaultState.consumables,
-      ...(savedState.consumables || {}),
+      ...(migratedState.consumables || {}),
     },
     fight: {
       ...defaultState.fight,
-      ...(savedState.fight || {}),
+      ...(migratedState.fight || {}),
     },
     sounds: {
       ...defaultState.sounds,
-      ...(savedState.sounds || {}),
+      ...(migratedState.sounds || {}),
     },
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
-    trailSequence: savedState.trailSequence || defaultState.trailSequence,
+    trailSequence: migratedState.trailSequence || defaultState.trailSequence,
+    sectionsExpanded: {
+      ...defaultState.sectionsExpanded,
+      ...(migratedState.sectionsExpanded || {}),
+    },
     metadata: {
       ...defaultState.metadata,
-      ...(savedState.metadata || {}),
-      // Legacy support: migrate actionSoundsEnabled and allSoundsMuted from top-level to metadata
-      actionSoundsEnabled:
-        savedState.metadata?.actionSoundsEnabled !== undefined
-          ? savedState.metadata.actionSoundsEnabled
-          : savedState.actionSoundsEnabled !== undefined
-            ? savedState.actionSoundsEnabled
-            : defaultState.metadata.actionSoundsEnabled,
-      allSoundsMuted:
-        savedState.metadata?.allSoundsMuted !== undefined
-          ? savedState.metadata.allSoundsMuted
-          : savedState.allSoundsMuted !== undefined
-            ? savedState.allSoundsMuted
-            : defaultState.metadata.allSoundsMuted,
+      ...(migratedState.metadata || {}),
     },
   };
 };
@@ -396,6 +394,11 @@ export const applyLoadedState = (savedState, setters) => {
     } else {
       setters.setTrailSequence(normalizedSequence);
     }
+  }
+
+  // Restore sections expanded state
+  if (savedState.sectionsExpanded && setters.setSectionsExpanded) {
+    setters.setSectionsExpanded(savedState.sectionsExpanded);
   }
 
   // Restore theme from metadata (new structure)

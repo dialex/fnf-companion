@@ -18,6 +18,7 @@ import {
   applyLoadedState,
   createDebouncedSave,
 } from './utils/stateManager';
+import { migrateState } from './utils/migrations';
 import { initTheme, getCurrentTheme, setTheme } from './utils/theme';
 import { annotationToColor, colorToAnnotation } from './utils/trailMapping';
 import yaml from 'js-yaml';
@@ -168,6 +169,16 @@ function App() {
   });
   const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
   const [allSoundsMuted, setAllSoundsMuted] = useState(false);
+  const [sectionsExpanded, setSectionsExpanded] = useState({
+    game: true,
+    character: true,
+    consumables: true,
+    diceRolls: true,
+    inventory: true,
+    map: true,
+    fight: false,
+    notes: false,
+  });
   const youtubePlayersRef = useRef({});
   const soundStoppedManuallyRef = useRef({
     ambience: false,
@@ -1086,13 +1097,19 @@ function App() {
             return;
           }
 
+          // Run migrations to ensure compatibility with current version
+          const migratedState = migrateState(loadedState);
+          if (!migratedState) {
+            return;
+          }
+
           // Restore book name
-          if (loadedState.metadata?.bookname) {
-            setBook(loadedState.metadata.bookname);
+          if (migratedState.metadata?.bookname) {
+            setBook(migratedState.metadata.bookname);
           }
 
           // Apply loaded state
-          applyLoadedState(loadedState, {
+          applyLoadedState(migratedState, {
             setName,
             setSkill,
             setHealth,
@@ -1133,6 +1150,7 @@ function App() {
             setActionSoundsEnabled,
             setAllSoundsMuted,
             setTheme,
+            setSectionsExpanded,
           });
 
           setNotification({ message: t('game.loaded'), type: 'success' });
@@ -1445,8 +1463,8 @@ function App() {
           return;
         }
 
-        // Only show use luck if hero won and fight didn't end
-        if (resultType === 'heroWins') {
+        // Show use luck after every attack with a winner (not on ties, and fight didn't end)
+        if (resultType === 'heroWins' || resultType === 'monsterWins') {
           shouldShowUseLuck = true;
         }
 
