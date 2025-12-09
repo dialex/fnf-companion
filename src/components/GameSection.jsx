@@ -13,6 +13,7 @@ import {
   mdiGestureTap,
   mdiGestureTapHold,
   mdiVolumeOff,
+  mdiPlus,
 } from '@mdi/js';
 import { t } from '../translations';
 
@@ -37,6 +38,18 @@ export default function GameSection({
   onSoundPlayPause,
   onSoundStop,
   onSoundVolumeChange,
+  customSounds,
+  customSoundInputs,
+  customSoundErrors,
+  customSoundPlaying,
+  customSoundVolumes,
+  onCustomSoundInputChange,
+  onCustomSoundSubmit,
+  onCustomSoundDelete,
+  onCustomSoundPlayPause,
+  onCustomSoundStop,
+  onCustomSoundVolumeChange,
+  onAddCustomSound,
   initialExpanded = true,
   onExpandedChange,
 }) {
@@ -115,6 +128,12 @@ export default function GameSection({
       soundTypes.forEach((st) => {
         if (soundPlaying[st]) {
           onSoundStop(st);
+        }
+      });
+      // Stop all custom sounds
+      Object.keys(customSoundPlaying).forEach((id) => {
+        if (customSoundPlaying[id]) {
+          onCustomSoundStop(id);
         }
       });
       // Auto-turn off action sounds when master is muted
@@ -246,9 +265,24 @@ export default function GameSection({
                     size={1}
                   />
                 </button>
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={onAddCustomSound}
+                  disabled={allSoundsMuted}
+                  style={{
+                    minWidth: 'auto',
+                    width: 'auto',
+                    padding: '0.5rem',
+                  }}
+                  title={t('game.customSound')}
+                >
+                  <Icon path={mdiPlus} size={1} />
+                </button>
               </div>
               <div className="row g-3">
-                {['ambience', 'battle', 'victory', 'defeat'].map(
+                {/* Reordered: Victory, Defeat, Ambience, Battle */}
+                {['victory', 'defeat', 'ambience', 'battle'].map(
                   (soundType) => (
                     <div key={soundType} className="col-6">
                       <label className="content field-label mb-2">
@@ -371,6 +405,152 @@ export default function GameSection({
                     </div>
                   )
                 )}
+
+                {/* Custom sounds */}
+                {customSounds.map((customSound) => (
+                  <div key={customSound.id} className="col-6">
+                    <label className="content field-label mb-2">
+                      {customSound.label}
+                    </label>
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => onCustomSoundPlayPause(customSound.id)}
+                        disabled={allSoundsMuted}
+                        style={{
+                          minWidth: 'auto',
+                          width: 'auto',
+                          padding: '0.5rem',
+                        }}
+                        title={
+                          customSoundPlaying[customSound.id]
+                            ? t('game.pause')
+                            : t('game.play')
+                        }
+                      >
+                        <Icon
+                          path={
+                            customSoundPlaying[customSound.id]
+                              ? mdiPause
+                              : mdiPlay
+                          }
+                          size={1}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={() => onCustomSoundStop(customSound.id)}
+                        disabled={allSoundsMuted}
+                        style={{
+                          minWidth: 'auto',
+                          width: 'auto',
+                          padding: '0.5rem',
+                        }}
+                        title={t('game.stop')}
+                      >
+                        <Icon path={mdiStop} size={1} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={() => onCustomSoundDelete(customSound.id)}
+                        disabled={allSoundsMuted}
+                        style={{
+                          minWidth: 'auto',
+                          width: 'auto',
+                          padding: '0.5rem',
+                        }}
+                        title={t('game.delete')}
+                      >
+                        <Icon path={mdiClose} size={1} />
+                      </button>
+                      <div className="d-flex align-items-center gap-1">
+                        <Icon path={mdiVolumeHigh} size={0.8} />
+                        <input
+                          type="range"
+                          className="form-range"
+                          min="0"
+                          max="100"
+                          value={customSoundVolumes[customSound.id] ?? 50}
+                          onChange={(e) =>
+                            onCustomSoundVolumeChange(
+                              customSound.id,
+                              parseInt(e.target.value)
+                            )
+                          }
+                          disabled={allSoundsMuted}
+                          style={{
+                            width: '50px',
+                            height: '4px',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Custom sound input rows */}
+                {Object.keys(customSoundInputs).map((id) => (
+                  <div key={id} className="col-6">
+                    <label className="content field-label mb-2">
+                      {customSoundInputs[id]?.label?.trim() ||
+                        t('game.customSound')}
+                    </label>
+                    <div className="input-group" style={{ flex: 1 }}>
+                      <input
+                        type="text"
+                        className={`content field-input form-control ${
+                          customSoundErrors[id] ? 'is-invalid' : ''
+                        }`}
+                        placeholder={t('game.label')}
+                        value={customSoundInputs[id]?.label || ''}
+                        onChange={(e) =>
+                          onCustomSoundInputChange(id, 'label', e.target.value)
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            onCustomSoundSubmit(id);
+                          }
+                        }}
+                      />
+                      <input
+                        type="text"
+                        className={`content field-input form-control ${
+                          customSoundErrors[id] ? 'is-invalid' : ''
+                        }`}
+                        placeholder={t('game.youtubeUrl')}
+                        value={customSoundInputs[id]?.url || ''}
+                        onChange={(e) =>
+                          onCustomSoundInputChange(id, 'url', e.target.value)
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            onCustomSoundSubmit(id);
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => onCustomSoundSubmit(id)}
+                        style={{
+                          minWidth: 'auto',
+                          width: 'auto',
+                          padding: '0.5rem',
+                        }}
+                      >
+                        <Icon path={mdiCheck} size={1} />
+                      </button>
+                    </div>
+                    {customSoundErrors[id] && (
+                      <div className="invalid-feedback d-block sound-error">
+                        {customSoundErrors[id]}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

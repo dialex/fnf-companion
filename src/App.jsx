@@ -152,6 +152,11 @@ function App() {
     victory: false,
     defeat: false,
   });
+  // Custom sounds: array of { id, label, url }
+  const [customSounds, setCustomSounds] = useState([]);
+  const [customSoundInputs, setCustomSoundInputs] = useState({}); // { id: { label: '', url: '' } }
+  const [customSoundErrors, setCustomSoundErrors] = useState({}); // { id: error }
+  const [customSoundPlaying, setCustomSoundPlaying] = useState({}); // { id: boolean }
   const defaultState = getDefaultState();
   const [soundVolumes, setSoundVolumes] = useState({
     ambience: defaultState.sounds.ambienceVolume,
@@ -159,6 +164,7 @@ function App() {
     victory: defaultState.sounds.victoryVolume,
     defeat: defaultState.sounds.defeatVolume,
   });
+  const [customSoundVolumes, setCustomSoundVolumes] = useState({}); // { id: volume }
   const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
   const [allSoundsMuted, setAllSoundsMuted] = useState(false);
   const [sectionsExpanded, setSectionsExpanded] = useState({
@@ -236,6 +242,8 @@ function App() {
         getCurrentTheme,
         setBook,
         setSectionsExpanded,
+        setCustomSounds,
+        setCustomSoundVolumes,
       });
     }
 
@@ -307,6 +315,8 @@ function App() {
       allSoundsMuted,
       theme: getCurrentTheme(),
       sectionsExpanded,
+      customSounds,
+      customSoundVolumes,
     });
 
     debouncedSaveRef.current(stateToSave);
@@ -542,7 +552,7 @@ function App() {
           [soundType]: false,
         }));
       } else {
-        // Pause all other sounds
+        // Pause all other regular sounds
         const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
         soundTypes.forEach((st) => {
           if (st !== soundType && soundPlaying[st]) {
@@ -553,6 +563,24 @@ function App() {
                 setSoundPlaying((prev) => ({
                   ...prev,
                   [st]: false,
+                }));
+              } catch (e) {
+                // Ignore errors
+              }
+            }
+          }
+        });
+        // Pause all custom sounds
+        Object.keys(customSoundPlaying).forEach((customId) => {
+          if (customSoundPlaying[customId]) {
+            const customPlayer =
+              youtubePlayersRef.current[`custom-${customId}`];
+            if (customPlayer) {
+              try {
+                customPlayer.pauseVideo();
+                setCustomSoundPlaying((prev) => ({
+                  ...prev,
+                  [customId]: false,
                 }));
               } catch (e) {
                 // Ignore errors
@@ -609,6 +637,212 @@ function App() {
     }
   };
 
+  // Custom sound handlers
+  const handleCustomSoundInputChange = (id, field, value) => {
+    setCustomSoundInputs((prev) => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] || {}),
+        [field]: value,
+      },
+    }));
+    // Clear error when user types
+    if (customSoundErrors[id]) {
+      setCustomSoundErrors((prev) => ({
+        ...prev,
+        [id]: null,
+      }));
+    }
+  };
+
+  const handleCustomSoundSubmit = (id) => {
+    const input = customSoundInputs[id];
+    if (!input) return;
+
+    const label = input.label?.trim() || '';
+    const url = input.url?.trim() || '';
+
+    if (!label) {
+      setCustomSoundErrors((prev) => ({
+        ...prev,
+        [id]: t('game.labelRequired'),
+      }));
+      return;
+    }
+
+    if (!url) {
+      setCustomSoundErrors((prev) => ({
+        ...prev,
+        [id]: t('game.urlRequired'),
+      }));
+      return;
+    }
+
+    if (!isValidYouTubeUrl(url)) {
+      setCustomSoundErrors((prev) => ({
+        ...prev,
+        [id]: t('game.invalidUrl'),
+      }));
+      return;
+    }
+
+    // Add or update custom sound
+    setCustomSounds((prev) => {
+      const existing = prev.find((s) => s.id === id);
+      if (existing) {
+        // Update existing
+        return prev.map((s) => (s.id === id ? { ...s, label, url } : s));
+      } else {
+        // Add new
+        return [...prev, { id, label, url }];
+      }
+    });
+
+    // Clear inputs and errors
+    setCustomSoundInputs((prev) => {
+      const newInputs = { ...prev };
+      delete newInputs[id];
+      return newInputs;
+    });
+    setCustomSoundErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[id];
+      return newErrors;
+    });
+  };
+
+  const handleCustomSoundDelete = (id) => {
+    // Stop and destroy the player
+    const player = youtubePlayersRef.current[`custom-${id}`];
+    if (player) {
+      try {
+        player.stopVideo();
+        player.destroy();
+      } catch (e) {
+        // Ignore errors
+      }
+      delete youtubePlayersRef.current[`custom-${id}`];
+    }
+
+    // Remove from custom sounds
+    setCustomSounds((prev) => prev.filter((s) => s.id !== id));
+    setCustomSoundPlaying((prev) => {
+      const newPlaying = { ...prev };
+      delete newPlaying[id];
+      return newPlaying;
+    });
+    setCustomSoundVolumes((prev) => {
+      const newVolumes = { ...prev };
+      delete newVolumes[id];
+      return newVolumes;
+    });
+  };
+
+  const handleCustomSoundPlayPause = (id) => {
+    const player = youtubePlayersRef.current[`custom-${id}`];
+    if (!player) return;
+
+    try {
+      if (customSoundPlaying[id]) {
+        player.pauseVideo();
+        setCustomSoundPlaying((prev) => ({
+          ...prev,
+          [id]: false,
+        }));
+      } else {
+        // Stop other sounds if needed
+        Object.keys(soundPlaying).forEach((st) => {
+          if (soundPlaying[st]) {
+            const otherPlayer = youtubePlayersRef.current[st];
+            if (otherPlayer) {
+              try {
+                const playerState = otherPlayer.getPlayerState();
+                if (playerState === 1) {
+                  otherPlayer.pauseVideo();
+                }
+                setSoundPlaying((prev) => ({
+                  ...prev,
+                  [st]: false,
+                }));
+              } catch (e) {
+                // Ignore errors
+              }
+            }
+          }
+        });
+        // Stop other custom sounds
+        Object.keys(customSoundPlaying).forEach((otherId) => {
+          if (otherId !== id && customSoundPlaying[otherId]) {
+            const otherPlayer = youtubePlayersRef.current[`custom-${otherId}`];
+            if (otherPlayer) {
+              try {
+                const playerState = otherPlayer.getPlayerState();
+                if (playerState === 1) {
+                  otherPlayer.pauseVideo();
+                }
+                setCustomSoundPlaying((prev) => ({
+                  ...prev,
+                  [otherId]: false,
+                }));
+              } catch (e) {
+                // Ignore errors
+              }
+            }
+          }
+        });
+        player.playVideo();
+        setCustomSoundPlaying((prev) => ({
+          ...prev,
+          [id]: true,
+        }));
+      }
+    } catch (e) {
+      console.error('Error controlling YouTube player:', e);
+    }
+  };
+
+  const handleCustomSoundStop = (id) => {
+    const player = youtubePlayersRef.current[`custom-${id}`];
+    if (!player) return;
+
+    if (!customSoundPlaying[id]) return;
+
+    try {
+      soundStoppedManuallyRef.current[`custom-${id}`] = true;
+      player.pauseVideo();
+      player.seekTo(0, true);
+      setCustomSoundPlaying((prev) => ({
+        ...prev,
+        [id]: false,
+      }));
+    } catch (e) {
+      console.error('Error stopping YouTube player:', e);
+    }
+  };
+
+  const handleCustomSoundVolumeChange = (id, volume) => {
+    setCustomSoundVolumes((prev) => ({
+      ...prev,
+      [id]: volume,
+    }));
+    const player = youtubePlayersRef.current[`custom-${id}`];
+    if (player && typeof player.setVolume === 'function') {
+      try {
+        player.setVolume(volume);
+      } catch (e) {
+        console.error('Error setting volume:', e);
+      }
+    }
+  };
+
+  const handleAddCustomSound = () => {
+    const newId = `custom-${Date.now()}`;
+    setCustomSoundInputs((prev) => ({
+      ...prev,
+      [newId]: { label: '', url: '' },
+    }));
+  };
+
   // Auto-play sound from the beginning (stop then play)
   const autoPlaySound = (soundType) => {
     // Don't play if all sounds are muted
@@ -636,6 +870,26 @@ function App() {
               setSoundPlaying((prev) => ({
                 ...prev,
                 [st]: false,
+              }));
+            } catch (e) {
+              // Ignore errors
+            }
+          }
+        }
+      });
+      // Pause all custom sounds
+      Object.keys(customSoundPlaying).forEach((customId) => {
+        if (customSoundPlaying[customId]) {
+          const customPlayer = youtubePlayersRef.current[`custom-${customId}`];
+          if (customPlayer) {
+            try {
+              const playerState = customPlayer.getPlayerState();
+              if (playerState === 1) {
+                customPlayer.pauseVideo();
+              }
+              setCustomSoundPlaying((prev) => ({
+                ...prev,
+                [customId]: false,
               }));
             } catch (e) {
               // Ignore errors
@@ -815,6 +1069,101 @@ function App() {
     });
   }, [soundUrls, soundVolumes]);
 
+  // Initialize YouTube players for custom sounds
+  useEffect(() => {
+    if (!window.YT || !window.YT.Player) {
+      return;
+    }
+
+    customSounds.forEach((customSound) => {
+      const playerKey = `custom-${customSound.id}`;
+      if (youtubePlayersRef.current[playerKey]) {
+        return; // Player already exists
+      }
+
+      const videoId = extractVideoId(customSound.url);
+      if (!videoId) {
+        return;
+      }
+
+      const playerId = `youtube-player-${playerKey}`;
+      let container = document.getElementById(playerId);
+      if (!container) {
+        container = document.createElement('div');
+        container.id = playerId;
+        container.style.display = 'none';
+        document.body.appendChild(container);
+      }
+
+      youtubePlayersRef.current[playerKey] = new window.YT.Player(playerId, {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          enablejsapi: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: (event) => {
+            const player = event.target;
+            if (player && typeof player.setVolume === 'function') {
+              try {
+                const volume = customSoundVolumes[customSound.id] ?? 50;
+                player.setVolume(volume);
+              } catch (e) {
+                console.error('Error setting initial volume:', e);
+              }
+            }
+          },
+          onStateChange: (event) => {
+            if (soundStoppedManuallyRef.current[playerKey]) {
+              if (event.data === 0 || event.data === 2) {
+                setCustomSoundPlaying((prev) => ({
+                  ...prev,
+                  [customSound.id]: false,
+                }));
+              }
+              return;
+            }
+
+            if (event.data === 0) {
+              // Video ended - stop it
+              try {
+                const player = youtubePlayersRef.current[playerKey];
+                if (player) {
+                  player.stopVideo();
+                }
+              } catch (e) {
+                // Ignore errors
+              }
+              setCustomSoundPlaying((prev) => ({
+                ...prev,
+                [customSound.id]: false,
+              }));
+            } else if (event.data === 2) {
+              // Paused
+              setCustomSoundPlaying((prev) => ({
+                ...prev,
+                [customSound.id]: false,
+              }));
+            } else if (event.data === 1) {
+              // Playing
+              setCustomSoundPlaying((prev) => ({
+                ...prev,
+                [customSound.id]: true,
+              }));
+            }
+          },
+        },
+      });
+    });
+  }, [customSounds, customSoundVolumes]);
+
   // Update volumes on existing YouTube players when soundVolumes changes
   useEffect(() => {
     const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
@@ -829,6 +1178,22 @@ function App() {
       }
     });
   }, [soundVolumes]);
+
+  // Update volumes on existing custom sound players
+  useEffect(() => {
+    customSounds.forEach((customSound) => {
+      const playerKey = `custom-${customSound.id}`;
+      const player = youtubePlayersRef.current[playerKey];
+      if (player && typeof player.setVolume === 'function') {
+        try {
+          const volume = customSoundVolumes[customSound.id] ?? 50;
+          player.setVolume(volume);
+        } catch (e) {
+          console.error('Error setting volume on custom sound player:', e);
+        }
+      }
+    });
+  }, [customSoundVolumes, customSounds]);
 
   // Monitor creature name changes to start battle theme
   const prevMonsterCreatureRef = useRef(monsterCreature);
@@ -1089,6 +1454,24 @@ function App() {
       victory: defaultState.sounds.victoryVolume,
       defeat: defaultState.sounds.defeatVolume,
     });
+    // Reset custom sounds
+    customSounds.forEach((customSound) => {
+      const player = youtubePlayersRef.current[`custom-${customSound.id}`];
+      if (player) {
+        try {
+          player.stopVideo();
+          player.destroy();
+        } catch (e) {
+          // Ignore errors
+        }
+        delete youtubePlayersRef.current[`custom-${customSound.id}`];
+      }
+    });
+    setCustomSounds([]);
+    setCustomSoundInputs({});
+    setCustomSoundErrors({});
+    setCustomSoundPlaying({});
+    setCustomSoundVolumes({});
     // Reset manual stop flags
     soundStoppedManuallyRef.current = {
       ambience: false,
@@ -1096,6 +1479,10 @@ function App() {
       victory: false,
       defeat: false,
     };
+    // Clear custom sound stop flags
+    customSounds.forEach((customSound) => {
+      soundStoppedManuallyRef.current[`custom-${customSound.id}`] = false;
+    });
     // Stop and remove all YouTube players
     Object.keys(youtubePlayersRef.current).forEach((soundType) => {
       try {
@@ -1152,6 +1539,9 @@ function App() {
       actionSoundsEnabled,
       allSoundsMuted,
       theme: getCurrentTheme(),
+      sectionsExpanded,
+      customSounds,
+      customSoundVolumes,
     });
 
     // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.yaml
@@ -1265,6 +1655,8 @@ function App() {
             setAllSoundsMuted,
             setTheme,
             setSectionsExpanded,
+            setCustomSounds,
+            setCustomSoundVolumes,
           });
 
           setNotification({ message: t('game.loaded'), type: 'success' });
@@ -1755,6 +2147,8 @@ function App() {
         allSoundsMuted,
         theme: getCurrentTheme(),
         sectionsExpanded,
+        customSounds,
+        customSoundVolumes,
       });
       saveState(stateToSave);
     };
@@ -1856,6 +2250,18 @@ function App() {
               onSoundPlayPause={handleSoundPlayPause}
               onSoundStop={handleSoundStop}
               onSoundVolumeChange={handleSoundVolumeChange}
+              customSounds={customSounds}
+              customSoundInputs={customSoundInputs}
+              customSoundErrors={customSoundErrors}
+              customSoundPlaying={customSoundPlaying}
+              customSoundVolumes={customSoundVolumes}
+              onCustomSoundInputChange={handleCustomSoundInputChange}
+              onCustomSoundSubmit={handleCustomSoundSubmit}
+              onCustomSoundDelete={handleCustomSoundDelete}
+              onCustomSoundPlayPause={handleCustomSoundPlayPause}
+              onCustomSoundStop={handleCustomSoundStop}
+              onCustomSoundVolumeChange={handleCustomSoundVolumeChange}
+              onAddCustomSound={handleAddCustomSound}
               initialExpanded={sectionsExpanded.game}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('game', expanded)

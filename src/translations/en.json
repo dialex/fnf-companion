@@ -42,7 +42,11 @@
     "play": "Play",
     "pause": "Pause",
     "stop": "Stop",
-    "delete": "Delete"
+    "delete": "Delete",
+    "customSound": "New",
+    "label": "Label",
+    "labelRequired": "Needs a label",
+    "urlRequired": "Needs a YouTube URL"
   },
   "character": {
     "name": "Name",

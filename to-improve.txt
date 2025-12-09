@@ -1,2 +1,0 @@
-- sugestao: botao para adicionar sons extra custom, com a tag editavel
-- sugestao: fade out na musica quando para

@@ -246,6 +246,8 @@ export const buildStateObject = (stateValues) => {
       fight: false,
       notes: false,
     },
+    customSounds: stateValues.customSounds || [],
+    customSoundVolumes: stateValues.customSoundVolumes || {},
   };
 };
 
@@ -379,6 +381,16 @@ export const applyLoadedState = (savedState, setters) => {
   }
   // Restore notes
   if (savedState.notes !== undefined) setters.setNotes(savedState.notes);
+
+  // Restore custom sounds
+  if (savedState.customSounds && Array.isArray(savedState.customSounds)) {
+    if (setters.setCustomSounds) {
+      setters.setCustomSounds(savedState.customSounds);
+    }
+    if (savedState.customSoundVolumes && setters.setCustomSoundVolumes) {
+      setters.setCustomSoundVolumes(savedState.customSoundVolumes);
+    }
+  }
 
   // Restore trail state
   if (savedState.trailSequence !== undefined) {
