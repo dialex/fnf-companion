@@ -7,6 +7,7 @@ import {
   buildStateObject,
   applyLoadedState,
   createDebouncedSave,
+  getDefaultState,
 } from './utils/stateManager';
 import { migrateState } from './utils/migrations';
 import { getCurrentTheme, setTheme } from './utils/theme';
@@ -151,11 +152,12 @@ function App() {
     victory: false,
     defeat: false,
   });
+  const defaultState = getDefaultState();
   const [soundVolumes, setSoundVolumes] = useState({
-    ambience: 100,
-    battle: 100,
-    victory: 100,
-    defeat: 100,
+    ambience: defaultState.sounds.ambienceVolume,
+    battle: defaultState.sounds.battleVolume,
+    victory: defaultState.sounds.victoryVolume,
+    defeat: defaultState.sounds.defeatVolume,
   });
   const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
   const [allSoundsMuted, setAllSoundsMuted] = useState(false);
@@ -1080,11 +1082,12 @@ function App() {
       victory: false,
       defeat: false,
     });
+    const defaultState = getDefaultState();
     setSoundVolumes({
-      ambience: 100,
-      battle: 100,
-      victory: 100,
-      defeat: 100,
+      ambience: defaultState.sounds.ambienceVolume,
+      battle: defaultState.sounds.battleVolume,
+      victory: defaultState.sounds.victoryVolume,
+      defeat: defaultState.sounds.defeatVolume,
     });
     // Reset manual stop flags
     soundStoppedManuallyRef.current = {
@@ -1809,8 +1812,8 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-                </div>
-              )}
+        </div>
+      )}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
@@ -1858,7 +1861,7 @@ function App() {
                 handleSectionExpandedChange('game', expanded)
               }
             />
-            </div>
+          </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
@@ -1885,8 +1888,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('character', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1917,8 +1920,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('consumables', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -1938,9 +1941,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('diceRolls', expanded)
               }
-                />
-              </div>
-                </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -1952,8 +1955,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('inventory', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -1966,9 +1969,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('map', expanded)
               }
-                />
-              </div>
-                </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
@@ -2002,9 +2005,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('fight', expanded)
               }
-                />
-              </div>
-            </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
@@ -2015,8 +2018,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('notes', expanded)
               }
-              />
-            </div>
+            />
+          </div>
         </div>
       </main>
       <Footer />
