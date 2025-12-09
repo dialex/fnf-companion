@@ -828,6 +828,80 @@ function App() {
     });
   }, [soundVolumes]);
 
+  // Monitor creature name changes to start battle theme
+  const prevMonsterCreatureRef = useRef(monsterCreature);
+  useEffect(() => {
+    const prevCreature = prevMonsterCreatureRef.current;
+    const currentCreature = monsterCreature.trim();
+    const prevWasEmpty = !prevCreature || prevCreature.length === 0;
+    const currentHasContent = currentCreature.length > 0;
+
+    // If creature name goes from empty to having at least one character, start battle theme
+    if (prevWasEmpty && currentHasContent && !allSoundsMuted) {
+      autoPlaySound('battle');
+    }
+
+    // If victory theme is playing and creature name changes (user types new name), stop victory and start battle
+    if (
+      soundPlaying.victory &&
+      currentHasContent &&
+      prevCreature !== currentCreature &&
+      !allSoundsMuted
+    ) {
+      // Stop victory theme
+      const victoryPlayer = youtubePlayersRef.current.victory;
+      if (victoryPlayer) {
+        try {
+          victoryPlayer.pauseVideo();
+          setSoundPlaying((prev) => ({
+            ...prev,
+            victory: false,
+          }));
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+      // Start battle theme from beginning
+      autoPlaySound('battle');
+    }
+
+    prevMonsterCreatureRef.current = monsterCreature;
+  }, [monsterCreature, allSoundsMuted, soundPlaying.victory]);
+
+  // Monitor trail sequence changes to stop victory and resume ambience
+  const prevTrailSequenceRef = useRef(trailSequence);
+  useEffect(() => {
+    const prevSequence = prevTrailSequenceRef.current;
+    const currentSequence = trailSequence;
+
+    // Check if trail sequence actually changed (not just a reference change)
+    const sequenceChanged =
+      JSON.stringify(prevSequence) !== JSON.stringify(currentSequence);
+
+    // If victory theme is playing and trail sequence changes, stop victory and resume ambience
+    if (sequenceChanged && soundPlaying.victory && !allSoundsMuted) {
+      // Stop victory theme
+      const victoryPlayer = youtubePlayersRef.current.victory;
+      if (victoryPlayer) {
+        try {
+          victoryPlayer.pauseVideo();
+          setSoundPlaying((prev) => ({
+            ...prev,
+            victory: false,
+          }));
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+      // Resume ambience music
+      if (soundUrls.ambience) {
+        autoPlaySound('ambience');
+      }
+    }
+
+    prevTrailSequenceRef.current = trailSequence;
+  }, [trailSequence, soundPlaying.victory, allSoundsMuted, soundUrls.ambience]);
+
   // Character handlers
   const handleRandomStats = () => {
     const skillRoll = Math.floor(Math.random() * 6) + 1;
@@ -1408,11 +1482,8 @@ function App() {
       return;
     }
 
-    // Auto-play battle sound only on first fight click - do this immediately
     if (!isFightStarted) {
       setIsFightStarted(true);
-      // Call autoPlaySound immediately, before any other state changes
-      autoPlaySound('battle');
     }
 
     if (fightTimeoutRef.current) {
@@ -1738,8 +1809,8 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-        </div>
-      )}
+                </div>
+              )}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
@@ -1787,7 +1858,7 @@ function App() {
                 handleSectionExpandedChange('game', expanded)
               }
             />
-          </div>
+            </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
@@ -1814,8 +1885,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('character', expanded)
               }
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -1846,8 +1917,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('consumables', expanded)
               }
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -1867,9 +1938,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('diceRolls', expanded)
               }
-            />
-          </div>
-        </div>
+                />
+              </div>
+                </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -1881,8 +1952,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('inventory', expanded)
               }
-            />
-          </div>
+                />
+              </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -1895,9 +1966,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('map', expanded)
               }
-            />
-          </div>
-        </div>
+                />
+              </div>
+                </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
@@ -1931,9 +2002,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('fight', expanded)
               }
-            />
-          </div>
-        </div>
+                />
+              </div>
+            </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
@@ -1944,8 +2015,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('notes', expanded)
               }
-            />
-          </div>
+              />
+            </div>
         </div>
       </main>
       <Footer />

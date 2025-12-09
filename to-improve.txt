@@ -1,3 +1,2 @@
 - sugestao: botao para adicionar sons extra custom, com a tag editavel
-- sugestao: qdo avancamos para a proxima step depois duma fight ele devia parar a victory song e meter a ambience automaticamente
 - sugestao: fade out na musica quando para
