@@ -387,8 +387,16 @@ export const applyLoadedState = (savedState, setters) => {
     if (setters.setCustomSounds) {
       setters.setCustomSounds(savedState.customSounds);
     }
-    if (savedState.customSoundVolumes && setters.setCustomSoundVolumes) {
-      setters.setCustomSoundVolumes(savedState.customSoundVolumes);
+    // Restore volumes, initializing missing ones with default (50)
+    if (setters.setCustomSoundVolumes) {
+      const defaultState = getDefaultState();
+      const defaultVolume = defaultState.sounds.ambienceVolume;
+      const volumes = {};
+      savedState.customSounds.forEach((customSound) => {
+        volumes[customSound.id] =
+          savedState.customSoundVolumes?.[customSound.id] ?? defaultVolume;
+      });
+      setters.setCustomSoundVolumes(volumes);
     }
   }
 

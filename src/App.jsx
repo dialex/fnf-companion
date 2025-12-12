@@ -361,6 +361,8 @@ function App() {
     actionSoundsEnabled,
     allSoundsMuted,
     sectionsExpanded,
+    customSounds,
+    customSoundVolumes,
   ]);
 
   // Section expanded state handler
@@ -694,7 +696,13 @@ function App() {
         return prev.map((s) => (s.id === id ? { ...s, label, url } : s));
       } else {
         // Add new
-        return [...prev, { id, label, url }];
+        const newSound = { id, label, url };
+        // Initialize volume with default
+        setCustomSoundVolumes((prevVolumes) => ({
+          ...prevVolumes,
+          [id]: defaultState.sounds.ambienceVolume,
+        }));
+        return [...prev, newSound];
       }
     });
 
@@ -841,6 +849,27 @@ function App() {
       ...prev,
       [newId]: { label: '', url: '' },
     }));
+  };
+
+  const handleRemovePendingCustomSound = () => {
+    setCustomSoundInputs((prev) => {
+      const keys = Object.keys(prev);
+      if (keys.length === 0) return prev;
+      // Remove the last pending input (most recently added)
+      const lastKey = keys[keys.length - 1];
+      const newInputs = { ...prev };
+      delete newInputs[lastKey];
+      return newInputs;
+    });
+    // Also clear any errors for the removed input
+    setCustomSoundErrors((prev) => {
+      const keys = Object.keys(prev);
+      if (keys.length === 0) return prev;
+      const lastKey = keys[keys.length - 1];
+      const newErrors = { ...prev };
+      delete newErrors[lastKey];
+      return newErrors;
+    });
   };
 
   // Auto-play sound from the beginning (stop then play)
@@ -2262,6 +2291,7 @@ function App() {
               onCustomSoundStop={handleCustomSoundStop}
               onCustomSoundVolumeChange={handleCustomSoundVolumeChange}
               onAddCustomSound={handleAddCustomSound}
+              onRemovePendingCustomSound={handleRemovePendingCustomSound}
               initialExpanded={sectionsExpanded.game}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('game', expanded)
