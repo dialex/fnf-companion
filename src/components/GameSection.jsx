@@ -50,6 +50,7 @@ export default function GameSection({
   onCustomSoundStop,
   onCustomSoundVolumeChange,
   onAddCustomSound,
+  onRemovePendingCustomSound,
   initialExpanded = true,
   onExpandedChange,
 }) {
@@ -268,16 +269,31 @@ export default function GameSection({
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={onAddCustomSound}
+                  onClick={
+                    Object.keys(customSoundInputs).length > 0
+                      ? onRemovePendingCustomSound
+                      : onAddCustomSound
+                  }
                   disabled={allSoundsMuted}
                   style={{
                     minWidth: 'auto',
                     width: 'auto',
                     padding: '0.5rem',
                   }}
-                  title={t('game.customSound')}
+                  title={
+                    Object.keys(customSoundInputs).length > 0
+                      ? t('game.removePendingSound')
+                      : t('game.customSound')
+                  }
                 >
-                  <Icon path={mdiPlus} size={1} />
+                  <Icon
+                    path={
+                      Object.keys(customSoundInputs).length > 0
+                        ? mdiClose
+                        : mdiPlus
+                    }
+                    size={1}
+                  />
                 </button>
               </div>
               <div className="row g-3">

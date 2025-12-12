@@ -44,6 +44,7 @@
     "stop": "Parar",
     "delete": "Eliminar",
     "customSound": "Novo",
+    "removePendingSound": "Remover",
     "label": "Nome",
     "labelRequired": "Precisa de um nome",
     "urlRequired": "Precisa de um link do YouTube"
