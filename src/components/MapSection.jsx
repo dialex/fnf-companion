@@ -24,6 +24,7 @@ export default function MapSection({
   onTrailInputChange,
   onTrailSubmit,
   onTrailPillColorChange,
+  onTrailPillDelete,
   initialExpanded = true,
   onExpandedChange,
 }) {
@@ -342,6 +343,25 @@ export default function MapSection({
               }
 
               const pillId = `trail-pill-${index}`;
+              const isLastPill = index === normalizedDisplaySequence.length - 1;
+              const canDelete = isLastPill && normalizedDisplaySequence.length > 1;
+
+              const handlePillClick = async () => {
+                if (canDelete && onTrailPillDelete) {
+                  // Dispose tooltip before deleting the pill
+                  const element = pillRefs.current[pillId];
+                  if (element) {
+                    const bootstrap = await import('bootstrap');
+                    const tooltip = bootstrap.Tooltip.getInstance(element);
+                    if (tooltip) {
+                      tooltip.hide(); // Hide tooltip if visible
+                      tooltip.dispose(); // Dispose tooltip instance
+                    }
+                  }
+                  onTrailPillDelete();
+                }
+              };
+
               return (
                 <span
                   key={index}
@@ -350,12 +370,16 @@ export default function MapSection({
                     pillRefs.current[pillId] = el;
                   }}
                   className={pillClass}
-                  style={customStyle}
+                  style={{
+                    ...customStyle,
+                    cursor: canDelete ? 'pointer' : 'default',
+                  }}
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title={tooltipText || String(num)}
                   role="button"
                   tabIndex={0}
+                  onClick={handlePillClick}
                 >
                   {num}
                 </span>
