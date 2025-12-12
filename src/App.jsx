@@ -188,6 +188,7 @@ function App() {
 
   // State management
   const isInitialMountRef = useRef(true);
+  const preBattleSoundRef = useRef(null); // Track what sound was playing before battle
   const debouncedSaveRef = useRef(
     createDebouncedSave((state) => {
       saveState(state);
@@ -1243,6 +1244,20 @@ function App() {
 
     // If creature name goes from empty to having at least one character, start battle theme
     if (prevWasEmpty && currentHasContent && !allSoundsMuted) {
+      // Save what sound was playing before battle (ambience or custom sound, not battle)
+      if (soundPlaying.ambience) {
+        preBattleSoundRef.current = 'ambience';
+      } else {
+        // Check if any custom sound was playing
+        const playingCustomSound = Object.keys(customSoundPlaying).find(
+          (id) => customSoundPlaying[id]
+        );
+        if (playingCustomSound) {
+          preBattleSoundRef.current = `custom-${playingCustomSound}`;
+        } else {
+          preBattleSoundRef.current = null;
+        }
+      }
       autoPlaySound('battle');
     }
 
@@ -1271,7 +1286,7 @@ function App() {
     }
 
     prevMonsterCreatureRef.current = monsterCreature;
-  }, [monsterCreature, allSoundsMuted, soundPlaying.victory]);
+  }, [monsterCreature, allSoundsMuted, soundPlaying.victory, soundPlaying.ambience, customSoundPlaying]);
 
   // Monitor trail sequence changes to stop victory and resume ambience
   const prevTrailSequenceRef = useRef(trailSequence);
@@ -1283,7 +1298,7 @@ function App() {
     const sequenceChanged =
       JSON.stringify(prevSequence) !== JSON.stringify(currentSequence);
 
-    // If victory theme is playing and trail sequence changes, stop victory and resume ambience
+    // If victory theme is playing and trail sequence changes, stop victory and resume previous sound
     if (sequenceChanged && soundPlaying.victory && !allSoundsMuted) {
       // Stop victory theme
       const victoryPlayer = youtubePlayersRef.current.victory;
@@ -1298,14 +1313,36 @@ function App() {
           // Ignore errors
         }
       }
-      // Resume ambience music
-      if (soundUrls.ambience) {
+      // Resume the sound that was playing before battle (ambience or custom sound)
+      const preBattleSound = preBattleSoundRef.current;
+      if (preBattleSound === 'ambience' && soundUrls.ambience) {
         autoPlaySound('ambience');
+      } else if (preBattleSound && preBattleSound.startsWith('custom-')) {
+        // Extract custom sound ID (remove 'custom-' prefix)
+        const customId = preBattleSound.replace('custom-', '');
+        const customSound = customSounds.find((s) => s.id === customId);
+        if (customSound && customSound.url) {
+          // Resume custom sound
+          const customPlayer = youtubePlayersRef.current[preBattleSound];
+          if (customPlayer) {
+            try {
+              customPlayer.playVideo();
+              setCustomSoundPlaying((prev) => ({
+                ...prev,
+                [customId]: true,
+              }));
+            } catch (e) {
+              // Ignore errors
+            }
+          }
+        }
       }
+      // Reset pre-battle sound reference
+      preBattleSoundRef.current = null;
     }
 
     prevTrailSequenceRef.current = trailSequence;
-  }, [trailSequence, soundPlaying.victory, allSoundsMuted, soundUrls.ambience]);
+  }, [trailSequence, soundPlaying.victory, allSoundsMuted, soundUrls.ambience, customSounds]);
 
   // Character handlers
   const handleRandomStats = () => {
