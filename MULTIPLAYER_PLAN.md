@@ -322,7 +322,3 @@ Instead of a dedicated server, could use:
 ## Recommendation
 
 Start with a simple Node.js + WebSocket server for MVP, then consider migrating to a managed service if needed. This gives full control and understanding of the system.
-
-
-
-
