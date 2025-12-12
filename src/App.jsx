@@ -1286,7 +1286,13 @@ function App() {
     }
 
     prevMonsterCreatureRef.current = monsterCreature;
-  }, [monsterCreature, allSoundsMuted, soundPlaying.victory, soundPlaying.ambience, customSoundPlaying]);
+  }, [
+    monsterCreature,
+    allSoundsMuted,
+    soundPlaying.victory,
+    soundPlaying.ambience,
+    customSoundPlaying,
+  ]);
 
   // Monitor trail sequence changes to stop victory and resume ambience
   const prevTrailSequenceRef = useRef(trailSequence);
@@ -1342,7 +1348,13 @@ function App() {
     }
 
     prevTrailSequenceRef.current = trailSequence;
-  }, [trailSequence, soundPlaying.victory, allSoundsMuted, soundUrls.ambience, customSounds]);
+  }, [
+    trailSequence,
+    soundPlaying.victory,
+    allSoundsMuted,
+    soundUrls.ambience,
+    customSounds,
+  ]);
 
   // Character handlers
   const handleRandomStats = () => {
@@ -2281,8 +2293,8 @@ function App() {
       {showYouDied && (
         <div className="you-died-overlay">
           <div className="you-died-text">{t('fight.youDied')}</div>
-                </div>
-              )}
+        </div>
+      )}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
@@ -2343,7 +2355,7 @@ function App() {
                 handleSectionExpandedChange('game', expanded)
               }
             />
-            </div>
+          </div>
         </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
@@ -2370,8 +2382,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('character', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
@@ -2402,8 +2414,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('consumables', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
@@ -2423,9 +2435,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('diceRolls', expanded)
               }
-                />
-              </div>
-                </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12 col-xl-4">
             <InventorySection
@@ -2437,8 +2449,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('inventory', expanded)
               }
-                />
-              </div>
+            />
+          </div>
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
@@ -2452,9 +2464,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('map', expanded)
               }
-                />
-              </div>
-                </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <FightSection
@@ -2488,9 +2500,9 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('fight', expanded)
               }
-                />
-              </div>
-            </div>
+            />
+          </div>
+        </div>
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <NotesSection
@@ -2501,8 +2513,8 @@ function App() {
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('notes', expanded)
               }
-              />
-            </div>
+            />
+          </div>
         </div>
       </main>
       <Footer />

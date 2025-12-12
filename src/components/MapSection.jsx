@@ -344,7 +344,8 @@ export default function MapSection({
 
               const pillId = `trail-pill-${index}`;
               const isLastPill = index === normalizedDisplaySequence.length - 1;
-              const canDelete = isLastPill && normalizedDisplaySequence.length > 1;
+              const canDelete =
+                isLastPill && normalizedDisplaySequence.length > 1;
 
               const handlePillClick = async () => {
                 if (canDelete && onTrailPillDelete) {
