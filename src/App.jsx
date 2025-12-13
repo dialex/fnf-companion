@@ -11,7 +11,7 @@ import {
 } from './utils/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
-import { rollTwoDice } from './utils/dice';
+import { rollDie, rollTwoDice } from './utils/dice';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -1889,7 +1889,7 @@ function App() {
     setRollDiceResults(null);
     setRollDieResult(null);
     setTimeout(() => {
-      const result = Math.floor(Math.random() * 6) + 1;
+      const result = rollDie();
       setRollDieResult(result);
       setDiceRollingType(null);
     }, 1000);
@@ -1903,9 +1903,8 @@ function App() {
     setRollDieResult(null);
     setRollDiceResults(null);
     setTimeout(() => {
-      const result1 = Math.floor(Math.random() * 6) + 1;
-      const result2 = Math.floor(Math.random() * 6) + 1;
-      setRollDiceResults([result1, result2]);
+      const results = rollTwoDice();
+      setRollDiceResults([results.roll1, results.roll2]);
       setDiceRollingType(null);
     }, 1000);
   };
