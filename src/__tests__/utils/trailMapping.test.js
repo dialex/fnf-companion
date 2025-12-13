@@ -18,17 +18,10 @@ describe('Trail mapping utilities', () => {
       expect(convertColorToNote(color)).toBe(expected);
     });
 
-    it.each(['unknown', 'light', ''])(
-      'should return null for unknown color "%s"',
+    it.each(['unknown', 'light', '', null, undefined])(
+      'should return null for unknown or invalid color "%s"',
       (color) => {
         expect(convertColorToNote(color)).toBe(null);
-      }
-    );
-
-    it.each([null, undefined])(
-      'should return null for invalid input %s',
-      (input) => {
-        expect(convertColorToNote(input)).toBe(null);
       }
     );
   });
@@ -44,17 +37,10 @@ describe('Trail mapping utilities', () => {
       expect(convertNoteToColor(annotation)).toBe(expected);
     });
 
-    it.each(['unknown', ''])(
+    it.each(['unknown', '', null, undefined])(
       'should return null for unknown annotation "%s"',
       (annotation) => {
         expect(convertNoteToColor(annotation)).toBe(null);
-      }
-    );
-
-    it.each([null, undefined])(
-      'should return null for invalid input %s',
-      (input) => {
-        expect(convertNoteToColor(input)).toBe(null);
       }
     );
   });
