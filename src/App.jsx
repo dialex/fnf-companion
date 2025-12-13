@@ -10,8 +10,8 @@ import {
   getDefaultState,
 } from './utils/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
-import { colorToAnnotation } from './utils/trailMapping';
-import { rollDie, rollTwoDice } from './utils/dice';
+import { convertColorToNote } from './utils/trailMapping';
+import { rollTwoDice } from './utils/dice';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -480,7 +480,7 @@ function App() {
   };
 
   const handleTrailPillColorChange = (color) => {
-    const annotation = colorToAnnotation(color);
+    const annotation = convertColorToNote(color);
     setTrailSequence((prev) => {
       if (prev.length === 0) return prev;
       const newSequence = [...prev];
