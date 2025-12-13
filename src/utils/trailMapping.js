@@ -1,29 +1,22 @@
 /**
- * Mapping between trail pill colors and their annotations
+ * Mapping between trail pill semantic notes and their display colors
  */
-const COLOR_TO_ANNOTATION = {
-  dark: 'died',
-  info: 'question',
-  success: 'good',
-  danger: 'bad',
-  warning: 'important',
-};
-
-const ANNOTATION_TO_COLOR = {
-  died: 'dark',
-  question: 'info',
-  good: 'success',
-  bad: 'danger',
-  important: 'warning',
-};
+const mapNoteColor = [
+  { note: 'died', color: 'dark' },
+  { note: 'question', color: 'info' },
+  { note: 'good', color: 'success' },
+  { note: 'bad', color: 'danger' },
+  { note: 'important', color: 'warning' },
+];
 
 /**
  * Convert color to annotation
  * @param {string} color - The color value
  * @returns {string|null} - The annotation or null if no annotation
  */
-export const colorToAnnotation = (color) => {
-  return COLOR_TO_ANNOTATION[color] || null;
+export const convertColorToNote = (color) => {
+  const pair = mapNoteColor.find((p) => p.color === color);
+  return pair ? pair.note : null;
 };
 
 /**
@@ -31,8 +24,9 @@ export const colorToAnnotation = (color) => {
  * @param {string} annotation - The annotation value
  * @returns {string|null} - The color or null if no color
  */
-export const annotationToColor = (annotation) => {
-  return ANNOTATION_TO_COLOR[annotation] || null;
+export const convertNoteToColor = (annotation) => {
+  const pair = mapNoteColor.find((p) => p.note === annotation);
+  return pair ? pair.color : null;
 };
 
 /**
@@ -46,7 +40,7 @@ export const convertItemColorToAnnotation = (item) => {
   }
   return {
     number: item.number,
-    annotation: colorToAnnotation(item.color),
+    annotation: convertColorToNote(item.color),
   };
 };
 
@@ -68,7 +62,7 @@ export const convertItemAnnotationToColor = (item) => {
 
   // If there's an annotation, convert it to color
   if (annotation) {
-    const color = annotationToColor(annotation);
+    const color = convertNoteToColor(annotation);
     if (color) {
       return { number: num, color };
     }
