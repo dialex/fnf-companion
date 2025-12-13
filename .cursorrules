@@ -19,6 +19,12 @@ When adding user-facing text:
 - Use the `t()` function from `./translations` to display translated text in components
 - Never hardcode user-facing strings directly in components
 
+# Testing Requirements
+
+- We should follow the TDD methodology and write the test first and use it to guide the structure of our code. That improves the testability of the code.
+- When adding a new feature, we should add at least one test, at the lowest layer (unit > integration > UI), that confirms that feature works
+- When fixing a bug, first create a test that reproduces the issue, then change just enough code to make the test pass. That test becomes a regression test, in the regressions test folder.
+
 # Save File Structure Changes
 
 When modifying the save file structure (adding, removing, or renaming fields):
