@@ -14,12 +14,6 @@ These are pure functions with no dependencies - easiest to test.
 - [ ] Test handling of invalid JSON
 - [ ] Test with missing keys
 
-### `src/utils/fieldBadges.js`
-
-- [ ] Test badge creation and timing
-- [ ] Test badge cleanup after timeout
-- [ ] Test badge state management
-
 ## 🔄 State Management (Medium)
 
 These involve state objects and persistence logic.

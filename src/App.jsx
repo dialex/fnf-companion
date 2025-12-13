@@ -398,7 +398,7 @@ function App() {
         delete updated[fieldName];
         return updated;
       });
-    }, 2200);
+    }, BADGE_ANIMATION_DURATION_MS);
   };
 
   const celebrate = () => {
