@@ -12,6 +12,7 @@ import {
 import { migrateState } from './utils/migrations';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { colorToAnnotation } from './utils/trailMapping';
+import { rollDie, rollTwoDice } from './utils/dice';
 import yaml from 'js-yaml';
 import './styles/variables.css';
 import './styles/animations.css';
@@ -1995,13 +1996,16 @@ function App() {
       }
 
       try {
-        const heroRoll1 = Math.floor(Math.random() * 6) + 1;
-        const heroRoll2 = Math.floor(Math.random() * 6) + 1;
-        const heroDiceSum = heroRoll1 + heroRoll2;
+        // Roll dice for both hero and monster using utility functions
+        const heroRolls = rollTwoDice();
+        const heroRoll1 = heroRolls.roll1;
+        const heroRoll2 = heroRolls.roll2;
+        const heroDiceSum = heroRolls.sum;
 
-        const monsterRoll1 = Math.floor(Math.random() * 6) + 1;
-        const monsterRoll2 = Math.floor(Math.random() * 6) + 1;
-        const monsterDiceSum = monsterRoll1 + monsterRoll2;
+        const monsterRolls = rollTwoDice();
+        const monsterRoll1 = monsterRolls.roll1;
+        const monsterRoll2 = monsterRolls.roll2;
+        const monsterDiceSum = monsterRolls.sum;
 
         const heroSkill = parseInt(skill) || 0;
         const monsterSkillValue = parseInt(monsterSkill) || 0;
