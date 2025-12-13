@@ -13,6 +13,7 @@ import { migrateState } from './utils/migrations';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { colorToAnnotation } from './utils/trailMapping';
 import { rollDie, rollTwoDice } from './utils/dice';
+import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
 import './styles/animations.css';
@@ -401,6 +402,46 @@ function App() {
     }, 2200);
   };
 
+  const celebrate = () => {
+    // Create a confetti cannon effect with custom colors
+    const colors = ['#FF0000', '#FFD700', '#FFFFFF'];
+    const duration = 1000 * 15; // seconds
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 200,
+      zIndex: 0,
+      colors: colors,
+    };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      // Launch confetti from multiple positions
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }, 250);
+  };
+
   // Trail handlers
   const handleTrailSubmit = () => {
     const num = parseInt(trailInput);
@@ -412,6 +453,11 @@ function App() {
     setTrailSequence((prev) => [...prev, { number: num, annotation: null }]);
     // Clear input
     setTrailInput('');
+
+    // Celebrate if the game was won
+    if (num === 400) {
+      celebrate();
+    }
   };
 
   const handleTrailTest = () => {
