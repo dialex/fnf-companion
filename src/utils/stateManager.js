@@ -62,10 +62,10 @@ export const getDefaultState = () => ({
     battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
     victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
     defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-    ambienceVolume: 50,
-    battleVolume: 50,
-    victoryVolume: 50,
-    defeatVolume: 50,
+    ambienceVolume: 25,
+    battleVolume: 25,
+    victoryVolume: 25,
+    defeatVolume: 25,
   },
   notes: '',
   trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
@@ -218,19 +218,19 @@ export const buildStateObject = (stateValues) => {
       ambienceVolume:
         typeof stateValues.soundVolumes?.ambience === 'number'
           ? stateValues.soundVolumes.ambience
-          : 50,
+          : 25,
       battleVolume:
         typeof stateValues.soundVolumes?.battle === 'number'
           ? stateValues.soundVolumes.battle
-          : 50,
+          : 25,
       victoryVolume:
         typeof stateValues.soundVolumes?.victory === 'number'
           ? stateValues.soundVolumes.victory
-          : 50,
+          : 25,
       defeatVolume:
         typeof stateValues.soundVolumes?.defeat === 'number'
           ? stateValues.soundVolumes.defeat
-          : 50,
+          : 25,
     },
     notes: stateValues.notes || '',
     trailSequence: stateValues.trailSequence || [
@@ -363,20 +363,20 @@ export const applyLoadedState = (savedState, setters) => {
     // Restore sound volumes from sounds object (new structure)
     if (setters.setSoundVolumes) {
       setters.setSoundVolumes({
-        ambience: sounds.ambienceVolume ?? 50,
-        battle: sounds.battleVolume ?? 50,
-        victory: sounds.victoryVolume ?? 50,
-        defeat: sounds.defeatVolume ?? 50,
+        ambience: sounds.ambienceVolume ?? 25,
+        battle: sounds.battleVolume ?? 25,
+        victory: sounds.victoryVolume ?? 25,
+        defeat: sounds.defeatVolume ?? 25,
       });
     }
   }
   // Legacy support: also check old soundVolumes structure
   else if (savedState.soundVolumes && setters.setSoundVolumes) {
     setters.setSoundVolumes({
-      ambience: savedState.soundVolumes.ambience ?? 50,
-      battle: savedState.soundVolumes.battle ?? 50,
-      victory: savedState.soundVolumes.victory ?? 50,
-      defeat: savedState.soundVolumes.defeat ?? 50,
+      ambience: savedState.soundVolumes.ambience ?? 25,
+      battle: savedState.soundVolumes.battle ?? 25,
+      victory: savedState.soundVolumes.victory ?? 25,
+      defeat: savedState.soundVolumes.defeat ?? 25,
     });
   }
   // Restore notes

@@ -489,7 +489,7 @@ export default function GameSection({
                           className="form-range"
                           min="0"
                           max="100"
-                          value={customSoundVolumes[customSound.id] ?? 50}
+                          value={customSoundVolumes[customSound.id] ?? 25}
                           onChange={(e) =>
                             onCustomSoundVolumeChange(
                               customSound.id,

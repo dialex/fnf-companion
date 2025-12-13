@@ -1152,7 +1152,7 @@ function App() {
             const player = event.target;
             if (player && typeof player.setVolume === 'function') {
               try {
-                const volume = customSoundVolumes[customSound.id] ?? 50;
+                const volume = customSoundVolumes[customSound.id] ?? 25;
                 player.setVolume(volume);
               } catch (e) {
                 console.error('Error setting initial volume:', e);
