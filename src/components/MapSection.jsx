@@ -13,10 +13,7 @@ import {
   mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
-import {
-  convertItemAnnotationToColor,
-  annotationToColor,
-} from '../utils/trailMapping';
+import { convertNoteItemtoColor } from '../utils/trailMapping';
 
 export default function MapSection({
   trailSequence,
@@ -46,7 +43,7 @@ export default function MapSection({
 
   // Convert annotations to colors for display
   const displaySequence = trailSequence.map((item) =>
-    convertItemAnnotationToColor(item)
+    convertNoteItemtoColor(item)
   );
 
   // Ensure sequence always starts with 1

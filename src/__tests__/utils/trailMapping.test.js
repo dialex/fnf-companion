@@ -2,8 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   convertColorToNote,
   convertNoteToColor,
-  convertItemColorToAnnotation,
-  convertItemAnnotationToColor,
+  convertNoteItemtoColor,
 } from '../../utils/trailMapping';
 
 describe('Trail mapping utilities', () => {
@@ -45,52 +44,7 @@ describe('Trail mapping utilities', () => {
     );
   });
 
-  describe('convertItemColorToAnnotation', () => {
-    it.each([
-      [1, { number: 1, annotation: null }],
-      [{ number: 42 }, { number: 42, annotation: null }],
-    ])('should convert item without annotation: %s', (input, expected) => {
-      expect(convertItemColorToAnnotation(input)).toEqual(expected);
-    });
-
-    it.each([
-      [
-        { number: 1, color: 'dark' },
-        { number: 1, annotation: 'died' },
-      ],
-      [
-        { number: 5, color: 'success' },
-        { number: 5, annotation: 'good' },
-      ],
-    ])(
-      'should convert item with color to annotation: %s',
-      (input, expected) => {
-        expect(convertItemColorToAnnotation(input)).toEqual(expected);
-      }
-    );
-
-    it.each(['light', 'unknown'])(
-      'should convert item with unknown color "%s" to null annotation',
-      (color) => {
-        expect(convertItemColorToAnnotation({ number: 1, color })).toEqual({
-          number: 1,
-          annotation: null,
-        });
-      }
-    );
-  });
-
-  describe('convertItemAnnotationToColor', () => {
-    it.each([
-      [1, { number: 1, color: 'light' }],
-      [42, { number: 42, color: 'light' }],
-    ])(
-      'should convert number %s to item with light color',
-      (input, expected) => {
-        expect(convertItemAnnotationToColor(input)).toEqual(expected);
-      }
-    );
-
+  describe('convertNoteItemtoColor', () => {
     it.each([
       [
         { number: 1, annotation: 'died' },
@@ -113,24 +67,37 @@ describe('Trail mapping utilities', () => {
         { number: 5, color: 'warning' },
       ],
     ])(
-      'should convert item with annotation to color: %s',
+      "should convert item's annotation to its color format",
       (input, expected) => {
-        expect(convertItemAnnotationToColor(input)).toEqual(expected);
+        expect(convertNoteItemtoColor(input)).toEqual(expected);
       }
     );
 
-    it.each([
-      [{ number: 1, annotation: null }],
-      [{ number: 1 }],
-      [{ number: 1, annotation: 'unknown' }],
-    ])(
-      'should convert item to light color when no valid annotation: %s',
-      (input) => {
-        expect(convertItemAnnotationToColor(input)).toEqual({
-          number: 1,
-          color: 'light',
-        });
-      }
-    );
+    it("should return default color when item's annotation is missing", () => {
+      expect(convertNoteItemtoColor({ number: 1 })).toEqual({
+        number: 1,
+        color: 'light',
+      });
+    });
+
+    it("should return default color when item's annotation is missing or null", () => {
+      expect(convertNoteItemtoColor({ number: 1, annotation: null })).toEqual({
+        number: 1,
+        color: 'light',
+      });
+      expect(
+        convertNoteItemtoColor({ number: 1, annotation: 'invalid' })
+      ).toEqual({
+        number: 1,
+        color: 'light',
+      });
+    });
+
+    it("should return default color when item's annotation is empty", () => {
+      expect(convertNoteItemtoColor({ number: 1, annotation: '' })).toEqual({
+        number: 1,
+        color: 'light',
+      });
+    });
   });
 });

@@ -3,7 +3,6 @@
  */
 
 import { getFromStorage, saveToStorage } from './localStorage';
-import { loadNote } from './trailMapping';
 import packageJson from '../../package.json';
 
 const CURRENT_VERSION = packageJson.version;
@@ -226,7 +225,7 @@ export const buildStateObject = (stateValues) => {
     },
     notes: stateValues.notes || '',
     trailSequence: stateValues.trailSequence || [
-      { number: 1, color: 'primary-1' },
+      { number: 1, annotation: null },
     ],
     sectionsExpanded: stateValues.sectionsExpanded || {
       game: true,
@@ -396,27 +395,13 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.trailSequence !== undefined) {
     // Ensure sequence always starts with 1
     const sequence = savedState.trailSequence;
-    const normalizedSequence = sequence.map((item) => {
-      if (typeof item === 'number') {
-        return {
-          number: item,
-          annotation: null,
-        };
-      }
-      // If item has 'color', convert to 'annotation'
-      if (item.color !== undefined) {
-        return loadNote(item);
-      }
-      // If item already has 'annotation', use it as-is
-      return item;
-    });
-    if (normalizedSequence.length === 0 || normalizedSequence[0].number !== 1) {
+    if (sequence.length === 0 || sequence[0].number !== 1) {
       setters.setTrailSequence([
         { number: 1, annotation: null },
-        ...normalizedSequence.filter((item) => item.number !== 1),
+        ...sequence.filter((item) => item.number !== 1),
       ]);
     } else {
-      setters.setTrailSequence(normalizedSequence);
+      setters.setTrailSequence(sequence);
     }
   }
 

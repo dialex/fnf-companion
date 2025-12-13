@@ -6,13 +6,6 @@ This document tracks what needs to be tested. We'll work through it incrementall
 
 These are pure functions with no dependencies - easiest to test.
 
-### `src/utils/trailMapping.js`
-
-- [ ] Test `annotationToColor` - converts annotation strings to color values
-- [ ] Test `colorToAnnotation` - converts color values to annotation strings
-- [ ] Test `convertItemAnnotationToColor` - converts trail items with annotations to display format
-- [ ] Test edge cases (null, undefined, invalid values)
-
 ### `src/utils/localStorage.js`
 
 - [ ] Test `saveToStorage` - saves data to localStorage

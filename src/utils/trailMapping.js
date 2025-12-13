@@ -30,44 +30,14 @@ export const convertNoteToColor = (annotation) => {
 };
 
 /**
- * Convert trail sequence item from color to annotation format
- * @param {Object} item - Item with { number, color }
- * @returns {Object} - Item with { number, annotation } (annotation is null if no annotation)
- */
-export const loadNote = (item) => {
-  if (typeof item === 'number') {
-    return { number: item, annotation: null };
-  }
-  return {
-    number: item.number,
-    annotation: convertColorToNote(item.color),
-  };
-};
-
-/**
  * Convert trail sequence item from annotation to color format
  * @param {Object} item - Item with { number, annotation }
- * @returns {Object} - Item with { number, color } (color defaults based on number if no annotation)
+ * @returns {Object} - Item with { number, color } (color defaults to 'light' if no valid annotation)
  */
-export const convertItemAnnotationToColor = (item) => {
-  if (typeof item === 'number') {
-    const num = item;
-    return {
-      number: num,
-      color: 'light',
-    };
-  }
-  const num = item.number;
-  const annotation = item.annotation;
-
-  // If there's an annotation, convert it to color
-  if (annotation) {
-    const color = convertNoteToColor(annotation);
-    if (color) {
-      return { number: num, color };
-    }
-  }
-
-  // Default to light if no annotation
-  return { number: num, color: 'light' };
+export const convertNoteItemtoColor = (item) => {
+  const color = item.annotation ? convertNoteToColor(item.annotation) : null;
+  return {
+    number: item.number,
+    color: color || 'light',
+  };
 };
