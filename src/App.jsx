@@ -2038,10 +2038,28 @@ function App() {
         if (newHealth !== currentHealth) {
           setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-2', 'danger');
+          // Play hurt sound when hero takes damage
+          if (actionSoundsEnabled) {
+            const audio = new Audio(
+              `${import.meta.env.BASE_URL}audio/minecraft-hurt.mp3`
+            );
+            audio.play().catch((error) => {
+              console.warn('Could not play audio:', error);
+            });
+          }
         }
         if (newMonsterHealth !== currentMonsterHealth) {
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-2', 'danger');
+          // Play hit sound when monster takes damage
+          if (actionSoundsEnabled) {
+            const audio = new Audio(
+              `${import.meta.env.BASE_URL}audio/minecraft-hit-monster.mp3`
+            );
+            audio.play().catch((error) => {
+              console.warn('Could not play audio:', error);
+            });
+          }
         }
 
         // Now check if fight ended with the updated health values
@@ -2141,6 +2159,15 @@ function App() {
           newMonsterHealth = Math.max(0, currentMonsterHealth - 1);
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-1', 'danger');
+          // Play hit sound when monster takes extra damage
+          if (actionSoundsEnabled) {
+            const audio = new Audio(
+              `${import.meta.env.BASE_URL}audio/minecraft-hit-monster.mp3`
+            );
+            audio.play().catch((error) => {
+              console.warn('Could not play audio:', error);
+            });
+          }
         } else {
           newMonsterHealth = currentMonsterHealth + 1;
           setMonsterHealth(String(newMonsterHealth));
@@ -2163,6 +2190,15 @@ function App() {
           newHealth = Math.max(0, currentHealth - 1);
           setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-1', 'danger');
+          // Play hurt sound when hero takes extra damage
+          if (actionSoundsEnabled) {
+            const audio = new Audio(
+              `${import.meta.env.BASE_URL}audio/minecraft-hurt.mp3`
+            );
+            audio.play().catch((error) => {
+              console.warn('Could not play audio:', error);
+            });
+          }
         }
       }
 
