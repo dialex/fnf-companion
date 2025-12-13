@@ -3,12 +3,10 @@
  */
 
 import { getFromStorage, saveToStorage } from './localStorage';
-import {
-  convertItemColorToAnnotation,
-  annotationToColor,
-} from './trailMapping';
-import { migrateState } from './migrations';
-import { CURRENT_VERSION } from './migrations';
+import { loadNote } from './trailMapping';
+import packageJson from '../../package.json';
+
+const CURRENT_VERSION = packageJson.version;
 
 const STORAGE_KEY = 'fnf-companion-state';
 const DEBOUNCE_DELAY = 1000; // 1 second
@@ -91,42 +89,36 @@ export const loadState = () => {
     return null;
   }
 
-  // Run migrations first to ensure compatibility
-  const migratedState = migrateState(savedState);
-  if (!migratedState) {
-    return null;
-  }
-
   // Merge with default state to ensure all fields exist
   const defaultState = getDefaultState();
   return {
     ...defaultState,
-    ...migratedState,
+    ...savedState,
     character: {
       ...defaultState.character,
-      ...(migratedState.character || {}),
+      ...(savedState.character || {}),
     },
     consumables: {
       ...defaultState.consumables,
-      ...(migratedState.consumables || {}),
+      ...(savedState.consumables || {}),
     },
     fight: {
       ...defaultState.fight,
-      ...(migratedState.fight || {}),
+      ...(savedState.fight || {}),
     },
     sounds: {
       ...defaultState.sounds,
-      ...(migratedState.sounds || {}),
+      ...(savedState.sounds || {}),
     },
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
-    trailSequence: migratedState.trailSequence || defaultState.trailSequence,
+    trailSequence: savedState.trailSequence || defaultState.trailSequence,
     sectionsExpanded: {
       ...defaultState.sectionsExpanded,
-      ...(migratedState.sectionsExpanded || {}),
+      ...(savedState.sectionsExpanded || {}),
     },
     metadata: {
       ...defaultState.metadata,
-      ...(migratedState.metadata || {}),
+      ...(savedState.metadata || {}),
     },
   };
 };
@@ -404,7 +396,6 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.trailSequence !== undefined) {
     // Ensure sequence always starts with 1
     const sequence = savedState.trailSequence;
-    // Handle migration from old format (just numbers or color-based) to new format (annotation-based)
     const normalizedSequence = sequence.map((item) => {
       if (typeof item === 'number') {
         return {
@@ -414,7 +405,7 @@ export const applyLoadedState = (savedState, setters) => {
       }
       // If item has 'color', convert to 'annotation'
       if (item.color !== undefined) {
-        return convertItemColorToAnnotation(item);
+        return loadNote(item);
       }
       // If item already has 'annotation', use it as-is
       return item;

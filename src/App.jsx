@@ -9,7 +9,6 @@ import {
   createDebouncedSave,
   getDefaultState,
 } from './utils/stateManager';
-import { migrateState } from './utils/migrations';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { colorToAnnotation } from './utils/trailMapping';
 import { rollDie, rollTwoDice } from './utils/dice';
@@ -1732,12 +1731,6 @@ function App() {
 
           // Validate it's a valid state object
           if (!loadedState || typeof loadedState !== 'object') {
-            return;
-          }
-
-          // Run migrations to ensure compatibility with current version
-          const migratedState = migrateState(loadedState);
-          if (!migratedState) {
             return;
           }
 

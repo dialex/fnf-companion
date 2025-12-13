@@ -34,7 +34,7 @@ export const convertNoteToColor = (annotation) => {
  * @param {Object} item - Item with { number, color }
  * @returns {Object} - Item with { number, annotation } (annotation is null if no annotation)
  */
-export const convertItemColorToAnnotation = (item) => {
+export const loadNote = (item) => {
   if (typeof item === 'number') {
     return { number: item, annotation: null };
   }
