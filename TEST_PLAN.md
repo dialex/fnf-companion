@@ -2,18 +2,6 @@
 
 This document tracks what needs to be tested. We'll work through it incrementally, starting with the simplest tests first.
 
-## Pure Utility Functions (Easy)
-
-These are pure functions with no dependencies - easiest to test.
-
-### `src/utils/localStorage.js`
-
-- [ ] Test `saveToStorage` - saves data to localStorage
-- [ ] Test `getFromStorage` - retrieves data from localStorage
-- [ ] Test `getFromStorage` with default values
-- [ ] Test handling of invalid JSON
-- [ ] Test with missing keys
-
 ## 🔄 State Management (Medium)
 
 These involve state objects and persistence logic.
