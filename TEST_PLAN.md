@@ -1,21 +1,27 @@
 # Test Plan
 
-This document tracks what needs to be tested. We'll work through it incrementally, starting with the simplest tests first.
-
-## 🔄 State Management (Medium)
-
-These involve state objects and persistence logic.
-
-### `src/utils/migrations.js`
-
-- [ ] Test `migrateState` - migrates old state format to new
-- [ ] Test migration from version 1.0.0 to current
-- [ ] Test that current version state doesn't get migrated
-- [ ] Test handling of unknown versions
+Tracks what needs to be tested, starting with the simplest tests first.
 
 ## 🎲 Game Logic (Medium-Hard)
 
 These test the core game mechanics.
+
+### Save and load file logic
+
+- Creates yaml file
+- Saves file and has the right values
+- Loads file
+- Loads file and overrides current state (and local storage)
+
+### Dice Rolling in Context
+
+- [x] Test skill test calculations
+- [x] Test luck test calculations
+- [x] Test dice roll results affect game state correctly
+- [ ] Test that action sounds manager is called when luck test is successful
+  - TODO: This test is pending until we simplify/extract the dice roll handler logic out of App.jsx
+  - The current handler has too many dependencies to test easily
+  - Once handlers are extracted to separate functions, we can test the integration properly
 
 ### Fight System (`src/App.jsx` - fight logic)
 
@@ -24,12 +30,6 @@ These test the core game mechanics.
 - [ ] Test health updates on damage
 - [ ] Test luck usage in fights
 - [ ] Test fight outcome states
-
-### Dice Rolling in Context
-
-- [ ] Test skill test calculations
-- [ ] Test luck test calculations
-- [ ] Test dice roll results affect game state correctly
 
 ## 🎵 Sound Management (Hard)
 
