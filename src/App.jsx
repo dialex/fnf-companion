@@ -459,17 +459,6 @@ function App() {
     }
   };
 
-  const handleTrailTest = () => {
-    // Available annotations for random selection
-    const annotations = ['died', 'question', 'good', 'bad', 'important'];
-    // Generate 20 random numbers between 1 and 400 with random annotations
-    const randomNumbers = Array.from({ length: 20 }, () => ({
-      number: Math.floor(Math.random() * 400) + 1,
-      annotation: annotations[Math.floor(Math.random() * annotations.length)],
-    }));
-    setTrailSequence((prev) => [...prev, ...randomNumbers]);
-  };
-
   const handleTrailPillDelete = () => {
     setTrailSequence((prev) => {
       // Don't delete if there's only one item (the initial 1)
