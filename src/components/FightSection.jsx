@@ -6,12 +6,11 @@ import {
   mdiSword,
   mdiHeart,
   mdiSnake,
-  mdiDice3,
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
-import { getDiceIcon } from '../utils/dice';
+import DiceDisplay from './DiceDisplay';
 
 export default function FightSection({
   // Hero stats (read-only)
@@ -297,83 +296,22 @@ export default function FightSection({
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: '80px' }}
                   >
-                    {diceRollingType === 'fight' && (
-                      <div className="d-flex align-items-center gap-2">
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#007e6e',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#007e6e',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                      </div>
-                    )}
-                    {diceRollingType === 'useLuck' && (
-                      <div className="d-flex align-items-center gap-2">
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#007e6e',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#007e6e',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                      </div>
-                    )}
-                    {testLuckResult &&
-                      diceRollingType === null &&
-                      !isTestingLuck && (
-                        <div className="d-flex align-items-center gap-2">
-                          <Icon
-                            path={getDiceIcon(testLuckResult.roll1)}
-                            size={3}
-                            style={{ color: '#007e6e' }}
-                          />
-                          <Icon
-                            path={getDiceIcon(testLuckResult.roll2)}
-                            size={3}
-                            style={{ color: '#007e6e' }}
-                          />
-                        </div>
-                      )}
-                    {heroDiceRolls &&
-                      diceRollingType === null &&
-                      !isTestingLuck &&
-                      !testLuckResult && (
-                        <div className="d-flex align-items-center gap-2">
-                          <Icon
-                            path={getDiceIcon(heroDiceRolls[0])}
-                            size={3}
-                            style={{ color: '#007e6e' }}
-                          />
-                          <Icon
-                            path={getDiceIcon(heroDiceRolls[1])}
-                            size={3}
-                            style={{ color: '#007e6e' }}
-                          />
-                        </div>
-                      )}
+                    <DiceDisplay
+                      rollingType={
+                        diceRollingType === 'fight' ||
+                        diceRollingType === 'useLuck'
+                          ? diceRollingType
+                          : null
+                      }
+                      result={
+                        testLuckResult
+                          ? [testLuckResult.roll1, testLuckResult.roll2]
+                          : heroDiceRolls
+                            ? heroDiceRolls
+                            : null
+                      }
+                      color="#007e6e"
+                    />
                   </div>
                 </div>
                 <div className="col-12 col-xl-6">
@@ -381,44 +319,11 @@ export default function FightSection({
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: '80px' }}
                   >
-                    {diceRollingType === 'fight' && (
-                      <div className="d-flex align-items-center gap-2">
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#7e000f',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                        <Icon
-                          path={mdiDice3}
-                          size={3}
-                          className="dice-rolling"
-                          style={{
-                            color: '#7e000f',
-                            animationDuration: '0.3s',
-                          }}
-                        />
-                      </div>
-                    )}
-                    {monsterDiceRolls &&
-                      diceRollingType === null &&
-                      !isTestingLuck && (
-                        <div className="d-flex align-items-center gap-2">
-                          <Icon
-                            path={getDiceIcon(monsterDiceRolls[0])}
-                            size={3}
-                            style={{ color: '#7e000f' }}
-                          />
-                          <Icon
-                            path={getDiceIcon(monsterDiceRolls[1])}
-                            size={3}
-                            style={{ color: '#7e000f' }}
-                          />
-                        </div>
-                      )}
+                    <DiceDisplay
+                      rollingType={diceRollingType === 'fight' ? 'fight' : null}
+                      result={monsterDiceRolls || null}
+                      color="#7e000f"
+                    />
                   </div>
                 </div>
               </div>

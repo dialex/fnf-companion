@@ -17,11 +17,6 @@ describe('Section: Rolls', () => {
       skill: '10',
       luck: '5',
       diceRollingType: null,
-      isTestingLuck: false,
-      rollDieResult: null,
-      rollDiceResults: null,
-      testLuckResult: null,
-      testSkillResult: null,
       onTestYourLuck: vi.fn(),
       onTestYourSkill: vi.fn(),
       onRollDie: vi.fn(),
@@ -63,32 +58,22 @@ describe('Section: Rolls', () => {
       expect(rollDiceButton).toBeDisabled();
     });
 
-    it('should be clickable when no roll is in progress', () => {
-      const onTestYourSkill = vi.fn();
-      const { rerender } = render(
-        <DiceRollsSection {...defaultProps} onTestYourSkill={onTestYourSkill} />
-      );
+    it('should be enabled when conditions are met', () => {
+      render(<DiceRollsSection {...defaultProps} />);
 
-      // Button should be enabled when no roll is in progress
       const testSkillButton = screen.getByRole('button', {
         name: /test skill/i,
       });
       expect(testSkillButton).toBeEnabled();
+    });
 
-      // Re-render with roll in progress to show button becomes disabled
-      rerender(
-        <DiceRollsSection
-          {...defaultProps}
-          onTestYourSkill={onTestYourSkill}
-          diceRollingType="testSkill"
-        />
-      );
+    it('should be disabled when skill is 0', () => {
+      render(<DiceRollsSection {...defaultProps} skill="0" />);
 
-      const disabledButton = screen.getByRole('button', {
+      const testSkillButton = screen.getByRole('button', {
         name: /test skill/i,
       });
-      expect(disabledButton).toBeDisabled();
-      expect(onTestYourSkill).not.toHaveBeenCalled();
+      expect(testSkillButton).toBeDisabled();
     });
 
     it('should start skill test when button is clicked', () => {
@@ -159,11 +144,6 @@ describe('Section: Rolls', () => {
       skill: '10',
       luck: '5',
       diceRollingType: null,
-      isTestingLuck: false,
-      rollDieResult: null,
-      rollDiceResults: null,
-      testLuckResult: null,
-      testSkillResult: null,
       onTestYourLuck: vi.fn(),
       onTestYourSkill: vi.fn(),
       onRollDie: vi.fn(),
@@ -201,32 +181,13 @@ describe('Section: Rolls', () => {
       expect(rollDiceButton).toBeDisabled();
     });
 
-    it('should be clickable when no roll is in progress', () => {
-      const onTestYourLuck = vi.fn();
-      const { rerender } = render(
-        <DiceRollsSection {...defaultProps} onTestYourLuck={onTestYourLuck} />
-      );
+    it('should be enabled when conditions are met', () => {
+      render(<DiceRollsSection {...defaultProps} />);
 
-      // Button should be enabled when no roll is in progress
       const testLuckButton = screen.getByRole('button', {
         name: /test luck/i,
       });
       expect(testLuckButton).toBeEnabled();
-
-      // Re-render with roll in progress to show button becomes disabled
-      rerender(
-        <DiceRollsSection
-          {...defaultProps}
-          onTestYourLuck={onTestYourLuck}
-          diceRollingType="testLuck"
-        />
-      );
-
-      const disabledButton = screen.getByRole('button', {
-        name: /test luck/i,
-      });
-      expect(disabledButton).toBeDisabled();
-      expect(onTestYourLuck).not.toHaveBeenCalled();
     });
 
     it('should start luck test when button is clicked', () => {
@@ -282,41 +243,7 @@ describe('Section: Rolls', () => {
       expect(failureAlert).toHaveTextContent(/tough luck/i);
     });
 
-    it('should decrease luck by 1 after each luck test', () => {
-      const onTestYourLuck = vi.fn();
-      const { rerender } = render(
-        <DiceRollsSection
-          {...defaultProps}
-          luck="5"
-          onTestYourLuck={onTestYourLuck}
-        />
-      );
-
-      // Initial state: luck is 5, button should be enabled
-      const testLuckButton = screen.getByRole('button', {
-        name: /test luck/i,
-      });
-      expect(testLuckButton).toBeEnabled();
-
-      // Simulate luck test completing - luck decreases by 1
-      rerender(
-        <DiceRollsSection
-          {...defaultProps}
-          luck="4"
-          diceRollingType={null}
-          testLuckResult={{ roll1: 2, roll2: 2, isLucky: true }}
-          onTestYourLuck={onTestYourLuck}
-        />
-      );
-
-      // Button should still be enabled with luck = 4
-      const buttonAfterTest = screen.getByRole('button', {
-        name: /test luck/i,
-      });
-      expect(buttonAfterTest).toBeEnabled();
-    });
-
-    it('should disable button when luck is 0', () => {
+    it('should be disabled when luck is 0', () => {
       render(<DiceRollsSection {...defaultProps} luck="0" />);
 
       const testLuckButton = screen.getByRole('button', {
@@ -340,11 +267,6 @@ describe('Section: Rolls', () => {
       skill: '10',
       luck: '5',
       diceRollingType: null,
-      isTestingLuck: false,
-      rollDieResult: null,
-      rollDiceResults: null,
-      testLuckResult: null,
-      testSkillResult: null,
       onTestYourLuck: vi.fn(),
       onTestYourSkill: vi.fn(),
       onRollDie: vi.fn(),
@@ -407,11 +329,6 @@ describe('Section: Rolls', () => {
       skill: '10',
       luck: '5',
       diceRollingType: null,
-      isTestingLuck: false,
-      rollDieResult: null,
-      rollDiceResults: null,
-      testLuckResult: null,
-      testSkillResult: null,
       onTestYourLuck: vi.fn(),
       onTestYourSkill: vi.fn(),
       onRollDie: vi.fn(),

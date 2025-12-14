@@ -9,7 +9,7 @@ import {
   mdiChevronUp,
 } from '@mdi/js';
 import { t } from '../translations';
-import { getDiceIcon } from '../utils/dice';
+import DiceDisplay from './DiceDisplay';
 
 export default function DiceRollsSection({
   skill,
@@ -39,6 +39,14 @@ export default function DiceRollsSection({
     if (onExpandedChange) {
       onExpandedChange(newExpanded);
     }
+  };
+
+  const getDiceResult = () => {
+    if (rollDieResult) return rollDieResult;
+    if (rollDiceResults) return rollDiceResults;
+    if (testSkillResult) return [testSkillResult.roll1, testSkillResult.roll2];
+    if (testLuckResult) return [testLuckResult.roll1, testLuckResult.roll2];
+    return null;
   };
 
   return (
@@ -124,154 +132,35 @@ export default function DiceRollsSection({
               className="d-flex flex-column justify-content-center align-items-center"
               style={{ minHeight: '100px', gap: '5px' }}
             >
-              {diceRollingType === 'rollDie' && (
-                <Icon
-                  path={mdiDice3}
-                  size={3}
-                  className="dice-rolling"
-                  style={{ color: '#007e6e', animationDuration: '0.3s' }}
-                />
-              )}
-              {diceRollingType === 'rollDice' && (
-                <div className="d-flex align-items-center gap-2">
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                </div>
-              )}
-              {diceRollingType === 'testSkill' && (
-                <div className="d-flex align-items-center gap-2">
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                </div>
-              )}
-              {diceRollingType === 'testLuck' && (
-                <div className="d-flex align-items-center gap-2">
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                  <Icon
-                    path={mdiDice3}
-                    size={3}
-                    className="dice-rolling"
-                    style={{
-                      color: '#007e6e',
-                      animationDuration: '0.3s',
-                    }}
-                  />
-                </div>
-              )}
+              {/* Dice animation or results */}
+              <DiceDisplay
+                rollingType={diceRollingType}
+                result={getDiceResult()}
+                color="#007e6e"
+              />
+              {/* Test result messages */}
               {testSkillResult && diceRollingType === null && (
-                <>
-                  <div
-                    className={`alert content ${
-                      testSkillResult.passed ? 'alert-success' : 'alert-danger'
-                    } mb-0`}
-                    role="alert"
-                  >
-                    {testSkillResult.passed
-                      ? t('dice.youPassedTheTest')
-                      : t('dice.youFailedTheTest')}
-                  </div>
-                  <div className="d-flex align-items-center gap-2">
-                    <Icon
-                      path={getDiceIcon(testSkillResult.roll1)}
-                      size={3}
-                      style={{ color: '#007e6e' }}
-                    />
-                    <Icon
-                      path={getDiceIcon(testSkillResult.roll2)}
-                      size={3}
-                      style={{ color: '#007e6e' }}
-                    />
-                  </div>
-                </>
+                <div
+                  className={`alert content ${
+                    testSkillResult.passed ? 'alert-success' : 'alert-danger'
+                  } mb-0`}
+                  role="alert"
+                >
+                  {testSkillResult.passed
+                    ? t('dice.youPassedTheTest')
+                    : t('dice.youFailedTheTest')}
+                </div>
               )}
               {testLuckResult && diceRollingType === null && (
-                <>
-                  <div
-                    className={`alert content ${
-                      testLuckResult.isLucky ? 'alert-success' : 'alert-danger'
-                    } mb-0`}
-                    role="alert"
-                  >
-                    {testLuckResult.isLucky
-                      ? t('dice.youWereLucky')
-                      : t('dice.youWereUnlucky')}
-                  </div>
-                  <div className="d-flex align-items-center gap-2">
-                    <Icon
-                      path={getDiceIcon(testLuckResult.roll1)}
-                      size={3}
-                      style={{ color: '#007e6e' }}
-                    />
-                    <Icon
-                      path={getDiceIcon(testLuckResult.roll2)}
-                      size={3}
-                      style={{ color: '#007e6e' }}
-                    />
-                  </div>
-                </>
-              )}
-              {rollDieResult && diceRollingType === null && (
-                <Icon
-                  path={getDiceIcon(rollDieResult)}
-                  size={3}
-                  style={{ color: '#007e6e' }}
-                />
-              )}
-              {rollDiceResults && diceRollingType === null && (
                 <div
-                  className="d-flex align-items-center"
-                  style={{ gap: '20px' }}
+                  className={`alert content ${
+                    testLuckResult.isLucky ? 'alert-success' : 'alert-danger'
+                  } mb-0`}
+                  role="alert"
                 >
-                  <Icon
-                    path={getDiceIcon(rollDiceResults[0])}
-                    size={3}
-                    style={{ color: '#007e6e' }}
-                  />
-                  <Icon
-                    path={getDiceIcon(rollDiceResults[1])}
-                    size={3}
-                    style={{ color: '#007e6e' }}
-                  />
+                  {testLuckResult.isLucky
+                    ? t('dice.youWereLucky')
+                    : t('dice.youWereUnlucky')}
                 </div>
               )}
             </div>

@@ -11,8 +11,9 @@ import {
 } from './utils/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
-import { rollDie, rollTwoDice } from './utils/dice';
+import { rollTwoDice } from './utils/dice';
 import { createActionSoundsManager } from './utils/actionSoundsManager';
+import { createDiceRollHandlers } from './utils/diceRollHandlers';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -1816,22 +1817,25 @@ function App() {
   };
 
   // Dice rolling handlers
-  const handleTestYourLuck = () => {
-    const currentLuck = parseInt(luck) || 0;
-    if (currentLuck <= 0 || isTestingLuck || diceRollingType !== null) return;
+  const diceRollHandlers = createDiceRollHandlers({
+    setDiceRollingType,
+    setRollDieResult,
+    setRollDiceResults,
+    setTestLuckResult,
+    setTestSkillResult,
+    getDiceRollingType: () => diceRollingType,
+    getSkill: () => skill,
+    getLuck: () => luck,
+    getIsTestingLuck: () => isTestingLuck,
+  });
 
-    setIsTestingLuck(true);
-    setDiceRollingType('testLuck');
-    setRollDieResult(null);
-    setRollDiceResults(null);
-    setTestLuckResult(null);
-    setTestSkillResult(null);
-
-    setTimeout(() => {
-      const rolls = rollTwoDice();
+  const handleTestYourLuck = diceRollHandlers.testLuck({
+    onBeforeRoll: () => setIsTestingLuck(true),
+    onRollComplete: (rolls) => {
       const roll1 = rolls.roll1;
       const roll2 = rolls.roll2;
       const sum = rolls.sum;
+      const currentLuck = parseInt(luck) || 0;
       const isLucky = sum <= currentLuck;
 
       actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
@@ -1840,59 +1844,31 @@ function App() {
       const newLuck = Math.max(0, currentLuck - 1);
       setLuck(String(newLuck));
       setIsTestingLuck(false);
-      setDiceRollingType(null);
-    }, 1000);
-  };
+    },
+  });
 
-  const handleTestYourSkill = () => {
-    const currentSkill = parseInt(skill) || 0;
-    if (currentSkill <= 0 || diceRollingType !== null) return;
-
-    setDiceRollingType('testSkill');
-    setRollDieResult(null);
-    setRollDiceResults(null);
-    setTestLuckResult(null);
-    setTestSkillResult(null);
-
-    setTimeout(() => {
-      const rolls = rollTwoDice();
+  const handleTestYourSkill = diceRollHandlers.testSkill({
+    onRollComplete: (rolls) => {
       const roll1 = rolls.roll1;
       const roll2 = rolls.roll2;
       const sum = rolls.sum;
+      const currentSkill = parseInt(skill) || 0;
       const passed = sum <= currentSkill;
-
       setTestSkillResult({ roll1, roll2, passed });
-      setDiceRollingType(null);
-    }, 1000);
-  };
+    },
+  });
 
-  const handleRollDie = () => {
-    if (diceRollingType !== null) return;
-    setDiceRollingType('rollDie');
-    setTestLuckResult(null);
-    setTestSkillResult(null);
-    setRollDiceResults(null);
-    setRollDieResult(null);
-    setTimeout(() => {
-      const result = rollDie();
+  const handleRollDie = diceRollHandlers.rollDie({
+    onRollComplete: (result) => {
       setRollDieResult(result);
-      setDiceRollingType(null);
-    }, 1000);
-  };
+    },
+  });
 
-  const handleRollDice = () => {
-    if (diceRollingType !== null) return;
-    setDiceRollingType('rollDice');
-    setTestLuckResult(null);
-    setTestSkillResult(null);
-    setRollDieResult(null);
-    setRollDiceResults(null);
-    setTimeout(() => {
-      const results = rollTwoDice();
+  const handleRollDice = diceRollHandlers.rollDice({
+    onRollComplete: (results) => {
       setRollDiceResults([results.roll1, results.roll2]);
-      setDiceRollingType(null);
-    }, 1000);
-  };
+    },
+  });
 
   // Fight handlers
   const checkFightEnd = (heroHealthValue = null, monsterHealthValue = null) => {
