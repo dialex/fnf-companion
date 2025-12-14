@@ -8,75 +8,12 @@ import packageJson from '../../package.json';
 const CURRENT_VERSION = packageJson.version;
 
 const STORAGE_KEY = 'fnf-companion-state';
-const DEBOUNCE_DELAY = 1000; // 1 second
+export const DEBOUNCE_DELAY = 1000; // 1 second
 
 /**
  * Get the default/initial state structure
  */
-export const getDefaultState = () => ({
-  metadata: {
-    version: CURRENT_VERSION,
-    savedAt: new Date().toISOString(),
-    bookname: '',
-    theme: 'light',
-    actionSoundsEnabled: true,
-    allSoundsMuted: false,
-  },
-  character: {
-    name: '',
-    skill: '',
-    health: '',
-    luck: '',
-    isLocked: false,
-    maxSkill: null,
-    maxHealth: null,
-    maxLuck: null,
-  },
-  consumables: {
-    coins: '0',
-    meals: '10',
-    transactionObject: '',
-    transactionCost: '',
-    potionType: '',
-    potionUsed: false,
-  },
-  inventory: '',
-  fight: {
-    monsterSkill: '',
-    monsterHealth: '',
-    monsterCreature: '',
-    graveyard: '',
-    showUseLuck: false,
-    luckUsed: false,
-    isFighting: false,
-    fightResult: null,
-    fightOutcome: null,
-    heroDiceRolls: null,
-    monsterDiceRolls: null,
-  },
-  sounds: {
-    ambience: '',
-    battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
-    victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
-    defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-    ambienceVolume: 25,
-    battleVolume: 25,
-    victoryVolume: 25,
-    defeatVolume: 25,
-  },
-  notes: '',
-  trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
-  sectionsExpanded: {
-    game: true,
-    character: true,
-    consumables: true,
-    diceRolls: true,
-    inventory: true,
-    map: true,
-    fight: false,
-    notes: false,
-  },
-});
+export const getDefaultState = () => buildStateObject({});
 
 /**
  * Load state from localStorage
@@ -203,9 +140,15 @@ export const buildStateObject = (stateValues) => {
     },
     sounds: {
       ambience: stateValues.soundUrls?.ambience || '',
-      battle: stateValues.soundUrls?.battle || '',
-      victory: stateValues.soundUrls?.victory || '',
-      defeat: stateValues.soundUrls?.defeat || '',
+      battle:
+        stateValues.soundUrls?.battle ||
+        'https://www.youtube.com/watch?v=s5NxP6tjm5o',
+      victory:
+        stateValues.soundUrls?.victory ||
+        'https://www.youtube.com/watch?v=rgUksX6eM0Y',
+      defeat:
+        stateValues.soundUrls?.defeat ||
+        'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
       ambienceVolume:
         typeof stateValues.soundVolumes?.ambience === 'number'
           ? stateValues.soundVolumes.ambience

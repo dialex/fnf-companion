@@ -6,16 +6,6 @@ This document tracks what needs to be tested. We'll work through it incrementall
 
 These involve state objects and persistence logic.
 
-### `src/utils/stateManager.js`
-
-- [ ] Test `getDefaultState` - returns correct default values
-- [ ] Test `buildStateObject` - builds state from current values
-- [ ] Test `loadState` - loads and merges saved state
-- [ ] Test `saveState` - saves state to localStorage
-- [ ] Test `applyLoadedState` - applies loaded state to setters
-- [ ] Test state merging (saved state + defaults)
-- [ ] Test handling of missing/corrupted saved state
-
 ### `src/utils/migrations.js`
 
 - [ ] Test `migrateState` - migrates old state format to new
