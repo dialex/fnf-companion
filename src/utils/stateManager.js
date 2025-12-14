@@ -213,21 +213,6 @@ export const applyLoadedState = (savedState, setters) => {
       setters.setAllSoundsMuted(savedState.metadata.allSoundsMuted);
     }
   }
-  // Legacy support: also check top-level for actionSoundsEnabled and allSoundsMuted
-  if (
-    savedState.actionSoundsEnabled !== undefined &&
-    setters.setActionSoundsEnabled &&
-    savedState.metadata?.actionSoundsEnabled === undefined
-  ) {
-    setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
-  }
-  if (
-    savedState.allSoundsMuted !== undefined &&
-    setters.setAllSoundsMuted &&
-    savedState.metadata?.allSoundsMuted === undefined
-  ) {
-    setters.setAllSoundsMuted(savedState.allSoundsMuted);
-  }
 
   // Restore character state
   if (savedState.character) {
@@ -294,7 +279,6 @@ export const applyLoadedState = (savedState, setters) => {
         defeat: sounds.defeat || '',
       });
     }
-    // Restore sound volumes from sounds object (new structure)
     if (setters.setSoundVolumes) {
       setters.setSoundVolumes({
         ambience: sounds.ambienceVolume ?? 25,
@@ -304,15 +288,6 @@ export const applyLoadedState = (savedState, setters) => {
       });
     }
   }
-  // Legacy support: also check old soundVolumes structure
-  else if (savedState.soundVolumes && setters.setSoundVolumes) {
-    setters.setSoundVolumes({
-      ambience: savedState.soundVolumes.ambience ?? 25,
-      battle: savedState.soundVolumes.battle ?? 25,
-      victory: savedState.soundVolumes.victory ?? 25,
-      defeat: savedState.soundVolumes.defeat ?? 25,
-    });
-  }
   // Restore notes
   if (savedState.notes !== undefined) setters.setNotes(savedState.notes);
 
@@ -321,7 +296,7 @@ export const applyLoadedState = (savedState, setters) => {
     if (setters.setCustomSounds) {
       setters.setCustomSounds(savedState.customSounds);
     }
-    // Restore volumes, initializing missing ones with default (50)
+    // Restore volumes, initializing missing ones with default
     if (setters.setCustomSoundVolumes) {
       const defaultState = getDefaultState();
       const defaultVolume = defaultState.sounds.ambienceVolume;
@@ -353,16 +328,10 @@ export const applyLoadedState = (savedState, setters) => {
     setters.setSectionsExpanded(savedState.sectionsExpanded);
   }
 
-  // Restore theme from metadata (new structure)
+  // Restore theme from metadata
   // Note: Theme utility's localStorage takes precedence over saved state
   // This ensures user's manual theme selection is preserved
-  const themeToRestore = savedState.metadata?.theme || savedState.theme;
-  if (
-    themeToRestore !== undefined &&
-    setters.setTheme &&
-    setters.getCurrentTheme
-  ) {
-    // Restore theme from saved state
-    setters.setTheme(themeToRestore);
+  if (savedState.metadata?.theme !== undefined && setters.setTheme) {
+    setters.setTheme(savedState.metadata.theme);
   }
 };
