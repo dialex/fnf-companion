@@ -31,7 +31,9 @@ describe('Section: Rolls', () => {
     };
 
     it('should show rolling animation when test is in progress', () => {
-      render(<DiceRollsSection {...defaultProps} diceRollingType="testSkill" />);
+      render(
+        <DiceRollsSection {...defaultProps} diceRollingType="testSkill" />
+      );
 
       // Check for rolling animation (dice icons with dice-rolling class)
       const rollingDice = document.querySelectorAll('.dice-rolling');
@@ -39,15 +41,21 @@ describe('Section: Rolls', () => {
     });
 
     it('should prevent multiple dice rolls at the same time', () => {
-      render(<DiceRollsSection {...defaultProps} diceRollingType="testSkill" />);
+      render(
+        <DiceRollsSection {...defaultProps} diceRollingType="testSkill" />
+      );
 
       // All dice rolling buttons should be disabled
       const testSkillButton = screen.getByRole('button', {
         name: /test skill/i,
       });
       const testLuckButton = screen.getByRole('button', { name: /test luck/i });
-      const rollDieButton = screen.getAllByRole('button', { name: /^roll$/i })[0];
-      const rollDiceButton = screen.getAllByRole('button', { name: /^roll$/i })[1];
+      const rollDieButton = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      })[0];
+      const rollDiceButton = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      })[1];
 
       expect(testSkillButton).toBeDisabled();
       expect(testLuckButton).toBeDisabled();
@@ -86,7 +94,9 @@ describe('Section: Rolls', () => {
     it('should start skill test when button is clicked', () => {
       const onTestYourSkill = vi.fn();
 
-      render(<DiceRollsSection {...defaultProps} onTestYourSkill={onTestYourSkill} />);
+      render(
+        <DiceRollsSection {...defaultProps} onTestYourSkill={onTestYourSkill} />
+      );
 
       const testSkillButton = screen.getByRole('button', {
         name: /test skill/i,
@@ -178,8 +188,12 @@ describe('Section: Rolls', () => {
         name: /test skill/i,
       });
       const testLuckButton = screen.getByRole('button', { name: /test luck/i });
-      const rollDieButton = screen.getAllByRole('button', { name: /^roll$/i })[0];
-      const rollDiceButton = screen.getAllByRole('button', { name: /^roll$/i })[1];
+      const rollDieButton = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      })[0];
+      const rollDiceButton = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      })[1];
 
       expect(testSkillButton).toBeDisabled();
       expect(testLuckButton).toBeDisabled();
@@ -218,7 +232,9 @@ describe('Section: Rolls', () => {
     it('should start luck test when button is clicked', () => {
       const onTestYourLuck = vi.fn();
 
-      render(<DiceRollsSection {...defaultProps} onTestYourLuck={onTestYourLuck} />);
+      render(
+        <DiceRollsSection {...defaultProps} onTestYourLuck={onTestYourLuck} />
+      );
 
       const testLuckButton = screen.getByRole('button', {
         name: /test luck/i,
@@ -269,7 +285,11 @@ describe('Section: Rolls', () => {
     it('should decrease luck by 1 after each luck test', () => {
       const onTestYourLuck = vi.fn();
       const { rerender } = render(
-        <DiceRollsSection {...defaultProps} luck="5" onTestYourLuck={onTestYourLuck} />
+        <DiceRollsSection
+          {...defaultProps}
+          luck="5"
+          onTestYourLuck={onTestYourLuck}
+        />
       );
 
       // Initial state: luck is 5, button should be enabled
@@ -303,10 +323,6 @@ describe('Section: Rolls', () => {
         name: /test luck/i,
       });
       expect(testLuckButton).toBeDisabled();
-    });
-
-    it('should trigger a lucky sound when test is successful', () => {
-      //TODO
     });
   });
 });

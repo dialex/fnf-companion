@@ -12,6 +12,7 @@ import {
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
 import { rollDie, rollTwoDice } from './utils/dice';
+import { createActionSoundsManager } from './utils/actionSoundsManager';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -118,6 +119,9 @@ function App() {
 
   // Field badges
   const [fieldBadges, setFieldBadges] = useState({});
+
+  // Action sounds manager
+  const actionSoundsPlayer = useRef(createActionSoundsManager());
 
   // Notification banner
   const [notification, setNotification] = useState(null);
@@ -1830,16 +1834,7 @@ function App() {
       const sum = rolls.sum;
       const isLucky = sum <= currentLuck;
 
-      if (isLucky) {
-        if (actionSoundsEnabled) {
-          const audio = new Audio(
-            `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
-          );
-          audio.play().catch((error) => {
-            console.warn('Could not play audio:', error);
-          });
-        }
-      }
+      actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
 
       setTestLuckResult({ roll1, roll2, isLucky });
       const newLuck = Math.max(0, currentLuck - 1);
@@ -2084,6 +2079,7 @@ function App() {
           setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-2', 'danger');
           // Play hit sound when monster takes damage
+          //TODO: use playActionSound
           if (actionSoundsEnabled) {
             const audio = new Audio(
               `${import.meta.env.BASE_URL}audio/minecraft-hit-monster.mp3`
@@ -2170,16 +2166,7 @@ function App() {
       const sum = rolls.sum;
       const isLucky = sum <= currentLuck;
 
-      if (isLucky) {
-        if (actionSoundsEnabled) {
-          const audio = new Audio(
-            `${import.meta.env.BASE_URL}audio/rayman-lucky.mp3`
-          );
-          audio.play().catch((error) => {
-            console.warn('Could not play audio:', error);
-          });
-        }
-      }
+      actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
 
       const heroWonLastFight = fightResult.type === 'heroWins';
       const currentHealth = parseInt(health) || 0;
