@@ -1393,20 +1393,19 @@ function App() {
 
   // Character handlers
   const handleRandomStats = () => {
-    const skillRoll = Math.floor(Math.random() * 6) + 1;
+    const skillRoll = rollDie();
     const newSkill = skillRoll + 6;
     setSkill(
       String(maxSkill !== null ? Math.min(newSkill, maxSkill) : newSkill)
     );
 
-    const healthRoll1 = Math.floor(Math.random() * 6) + 1;
-    const healthRoll2 = Math.floor(Math.random() * 6) + 1;
-    const newHealth = healthRoll1 + healthRoll2 + 12;
+    const healthRolls = rollTwoDice();
+    const newHealth = healthRolls.sum + 12;
     setHealth(
       String(maxHealth !== null ? Math.min(newHealth, maxHealth) : newHealth)
     );
 
-    const luckRoll = Math.floor(Math.random() * 6) + 1;
+    const luckRoll = rollDie();
     const newLuck = luckRoll + 6;
     setLuck(String(maxLuck !== null ? Math.min(newLuck, maxLuck) : newLuck));
   };
@@ -1724,12 +1723,12 @@ function App() {
           }
 
           // Restore book name
-          if (migratedState.metadata?.bookname) {
-            setBook(migratedState.metadata.bookname);
+          if (loadedState.metadata?.bookname) {
+            setBook(loadedState.metadata.bookname);
           }
 
           // Apply loaded state
-          applyLoadedState(migratedState, {
+          applyLoadedState(loadedState, {
             setName,
             setSkill,
             setHealth,
@@ -1825,9 +1824,10 @@ function App() {
     setTestSkillResult(null);
 
     setTimeout(() => {
-      const roll1 = Math.floor(Math.random() * 6) + 1;
-      const roll2 = Math.floor(Math.random() * 6) + 1;
-      const sum = roll1 + roll2;
+      const rolls = rollTwoDice();
+      const roll1 = rolls.roll1;
+      const roll2 = rolls.roll2;
+      const sum = rolls.sum;
       const isLucky = sum <= currentLuck;
 
       if (isLucky) {
@@ -1860,9 +1860,10 @@ function App() {
     setTestSkillResult(null);
 
     setTimeout(() => {
-      const roll1 = Math.floor(Math.random() * 6) + 1;
-      const roll2 = Math.floor(Math.random() * 6) + 1;
-      const sum = roll1 + roll2;
+      const rolls = rollTwoDice();
+      const roll1 = rolls.roll1;
+      const roll2 = rolls.roll2;
+      const sum = rolls.sum;
       const passed = sum <= currentSkill;
 
       setTestSkillResult({ roll1, roll2, passed });
@@ -2163,9 +2164,10 @@ function App() {
     setTestSkillResult(null);
 
     setTimeout(() => {
-      const roll1 = Math.floor(Math.random() * 6) + 1;
-      const roll2 = Math.floor(Math.random() * 6) + 1;
-      const sum = roll1 + roll2;
+      const rolls = rollTwoDice();
+      const roll1 = rolls.roll1;
+      const roll2 = rolls.roll2;
+      const sum = rolls.sum;
       const isLucky = sum <= currentLuck;
 
       if (isLucky) {
