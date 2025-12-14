@@ -325,4 +325,138 @@ describe('Section: Rolls', () => {
       expect(testLuckButton).toBeDisabled();
     });
   });
+
+  describe('Roll die', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    });
+
+    const defaultProps = {
+      skill: '10',
+      luck: '5',
+      diceRollingType: null,
+      isTestingLuck: false,
+      rollDieResult: null,
+      rollDiceResults: null,
+      testLuckResult: null,
+      testSkillResult: null,
+      onTestYourLuck: vi.fn(),
+      onTestYourSkill: vi.fn(),
+      onRollDie: vi.fn(),
+      onRollDice: vi.fn(),
+      initialExpanded: true,
+      onExpandedChange: vi.fn(),
+    };
+
+    it('should show rolling animation with single die when roll is in progress', () => {
+      render(<DiceRollsSection {...defaultProps} diceRollingType="rollDie" />);
+
+      const rollingDice = document.querySelectorAll('.dice-rolling');
+      expect(rollingDice.length).toBe(1);
+    });
+
+    it('should display single die result when roll completes', () => {
+      render(
+        <DiceRollsSection
+          {...defaultProps}
+          diceRollingType={null}
+          rollDieResult={4}
+        />
+      );
+
+      // Check that rolling animation is not shown
+      const rollingDice = document.querySelectorAll('.dice-rolling');
+      expect(rollingDice.length).toBe(0);
+
+      // Check that result die is displayed (using getDiceIcon which returns an icon path)
+      const diceIcons = document.querySelectorAll('svg');
+      expect(diceIcons.length).toBeGreaterThan(0);
+    });
+
+    it('should start roll die when button is clicked', () => {
+      const onRollDie = vi.fn();
+
+      render(<DiceRollsSection {...defaultProps} onRollDie={onRollDie} />);
+
+      const rollDieButtons = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      });
+      const rollDieButton = rollDieButtons[0];
+      fireEvent.click(rollDieButton);
+
+      expect(onRollDie).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Roll dice', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    });
+
+    const defaultProps = {
+      skill: '10',
+      luck: '5',
+      diceRollingType: null,
+      isTestingLuck: false,
+      rollDieResult: null,
+      rollDiceResults: null,
+      testLuckResult: null,
+      testSkillResult: null,
+      onTestYourLuck: vi.fn(),
+      onTestYourSkill: vi.fn(),
+      onRollDie: vi.fn(),
+      onRollDice: vi.fn(),
+      initialExpanded: true,
+      onExpandedChange: vi.fn(),
+    };
+
+    it('should show rolling animation with two dice when roll is in progress', () => {
+      render(<DiceRollsSection {...defaultProps} diceRollingType="rollDice" />);
+
+      const rollingDice = document.querySelectorAll('.dice-rolling');
+      expect(rollingDice.length).toBe(2);
+    });
+
+    it('should display two dice results when roll completes', () => {
+      render(
+        <DiceRollsSection
+          {...defaultProps}
+          diceRollingType={null}
+          rollDiceResults={[3, 5]}
+        />
+      );
+
+      // Check that rolling animation is not shown
+      const rollingDice = document.querySelectorAll('.dice-rolling');
+      expect(rollingDice.length).toBe(0);
+
+      // Check that result dice are displayed
+      const diceIcons = document.querySelectorAll('svg');
+      expect(diceIcons.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should start roll dice when button is clicked', () => {
+      const onRollDice = vi.fn();
+
+      render(<DiceRollsSection {...defaultProps} onRollDice={onRollDice} />);
+
+      const rollDiceButtons = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      });
+      const rollDiceButton = rollDiceButtons[1];
+      fireEvent.click(rollDiceButton);
+
+      expect(onRollDice).toHaveBeenCalledTimes(1);
+    });
+  });
 });
