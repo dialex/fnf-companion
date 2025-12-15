@@ -13,6 +13,8 @@ import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
 import { createActionSoundsManager } from './utils/actionSoundsManager';
 import { createDiceRoller } from './managers/diceRoller';
+import { createSoundManager } from './managers/soundManager';
+import { createGameShowManager } from './managers/gameShowManager';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -122,6 +124,12 @@ function App() {
 
   // Action sounds manager
   const actionSoundsPlayer = useRef(createActionSoundsManager());
+
+  // SoundManager and GameShowManager
+  const soundManagerRef = useRef(createSoundManager());
+  const gameShowManagerRef = useRef(
+    createGameShowManager(soundManagerRef.current)
+  );
 
   // Notification banner
   const [notification, setNotification] = useState(null);
@@ -1805,8 +1813,12 @@ function App() {
     const currentLuck = parseInt(luck) || 0;
     const isLucky = sum <= currentLuck;
 
-    // Play sound if lucky
-    actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
+    // Show luck test result (message + sound via GameShowManager)
+    const gameState = {
+      allSoundsMuted,
+      actionSoundsEnabled,
+    };
+    gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
 
     // Set result (used by FightSection)
     setTestLuckResult({ roll1, roll2, isLucky });
@@ -2388,6 +2400,7 @@ function App() {
               // TODO: Move canTestLuck logic to GameMaster once implemented
               // GameMaster should listen to luck value changes and control button state
               canTestLuck={parseInt(luck) > 0}
+              gameShowManager={gameShowManagerRef.current}
               onTestLuckComplete={handleTestLuckComplete}
               initialExpanded={sectionsExpanded.diceRolls}
               onExpandedChange={(expanded) =>

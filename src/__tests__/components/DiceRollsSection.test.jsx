@@ -1,10 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import DiceRollsSection from '../../components/DiceRollsSection';
+import { createGameShowManager } from '../../managers/gameShowManager';
+import { createSoundManager } from '../../managers/soundManager';
 
 describe('DiceRollsSection', () => {
+  let gameShowManager;
+
   beforeEach(() => {
     vi.useFakeTimers();
+    const soundManager = createSoundManager();
+    gameShowManager = createGameShowManager(soundManager);
   });
 
   afterEach(() => {
@@ -15,7 +21,11 @@ describe('DiceRollsSection', () => {
   describe('Roll one die', () => {
     it('should show rolling animation when roll is in progress', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const rollDieButton = screen.getAllByRole('button', {
@@ -29,7 +39,11 @@ describe('DiceRollsSection', () => {
 
     it('should display single die result when roll completes', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const rollDieButton = screen.getAllByRole('button', {
@@ -51,7 +65,13 @@ describe('DiceRollsSection', () => {
     });
 
     it('should prevent rolling when a roll is already in progress', () => {
-      render(<DiceRollsSection canTestLuck={true} initialExpanded={true} />);
+      render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
 
       const rollDieButton = screen.getAllByRole('button', {
         name: /^roll$/i,
@@ -71,7 +91,11 @@ describe('DiceRollsSection', () => {
 
     it('should clear previous results before starting new roll', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const rollDieButton = screen.getAllByRole('button', {
@@ -98,7 +122,11 @@ describe('DiceRollsSection', () => {
   describe('Roll two dice', () => {
     it('should show rolling animation with two dice when roll is in progress', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const rollDiceButton = screen.getAllByRole('button', {
@@ -112,7 +140,11 @@ describe('DiceRollsSection', () => {
 
     it('should display two dice results when roll completes', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const rollDiceButton = screen.getAllByRole('button', {
@@ -136,7 +168,13 @@ describe('DiceRollsSection', () => {
 
   describe('Test your luck', () => {
     it('should be enabled when canTestLuck is true', () => {
-      render(<DiceRollsSection canTestLuck={true} initialExpanded={true} />);
+      render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
 
       const testLuckButton = screen.getByRole('button', {
         name: /test luck/i,
@@ -145,7 +183,13 @@ describe('DiceRollsSection', () => {
     });
 
     it('should be disabled when canTestLuck is false', () => {
-      render(<DiceRollsSection canTestLuck={false} initialExpanded={true} />);
+      render(
+        <DiceRollsSection
+          canTestLuck={false}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
 
       const testLuckButton = screen.getByRole('button', {
         name: /test luck/i,
@@ -154,7 +198,13 @@ describe('DiceRollsSection', () => {
     });
 
     it('should be disabled when a roll is in progress', () => {
-      render(<DiceRollsSection canTestLuck={true} initialExpanded={true} />);
+      render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
 
       const rollDieButton = screen.getAllByRole('button', {
         name: /^roll$/i,
@@ -174,6 +224,7 @@ describe('DiceRollsSection', () => {
       render(
         <DiceRollsSection
           canTestLuck={true}
+          gameShowManager={gameShowManager}
           onTestLuckComplete={onTestLuckComplete}
           initialExpanded={true}
         />
@@ -202,7 +253,11 @@ describe('DiceRollsSection', () => {
 
     it('should show rolling animation during luck test', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const testLuckButton = screen.getByRole('button', {
@@ -216,7 +271,11 @@ describe('DiceRollsSection', () => {
 
     it('should display dice results after luck test completes', () => {
       const { container } = render(
-        <DiceRollsSection canTestLuck={true} initialExpanded={true} />
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
       );
 
       const testLuckButton = screen.getByRole('button', {
@@ -240,7 +299,13 @@ describe('DiceRollsSection', () => {
 
   describe('Button states', () => {
     it('should enable all buttons when no roll is in progress', () => {
-      render(<DiceRollsSection canTestLuck={true} initialExpanded={true} />);
+      render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
 
       const rollDieButton = screen.getAllByRole('button', {
         name: /^roll$/i,

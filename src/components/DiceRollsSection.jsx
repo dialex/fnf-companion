@@ -14,13 +14,16 @@ import { createDiceRoller } from '../managers/diceRoller';
 export default function DiceRollsSection({
   canTestLuck,
   onTestLuckComplete,
+  gameShowManager,
   initialExpanded = true,
   onExpandedChange,
 }) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
-  const [isRolling, setIsRolling] = useState(false);
-  const [rollingType, setRollingType] = useState(null);
-  const [rollResult, setRollResult] = useState(null);
+  const [displayState, setDisplayState] = useState(
+    gameShowManager
+      ? gameShowManager.getDisplayState()
+      : { diceRolling: null, diceResult: null }
+  );
   const diceRollerRef = useRef(createDiceRoller());
   const timeoutRef = useRef(null);
 
@@ -29,13 +32,19 @@ export default function DiceRollsSection({
   }, [initialExpanded]);
 
   useEffect(() => {
-    // Cleanup timeout on unmount
+    if (!gameShowManager) return;
+
+    const unsubscribe = gameShowManager.subscribe((state) => {
+      setDisplayState(state);
+    });
+
     return () => {
+      unsubscribe();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, []);
+  }, [gameShowManager]);
 
   const toggleCollapse = () => {
     const newExpanded = !isExpanded;
@@ -45,59 +54,47 @@ export default function DiceRollsSection({
     }
   };
 
+  const isRolling = displayState.diceRolling !== null;
+
   const handleRollOne = () => {
     if (isRolling) return;
+    if (!gameShowManager) return;
 
-    setIsRolling(true);
-    setRollingType('rollDie');
-    setRollResult(null);
+    gameShowManager.showDiceRolling(1);
 
     timeoutRef.current = setTimeout(() => {
       const result = diceRollerRef.current.rollDiceOne();
-      setRollResult(result);
-      setRollingType(null);
-      setIsRolling(false);
+      gameShowManager.showDiceResult(result);
     }, 1000);
   };
 
   const handleRollTwo = () => {
     if (isRolling) return;
+    if (!gameShowManager) return;
 
-    setIsRolling(true);
-    setRollingType('rollDice');
-    setRollResult(null);
+    gameShowManager.showDiceRolling(2);
 
     timeoutRef.current = setTimeout(() => {
       const result = diceRollerRef.current.rollDiceTwo();
-      setRollResult([result.roll1, result.roll2]);
-      setRollingType(null);
-      setIsRolling(false);
+      gameShowManager.showDiceResult([result.roll1, result.roll2]);
     }, 1000);
   };
 
   const handleTestLuck = () => {
     if (isRolling) return;
     if (!canTestLuck) return;
+    if (!gameShowManager) return;
 
-    setIsRolling(true);
-    setRollingType('testLuck');
-    setRollResult(null);
+    gameShowManager.showDiceRolling(2);
 
     timeoutRef.current = setTimeout(() => {
       const result = diceRollerRef.current.rollDiceTwo();
-      setRollResult([result.roll1, result.roll2]);
-      setRollingType(null);
-      setIsRolling(false);
+      gameShowManager.showDiceResult([result.roll1, result.roll2]);
 
       if (onTestLuckComplete) {
         onTestLuckComplete(result);
       }
     }, 1000);
-  };
-
-  const getDiceResult = () => {
-    if (rollResult) return rollResult;
-    return null;
   };
 
   return (
@@ -168,10 +165,15 @@ export default function DiceRollsSection({
               style={{ minHeight: '100px', gap: '5px' }}
             >
               <DiceDisplay
-                rollingType={rollingType}
-                result={getDiceResult()}
+                diceRolling={displayState.diceRolling}
+                result={displayState.diceResult}
                 color="#007e6e"
               />
+              {displayState.luckTestMessage && (
+                <div className="text-center mt-2">
+                  {displayState.luckTestMessage}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,34 +1,26 @@
 ## Basic
 
-- Page loads and there's no console error when the page finished loading
+- [ ] Page loads and there's no console error when the page finished loading
 
 ## Save and load file logic
 
-- Creates yaml file
-- Saves file and has the right values
-- Loads file
-- Loads file and overrides current state (and local storage)
+- [ ] Creates yaml file
+- [ ] Saves file and has the right values
+- [ ] Loads file
+- [ ] Loads file and overrides current state (and local storage)
 
 ## Translations logic
 
-- User-facing strings are not hardcoded in the code
-- User-facing strings are listed in a language specific json
-- User-facing strings are loaded from its respective language file and then displayed to the user
-- Lnaguages can be changed without a page reload
-- There's a menu in the page that lets the user switch languages
-- There's an entry in the menu for each Language file
+- [ ] User-facing strings are not hardcoded in the code
+- [ ] User-facing strings are listed in a language specific json
+- [ ] User-facing strings are loaded from its respective language file and then displayed to the user
+- [ ] Lnaguages can be changed without a page reload
+- [ ] There's a menu in the page that lets the user switch languages
+- [ ] There's an entry in the menu for each Language file
 
-## Dice Rolling in Context
+## Game rules
 
-- [x] Test skill test calculations
-- [x] Test luck test calculations
-- [x] Test dice roll results affect game state correctly
-- [ ] Test that action sounds manager is called when luck test is successful
-  - TODO: This test is pending until we simplify/extract the dice roll handler logic out of App.jsx
-  - The current handler has too many dependencies to test easily
-  - Once handlers are extracted to separate functions, we can test the integration properly
-
-## Fight System (`src/App.jsx` - fight logic)
+### Fight System (`src/App.jsx` - fight logic)
 
 - [ ] Test `checkFightEnd` - detects when fight ends (hero wins/loses)
 - [ ] Test fight attack calculations (hero wins, monster wins, tie)
@@ -40,7 +32,7 @@
 
 These involve YouTube API and async operations.
 
-## Sound Logic (`src/App.jsx` - sound management)
+### Sound Logic (`src/App.jsx` - sound management)
 
 - [ ] Test sound URL validation
 - [ ] Test sound volume updates
@@ -60,20 +52,22 @@ These involve YouTube API and async operations.
 - Dashes in the filename should display as spaces in the palette menu
 - When the user changes palette, the changes take immediate effect, without the need for a hard page refresh
 
-## `src/utils/theme.js`
+### `src/utils/theme.js`
 
 - [ ] Test theme switching (light/dark)
 - [ ] Test theme persistence
 - [ ] Test `getFilteredThemes` - filters based on palette variants
 
-## `src/utils/palette.js`
+### `src/utils/palette.js`
 
 - [ ] Test palette discovery
 - [ ] Test palette loading
 - [ ] Test palette variant detection
 - [ ] Test palette persistence
 
-## Run tests as part of the GitHub pipeline
+## Last touches
+
+- [ ] Run tests as part of the GitHub pipeline
 
 ## 📝 Notes
 

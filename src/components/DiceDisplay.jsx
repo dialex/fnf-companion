@@ -6,28 +6,18 @@ import { createDiceRoller } from '../managers/diceRoller';
 const diceRoller = createDiceRoller();
 
 /**
- * Get dice count for a roll type
- * @param {string} rollType - The roll type
- * @returns {number} Number of dice to display
- */
-const getDiceCount = (rollType) => {
-  if (rollType === 'rollDie') return 1;
-  return 2; // rollDice, testSkill, testLuck, fight, useLuck all use 2 dice
-};
-
-/**
  * Displays dice animation and results
- * @param {string} rollingType - Current rolling type (null if not rolling)
+ * @param {number} diceRolling - Number of dice rolling (1 or 2, or null if not rolling)
  * @param {number|Array} result - Dice result (single number or array of two numbers)
  * @param {string} color - Dice color (default: '#007e6e')
  */
 export default function DiceDisplay({
-  rollingType,
+  diceRolling,
   result,
   color = '#007e6e',
 }) {
-  if (rollingType) {
-    const diceCount = getDiceCount(rollingType);
+  if (diceRolling !== null && diceRolling !== undefined) {
+    const diceCount = diceRolling;
     const dice = [];
 
     for (let i = 0; i < diceCount; i++) {
