@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { t, getCurrentLanguage, setLanguage } from './translations';
+import { I18nProvider, useT } from './contexts/I18nContext';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import {
   loadState,
@@ -38,10 +38,9 @@ import GameSection from './components/GameSection';
 import NotificationBanner from './components/NotificationBanner';
 import ConfirmationDialog from './components/ConfirmationDialog';
 
-function App() {
-  // Language state to trigger re-renders when language changes
-  // Initialize from localStorage via getCurrentLanguage()
-  const [, setCurrentLang] = useState(getCurrentLanguage());
+function AppContent({ onLanguageChange }) {
+  const t = useT();
+  const i18n = useI18n();
 
   // Theme state to trigger re-renders when theme changes
   const [, setCurrentTheme] = useState(getCurrentTheme());
@@ -53,9 +52,9 @@ function App() {
 
   // Handler to update language and trigger re-render
   const handleLanguageChange = (lang) => {
-    setLanguage(lang); // Update old system TODO: remove once no component uses it
-    i18nManagerRef.current.setLanguage(lang); // Update new system (for GameShowManager)
-    setCurrentLang(lang);
+    if (onLanguageChange) {
+      onLanguageChange(lang);
+    }
   };
 
   // Handler to update theme and trigger re-render
@@ -127,11 +126,11 @@ function App() {
   // Action sounds manager
   const actionSoundsPlayer = useRef(createActionSoundsManager());
 
-  // SoundManager, i18nManager, and GameShowManager
+  // SoundManager and GameShowManager (use same i18nManager instance from context)
   const soundManagerRef = useRef(createSoundManager());
-  const i18nManagerRef = useRef(createI18nManager());
+  const i18n = useI18n();
   const gameShowManagerRef = useRef(
-    createGameShowManager(soundManagerRef.current, i18nManagerRef.current)
+    createGameShowManager(soundManagerRef.current, i18n)
   );
 
   // Notification banner
@@ -265,12 +264,6 @@ function App() {
     setTimeout(() => {
       isInitialMountRef.current = false;
     }, 100);
-
-    // Sync i18nManager with old translations system on mount
-    const currentLang = getCurrentLanguage(); // From old system
-    if (i18nManagerRef.current.getCurrentLanguage() !== currentLang) {
-      i18nManagerRef.current.setLanguage(currentLang);
-    }
   }, []);
 
   // Auto-sync action sounds with master sound state (only after initial mount)
@@ -2499,6 +2492,28 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  // Create i18nManager instance (single instance for entire app)
+  const i18nManagerRef = useRef(createI18nManager());
+
+  // Language state to trigger re-renders when language changes
+  const [, setCurrentLang] = useState(
+    i18nManagerRef.current.getCurrentLanguage()
+  );
+
+  // Handler to update language and trigger re-render
+  const handleLanguageChange = (lang) => {
+    i18nManagerRef.current.setLanguage(lang);
+    setCurrentLang(lang);
+  };
+
+  return (
+    <I18nProvider i18nManager={i18nManagerRef.current}>
+      <AppContent onLanguageChange={handleLanguageChange} />
+    </I18nProvider>
   );
 }
 

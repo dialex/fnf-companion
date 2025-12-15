@@ -9,7 +9,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 import DiceDisplay from './DiceDisplay';
 
 export default function FightSection({
@@ -45,6 +45,7 @@ export default function FightSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = useT();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   useEffect(() => {

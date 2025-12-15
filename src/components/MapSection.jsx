@@ -12,7 +12,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 import { convertNoteItemtoColor } from '../utils/trailMapping';
 
 export default function MapSection({
@@ -25,6 +25,7 @@ export default function MapSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = useT();
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
   const [isExpanded, setIsExpanded] = useState(initialExpanded);

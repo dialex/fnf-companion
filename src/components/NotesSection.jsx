@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiLeadPencil, mdiChevronDown, mdiChevronUp } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 
 export default function NotesSection({
   notes,
@@ -9,6 +9,7 @@ export default function NotesSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = useT();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   useEffect(() => {

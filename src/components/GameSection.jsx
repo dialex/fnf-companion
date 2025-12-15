@@ -15,7 +15,7 @@ import {
   mdiVolumeOff,
   mdiPlus,
 } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 
 export default function GameSection({
   book,
@@ -54,6 +54,7 @@ export default function GameSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = useT();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const masterSoundButtonRef = useRef(null);
   const actionSoundsCheckboxRef = useRef(null);

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 
 const NotificationBanner = ({ message, type = 'success', onDismiss }) => {
   const timeoutRef = useRef(null);

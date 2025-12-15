@@ -1,5 +1,5 @@
 import React from 'react';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 
 const ConfirmationDialog = ({
   message,
@@ -8,6 +8,7 @@ const ConfirmationDialog = ({
   confirmText,
   cancelText,
 }) => {
+  const t = useT();
   return (
     <div
       className="modal fade show"

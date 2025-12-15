@@ -11,7 +11,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 
 export default function CharacterSection({
   name,

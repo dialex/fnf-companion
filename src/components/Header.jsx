@@ -7,12 +7,7 @@ import {
   mdiBrightness5,
   mdiPalette,
 } from '@mdi/js';
-import {
-  t,
-  setLanguage,
-  getCurrentLanguage,
-  getAvailableLanguages,
-} from '../translations';
+import { useI18n } from '../contexts/I18nContext';
 import {
   setTheme,
   getCurrentTheme,
@@ -27,6 +22,7 @@ import {
 } from '../utils/palette';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
+  const i18n = useI18n();
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
@@ -80,7 +76,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
   }, []);
 
   const handleLanguageChange = (lang) => {
-    setLanguage(lang);
+    i18n.setLanguage(lang);
     setShowLanguageSelect(false);
     // Notify parent component to trigger re-render
     if (onLanguageChange) {

@@ -7,7 +7,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { t } from '../translations';
+import { useT } from '../contexts/I18nContext';
 import DiceDisplay from './DiceDisplay';
 import { createDiceRoller } from '../managers/diceRoller';
 
@@ -18,6 +18,7 @@ export default function DiceRollsSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = useT();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [displayState, setDisplayState] = useState(
     gameShowManager
