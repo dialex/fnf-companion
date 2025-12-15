@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createGameShowManager } from '../../managers/gameShowManager';
+import { createI18nManager } from '../../managers/i18nManager';
 
 describe('GameShowManager', () => {
   let mockSoundManager;
+  let i18nManager;
   let gameShowManager;
 
   beforeEach(() => {
@@ -10,7 +12,8 @@ describe('GameShowManager', () => {
     mockSoundManager = {
       playLuckySound: vi.fn(),
     };
-    gameShowManager = createGameShowManager(mockSoundManager);
+    i18nManager = createI18nManager();
+    gameShowManager = createGameShowManager(mockSoundManager, i18nManager);
   });
 
   afterEach(() => {
@@ -79,7 +82,7 @@ describe('GameShowManager', () => {
       expect(state.luckTestMessage).toBeTruthy();
       expect(state.luckTestMessage.type).toBe('div');
       expect(state.luckTestMessage.props.className).toContain('alert-success');
-      expect(state.luckTestMessage.props.children).toBe('You were lucky');
+      expect(state.luckTestMessage.props.children).toBe('You were lucky!');
       expect(mockSoundManager.playLuckySound).toHaveBeenCalledWith(gameState);
       expect(callback).toHaveBeenCalled();
     });
@@ -98,7 +101,7 @@ describe('GameShowManager', () => {
       expect(state.luckTestMessage).toBeTruthy();
       expect(state.luckTestMessage.type).toBe('div');
       expect(state.luckTestMessage.props.className).toContain('alert-danger');
-      expect(state.luckTestMessage.props.children).toBe('Tough luck');
+      expect(state.luckTestMessage.props.children).toBe('Tough luck...');
       expect(mockSoundManager.playLuckySound).not.toHaveBeenCalled();
       expect(callback).toHaveBeenCalled();
     });

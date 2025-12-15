@@ -15,6 +15,7 @@ import { createActionSoundsManager } from './utils/actionSoundsManager';
 import { createDiceRoller } from './managers/diceRoller';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
+import { createI18nManager } from './managers/i18nManager';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -125,10 +126,11 @@ function App() {
   // Action sounds manager
   const actionSoundsPlayer = useRef(createActionSoundsManager());
 
-  // SoundManager and GameShowManager
+  // SoundManager, i18nManager, and GameShowManager
   const soundManagerRef = useRef(createSoundManager());
+  const i18nManagerRef = useRef(createI18nManager());
   const gameShowManagerRef = useRef(
-    createGameShowManager(soundManagerRef.current)
+    createGameShowManager(soundManagerRef.current, i18nManagerRef.current)
   );
 
   // Notification banner

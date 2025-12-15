@@ -9,6 +9,7 @@ import {
 import DiceRollsSection from '../../components/DiceRollsSection';
 import { createGameShowManager } from '../../managers/gameShowManager';
 import { createSoundManager } from '../../managers/soundManager';
+import { createI18nManager } from '../../managers/i18nManager';
 
 describe('DiceRollsSection', () => {
   let gameShowManager;
@@ -29,7 +30,8 @@ describe('DiceRollsSection', () => {
     mockAudio = { play: playMock };
 
     const soundManager = createSoundManager();
-    gameShowManager = createGameShowManager(soundManager);
+    const i18nManager = createI18nManager();
+    gameShowManager = createGameShowManager(soundManager, i18nManager);
   });
 
   afterEach(() => {
@@ -370,7 +372,7 @@ describe('DiceRollsSection', () => {
       expect(messageElement).toBeTruthy();
       expect(messageElement).toHaveClass('alert-success');
       expect(messageElement).toHaveClass('content');
-      expect(messageElement).toHaveTextContent('You were lucky');
+      expect(messageElement).toHaveTextContent('You were lucky!');
     });
 
     it('should display luck test message with proper alert styling when unlucky', () => {
@@ -395,7 +397,7 @@ describe('DiceRollsSection', () => {
       expect(messageElement).toBeTruthy();
       expect(messageElement).toHaveClass('alert-danger');
       expect(messageElement).toHaveClass('content');
-      expect(messageElement).toHaveTextContent('Tough luck');
+      expect(messageElement).toHaveTextContent('Tough luck...');
     });
   });
 

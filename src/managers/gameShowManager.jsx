@@ -8,9 +8,11 @@ import React from 'react';
 /**
  * Creates a GameShowManager instance
  * @param {Object} soundManager - SoundManager instance for playing sounds
+ * @param {Object} i18nManager - i18nManager instance for translations
  * @returns {Object} GameShowManager with methods to show feedback
  */
-export const createGameShowManager = (soundManager) => {
+export const createGameShowManager = (soundManager, i18nManager) => {
+  const t = i18nManager.t.bind(i18nManager);
   let displayState = {
     diceRolling: null, // 1 or 2 (number of dice rolling), or null
     diceResult: null, // number, array, or null
@@ -50,7 +52,9 @@ export const createGameShowManager = (soundManager) => {
    * @param {Object} gameState - Game state for sound manager
    */
   const showLuckTestResult = (isLucky, gameState) => {
-    const messageText = isLucky ? 'You were lucky' : 'Tough luck'; //TODO: translate file?
+    const messageText = isLucky
+      ? t('dice.youWereLucky')
+      : t('dice.youWereUnlucky');
     const alertType = isLucky ? 'success' : 'danger';
 
     displayState.luckTestMessage = (
