@@ -103,7 +103,7 @@ describe('GameShowManager', () => {
       expect(callback).toHaveBeenCalled();
     });
 
-    it('should clear message after timeout', () => {
+    it('should keep message displayed until new dice roll starts', () => {
       const callback = vi.fn();
       gameShowManager.subscribe(callback);
       const gameState = {
@@ -114,11 +114,17 @@ describe('GameShowManager', () => {
       gameShowManager.showLuckTestResult(true, gameState);
       expect(callback).toHaveBeenCalledTimes(1);
 
-      vi.advanceTimersByTime(3000);
+      // Advance time - message should still be there
+      vi.advanceTimersByTime(5000);
 
-      const state = gameShowManager.getDisplayState();
-      expect(state.luckTestMessage).toBeNull();
-      expect(callback).toHaveBeenCalledTimes(2); // Once for show, once for clear
+      let state = gameShowManager.getDisplayState();
+      expect(state.luckTestMessage).toBeTruthy(); // Still displayed
+
+      // Start new dice roll - should clear the message
+      gameShowManager.showDiceRolling(1);
+      state = gameShowManager.getDisplayState();
+      expect(state.luckTestMessage).toBeNull(); // Cleared when new roll starts
+      expect(callback).toHaveBeenCalledTimes(2); // Once for show, once for new roll
     });
   });
 

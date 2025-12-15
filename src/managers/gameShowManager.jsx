@@ -5,8 +5,6 @@
 
 import React from 'react';
 
-const LUCK_TEST_MESSAGE_DURATION_MS = 3000;
-
 /**
  * Creates a GameShowManager instance
  * @param {Object} soundManager - SoundManager instance for playing sounds
@@ -32,6 +30,7 @@ export const createGameShowManager = (soundManager) => {
   const showDiceRolling = (diceCount) => {
     displayState.diceRolling = diceCount;
     displayState.diceResult = null; // Clear previous result
+    displayState.luckTestMessage = null; // Clear previous luck test message
     notifyListeners();
   };
 
@@ -68,12 +67,7 @@ export const createGameShowManager = (soundManager) => {
     }
 
     notifyListeners();
-
-    // Clear message after duration
-    setTimeout(() => {
-      displayState.luckTestMessage = null;
-      notifyListeners();
-    }, LUCK_TEST_MESSAGE_DURATION_MS);
+    // Message will be cleared when a new dice roll starts, not automatically
   };
 
   /**

@@ -136,6 +136,39 @@ describe('DiceRollsSection', () => {
       rollingDice = container.querySelectorAll('.dice-rolling');
       expect(rollingDice.length).toBe(1);
     });
+
+    it('should keep dice result displayed until a new roll starts', () => {
+      const { container } = render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
+
+      const rollDieButton = screen.getAllByRole('button', {
+        name: /^roll$/i,
+      })[0];
+
+      // Roll dice
+      fireEvent.click(rollDieButton);
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      // Result should be displayed
+      let resultIcons = container.querySelectorAll('svg');
+      expect(resultIcons.length).toBeGreaterThanOrEqual(1);
+
+      // Advance time - result should still be there (not cleared)
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      // Result should still be displayed until new roll starts
+      resultIcons = container.querySelectorAll('svg');
+      expect(resultIcons.length).toBeGreaterThanOrEqual(1);
+    });
   });
 
   describe('Roll two dice', () => {
