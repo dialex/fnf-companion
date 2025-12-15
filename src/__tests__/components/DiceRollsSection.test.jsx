@@ -1,14 +1,33 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import DiceRollsSection from '../../components/DiceRollsSection';
 import { createGameShowManager } from '../../managers/gameShowManager';
 import { createSoundManager } from '../../managers/soundManager';
 
 describe('DiceRollsSection', () => {
   let gameShowManager;
+  let mockAudio;
 
   beforeEach(() => {
     vi.useFakeTimers();
+    // Mock Audio API
+    const playMock = vi.fn().mockResolvedValue(undefined);
+    global.Audio = class MockAudio {
+      constructor(src) {
+        this.src = src;
+        this.play = playMock;
+        this.pause = vi.fn();
+        this.volume = 1;
+      }
+    };
+    mockAudio = { play: playMock };
+
     const soundManager = createSoundManager();
     gameShowManager = createGameShowManager(soundManager);
   });
@@ -294,6 +313,56 @@ describe('DiceRollsSection', () => {
       // Check that result dice are displayed
       const diceIcons = container.querySelectorAll('svg');
       expect(diceIcons.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should display luck test message with proper alert styling when lucky', () => {
+      const { container } = render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
+
+      // Simulate lucky result by directly calling showLuckTestResult
+      act(() => {
+        gameShowManager.showLuckTestResult(true, {
+          allSoundsMuted: false,
+          actionSoundsEnabled: true,
+        });
+      });
+
+      // Find the message element - GSM provides the styled JSX
+      const messageElement = container.querySelector('.alert');
+      expect(messageElement).toBeTruthy();
+      expect(messageElement).toHaveClass('alert-success');
+      expect(messageElement).toHaveClass('content');
+      expect(messageElement).toHaveTextContent('You were lucky');
+    });
+
+    it('should display luck test message with proper alert styling when unlucky', () => {
+      const { container } = render(
+        <DiceRollsSection
+          canTestLuck={true}
+          gameShowManager={gameShowManager}
+          initialExpanded={true}
+        />
+      );
+
+      // Simulate unlucky result
+      act(() => {
+        gameShowManager.showLuckTestResult(false, {
+          allSoundsMuted: false,
+          actionSoundsEnabled: true,
+        });
+      });
+
+      // Find the message element - GSM provides the styled JSX
+      const messageElement = container.querySelector('.alert');
+      expect(messageElement).toBeTruthy();
+      expect(messageElement).toHaveClass('alert-danger');
+      expect(messageElement).toHaveClass('content');
+      expect(messageElement).toHaveTextContent('Tough luck');
     });
   });
 

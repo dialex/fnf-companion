@@ -76,7 +76,10 @@ describe('GameShowManager', () => {
       gameShowManager.showLuckTestResult(true, gameState);
 
       const state = gameShowManager.getDisplayState();
-      expect(state.luckTestMessage).toBe('You were lucky');
+      expect(state.luckTestMessage).toBeTruthy();
+      expect(state.luckTestMessage.type).toBe('div');
+      expect(state.luckTestMessage.props.className).toContain('alert-success');
+      expect(state.luckTestMessage.props.children).toBe('You were lucky');
       expect(mockSoundManager.playLuckySound).toHaveBeenCalledWith(gameState);
       expect(callback).toHaveBeenCalled();
     });
@@ -92,7 +95,10 @@ describe('GameShowManager', () => {
       gameShowManager.showLuckTestResult(false, gameState);
 
       const state = gameShowManager.getDisplayState();
-      expect(state.luckTestMessage).toBe('Tough luck');
+      expect(state.luckTestMessage).toBeTruthy();
+      expect(state.luckTestMessage.type).toBe('div');
+      expect(state.luckTestMessage.props.className).toContain('alert-danger');
+      expect(state.luckTestMessage.props.children).toBe('Tough luck');
       expect(mockSoundManager.playLuckySound).not.toHaveBeenCalled();
       expect(callback).toHaveBeenCalled();
     });
@@ -162,6 +168,22 @@ describe('GameShowManager', () => {
       expect(state.diceRolling).toBeNull();
       expect(state.diceResult).toBeNull();
       expect(state.luckTestMessage).toBeNull();
+    });
+
+    it('should return luck test message with correct CSS classes', () => {
+      const gameState = {
+        allSoundsMuted: false,
+        actionSoundsEnabled: true,
+      };
+
+      gameShowManager.showLuckTestResult(true, gameState);
+      const state = gameShowManager.getDisplayState();
+
+      expect(state.luckTestMessage.props.className).toContain('alert');
+      expect(state.luckTestMessage.props.className).toContain('content');
+      expect(state.luckTestMessage.props.className).toContain('alert-success');
+      expect(state.luckTestMessage.props.className).toContain('text-center');
+      expect(state.luckTestMessage.props.role).toBe('alert');
     });
   });
 });

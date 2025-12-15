@@ -3,6 +3,8 @@
  * Handles dice roll animations, results, messages, and triggers sounds
  */
 
+import React from 'react';
+
 const LUCK_TEST_MESSAGE_DURATION_MS = 3000;
 
 /**
@@ -14,7 +16,7 @@ export const createGameShowManager = (soundManager) => {
   let displayState = {
     diceRolling: null, // 1 or 2 (number of dice rolling), or null
     diceResult: null, // number, array, or null
-    luckTestMessage: null, // string or null
+    luckTestMessage: null, // JSX element or null
   };
 
   const listeners = new Set();
@@ -49,7 +51,17 @@ export const createGameShowManager = (soundManager) => {
    * @param {Object} gameState - Game state for sound manager
    */
   const showLuckTestResult = (isLucky, gameState) => {
-    displayState.luckTestMessage = isLucky ? 'You were lucky' : 'Tough luck'; //TODO: translate file?
+    const messageText = isLucky ? 'You were lucky' : 'Tough luck'; //TODO: translate file?
+    const alertType = isLucky ? 'success' : 'danger';
+
+    displayState.luckTestMessage = (
+      <div
+        className={`alert content alert-${alertType} mb-0 text-center`}
+        role="alert"
+      >
+        {messageText}
+      </div>
+    );
 
     if (isLucky) {
       soundManager.playLuckySound(gameState);

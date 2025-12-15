@@ -169,11 +169,7 @@ export default function DiceRollsSection({
                 result={displayState.diceResult}
                 color="#007e6e"
               />
-              {displayState.luckTestMessage && (
-                <div className="text-center mt-2">
-                  {displayState.luckTestMessage}
-                </div>
-              )}
+              {displayState.luckTestMessage}
             </div>
           </div>
         </div>
