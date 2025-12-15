@@ -16,7 +16,7 @@ The current code is a spaguetti mess. We need to split the code in areas of resp
 - Knows how to display dice roll results
 - Knows how to show field update badges (e.g., "+5 health", "-1 meal")
 - Knows how to show test result messages (e.g., "You were lucky", "You failed")
-- Knows when to trigger sounds via NoiseBox (e.g., lucky sound on success)
+- Knows when to trigger sounds via SoundManager (e.g., lucky sound on success)
 - Uses a subscribe pattern (similar to fieldBadges) to notify React components of display state changes
 - Components subscribe to GameShowManager to get display state (dice rolling, results, badges, messages)
 - Separates "what happened" (game logic) from "how to show it" (display logic)
@@ -56,13 +56,13 @@ The current code is a spaguetti mess. We need to split the code in areas of resp
   - Will trigger a dice roll, using DiceRoller
   - Will trigger a game state update, using GameState
   - Will trigger visual/audio feedback, using GameShowManager
-  - GameShowManager will then decide to play sounds via NoiseBox if needed
+  - GameShowManager will then decide to play sounds via SoundManager if needed
 - Pure business logic - no UI concerns
 
 ## App
 
 - Should have very little logic, and just serves to group and instantiate all these focused components that each have their job and responsibility
-- Creates instances of managers (DiceRoller, GameShowManager, GameState, GameMaster, NoiseBox)
+- Creates instances of managers (DiceRoller, GameShowManager, GameStateManager, GameMaster, SoundManager)
 - Passes managers to sections/components that need them
 - More components, helpers, etc. can be created. The goal is to:
   - have clean tests

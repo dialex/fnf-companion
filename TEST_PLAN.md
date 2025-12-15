@@ -1,19 +1,35 @@
-# Test Plan
+## Basic
 
-Tracks what needs to be tested, starting with the simplest tests first.
+- Page loads and there's no console error when the page finished loading
 
-## 🎲 Game Logic (Medium-Hard)
-
-These test the core game mechanics.
-
-### Save and load file logic
+## Save and load file logic
 
 - Creates yaml file
 - Saves file and has the right values
 - Loads file
 - Loads file and overrides current state (and local storage)
 
-### Dice Rolling in Context
+## Translations logic
+
+- User-facing strings are not hardcoded in the code
+- User-facing strings are listed in a language specific json
+- User-facing strings are loaded from its respective language file and then displayed to the user
+- Lnaguages can be changed without a page reload
+- There's a menu in the page that lets the user switch languages
+- There's an entry in the menu for each Language file
+
+## Theme palette logic
+
+- Reads css file with palette settings
+- Validates css file before applying its values
+- If file only contains a light theme, it should use that, update the light/dark button state to show the light icon, and disable it
+- If file only contains a dark theme, it should use that, update the light/dark button state to show the dark icon, and disable it
+- It should have one default css
+- It should display one entry in the palette menu per theme file available
+- Dashes in the filename should display as spaces in the palette menu
+- When the user changes palette, the changes take immediate effect, without the need for a hard page refresh
+
+## Dice Rolling in Context
 
 - [x] Test skill test calculations
 - [x] Test luck test calculations
@@ -23,7 +39,7 @@ These test the core game mechanics.
   - The current handler has too many dependencies to test easily
   - Once handlers are extracted to separate functions, we can test the integration properly
 
-### Fight System (`src/App.jsx` - fight logic)
+## Fight System (`src/App.jsx` - fight logic)
 
 - [ ] Test `checkFightEnd` - detects when fight ends (hero wins/loses)
 - [ ] Test fight attack calculations (hero wins, monster wins, tie)
@@ -35,7 +51,7 @@ These test the core game mechanics.
 
 These involve YouTube API and async operations.
 
-### Sound Logic (`src/App.jsx` - sound management)
+## Sound Logic (`src/App.jsx` - sound management)
 
 - [ ] Test sound URL validation
 - [ ] Test sound volume updates
@@ -46,18 +62,20 @@ These involve YouTube API and async operations.
 
 ## 🎨 UI/Theme (Medium)
 
-### `src/utils/theme.js`
+## `src/utils/theme.js`
 
 - [ ] Test theme switching (light/dark)
 - [ ] Test theme persistence
 - [ ] Test `getFilteredThemes` - filters based on palette variants
 
-### `src/utils/palette.js`
+## `src/utils/palette.js`
 
 - [ ] Test palette discovery
 - [ ] Test palette loading
 - [ ] Test palette variant detection
 - [ ] Test palette persistence
+
+## Run tests as part of the GitHub pipeline
 
 ## 📝 Notes
 
