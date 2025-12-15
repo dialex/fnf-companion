@@ -18,17 +18,6 @@
 - There's a menu in the page that lets the user switch languages
 - There's an entry in the menu for each Language file
 
-## Theme palette logic
-
-- Reads css file with palette settings
-- Validates css file before applying its values
-- If file only contains a light theme, it should use that, update the light/dark button state to show the light icon, and disable it
-- If file only contains a dark theme, it should use that, update the light/dark button state to show the dark icon, and disable it
-- It should have one default css
-- It should display one entry in the palette menu per theme file available
-- Dashes in the filename should display as spaces in the palette menu
-- When the user changes palette, the changes take immediate effect, without the need for a hard page refresh
-
 ## Dice Rolling in Context
 
 - [x] Test skill test calculations
@@ -61,6 +50,15 @@ These involve YouTube API and async operations.
 - [ ] Test sound resumption after battle
 
 ## 🎨 UI/Theme (Medium)
+
+- Reads css file with palette settings
+- Validates css file before applying its values
+- If file only contains a light theme, it should use that, update the light/dark button state to show the light icon, and disable it
+- If file only contains a dark theme, it should use that, update the light/dark button state to show the dark icon, and disable it
+- It should have one default css
+- It should display one entry in the palette menu per theme file available
+- Dashes in the filename should display as spaces in the palette menu
+- When the user changes palette, the changes take immediate effect, without the need for a hard page refresh
 
 ## `src/utils/theme.js`
 
