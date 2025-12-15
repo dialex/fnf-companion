@@ -53,7 +53,8 @@ function App() {
 
   // Handler to update language and trigger re-render
   const handleLanguageChange = (lang) => {
-    setLanguage(lang);
+    setLanguage(lang); // Update old system TODO: remove once no component uses it
+    i18nManagerRef.current.setLanguage(lang); // Update new system (for GameShowManager)
     setCurrentLang(lang);
   };
 
@@ -264,6 +265,12 @@ function App() {
     setTimeout(() => {
       isInitialMountRef.current = false;
     }, 100);
+
+    // Sync i18nManager with old translations system on mount
+    const currentLang = getCurrentLanguage(); // From old system
+    if (i18nManagerRef.current.getCurrentLanguage() !== currentLang) {
+      i18nManagerRef.current.setLanguage(currentLang);
+    }
   }, []);
 
   // Auto-sync action sounds with master sound state (only after initial mount)
