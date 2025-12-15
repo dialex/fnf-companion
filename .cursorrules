@@ -25,6 +25,9 @@ When adding user-facing text:
 - When adding a new feature, we should add at least one test, at the lowest layer (unit > integration > UI), that confirms that feature works
 - When fixing a bug, first create a test that reproduces the issue, then change just enough code to make the test pass. That test becomes a regression test, in the regressions test folder.
 - Test descriptions must focus on behavior and business rules, not implementation details.
+- Tests must verify real behavior, not mocked behavior. After writing a test, verify it catches real failures by temporarily breaking the code and confirming the test fails.
+- Prefer using real code over mocks. Only mock when necessary (e.g., external APIs, timers, or when testing in isolation is required).
+- Avoid "dummy tests" that would pass even if the code is broken. Tests should assert actual behavior, not just that functions were called.
 
 # Save File Structure Changes
 
