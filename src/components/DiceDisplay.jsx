@@ -1,7 +1,9 @@
 import React from 'react';
 import Icon from '@mdi/react';
 import { mdiDice3 } from '@mdi/js';
-import { getDiceIcon } from '../utils/dice';
+import { createDiceRoller } from '../managers/diceRoller';
+
+const diceRoller = createDiceRoller();
 
 /**
  * Get dice count for a roll type
@@ -53,7 +55,7 @@ export default function DiceDisplay({
         {results.map((value, index) => (
           <Icon
             key={index}
-            path={getDiceIcon(value)}
+            path={diceRoller.getDiceIcon(value)}
             size={3}
             style={{ color }}
           />

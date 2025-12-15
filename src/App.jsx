@@ -11,9 +11,8 @@ import {
 } from './utils/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
-import { rollTwoDice } from './utils/dice';
 import { createActionSoundsManager } from './utils/actionSoundsManager';
-import { createDiceRollHandlers } from './utils/diceRollHandlers';
+import { createDiceRoller } from './managers/diceRoller';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -104,14 +103,14 @@ function App() {
   const [monsterDiceRolls, setMonsterDiceRolls] = useState(null);
   const [isFightStarted, setIsFightStarted] = useState(false);
 
-  // Dice rolling state
+  // Dice rolling state (kept for FightSection compatibility)
   const [rollingButton, setRollingButton] = useState(null);
-  const [rollDieResult, setRollDieResult] = useState(null);
-  const [rollDiceResults, setRollDiceResults] = useState(null);
   const [testLuckResult, setTestLuckResult] = useState(null);
   const [isTestingLuck, setIsTestingLuck] = useState(false);
-  const [testSkillResult, setTestSkillResult] = useState(null);
   const [diceRollingType, setDiceRollingType] = useState(null);
+
+  // DiceRoller instance for fight logic
+  const diceRollerRef = useRef(createDiceRoller());
 
   // Refs for fight animation management
   const fightAnimationIdRef = useRef(null);
@@ -234,11 +233,8 @@ function App() {
         setHeroDiceRolls,
         setMonsterDiceRolls,
         setRollingButton,
-        setRollDieResult,
-        setRollDiceResults,
         setTestLuckResult,
         setIsTestingLuck,
-        setTestSkillResult,
         setDiceRollingType,
         setTrailSequence,
         setSoundUrls,
@@ -309,11 +305,8 @@ function App() {
       heroDiceRolls,
       monsterDiceRolls,
       rollingButton,
-      rollDieResult,
-      rollDiceResults,
       testLuckResult,
       isTestingLuck,
-      testSkillResult,
       diceRollingType,
       trailSequence,
       soundUrls,
@@ -1540,11 +1533,8 @@ function App() {
     setHeroDiceRolls(null);
     setMonsterDiceRolls(null);
     setRollingButton(null);
-    setRollDieResult(null);
-    setRollDiceResults(null);
     setTestLuckResult(null);
     setIsTestingLuck(false);
-    setTestSkillResult(null);
     setDiceRollingType(null);
     setTrailSequence([{ number: 1, annotation: null }]);
     setTrailInput('');
@@ -1653,11 +1643,8 @@ function App() {
       heroDiceRolls,
       monsterDiceRolls,
       rollingButton,
-      rollDieResult,
-      rollDiceResults,
       testLuckResult,
       isTestingLuck,
-      testSkillResult,
       diceRollingType,
       trailSequence,
       soundUrls,
@@ -1762,11 +1749,8 @@ function App() {
             setHeroDiceRolls,
             setMonsterDiceRolls,
             setRollingButton,
-            setRollDieResult,
-            setRollDiceResults,
             setTestLuckResult,
             setIsTestingLuck,
-            setTestSkillResult,
             setDiceRollingType,
             setTrailSequence,
             setSoundUrls,
@@ -1816,59 +1800,24 @@ function App() {
     }
   };
 
-  // Dice rolling handlers
-  const diceRollHandlers = createDiceRollHandlers({
-    setDiceRollingType,
-    setRollDieResult,
-    setRollDiceResults,
-    setTestLuckResult,
-    setTestSkillResult,
-    getDiceRollingType: () => diceRollingType,
-    getSkill: () => skill,
-    getLuck: () => luck,
-    getIsTestingLuck: () => isTestingLuck,
-  });
+  // Handle test luck completion from DiceRollsSection
+  const handleTestLuckComplete = (rolls) => {
+    const roll1 = rolls.roll1;
+    const roll2 = rolls.roll2;
+    const sum = rolls.sum;
+    const currentLuck = parseInt(luck) || 0;
+    const isLucky = sum <= currentLuck;
 
-  const handleTestYourLuck = diceRollHandlers.testLuck({
-    onBeforeRoll: () => setIsTestingLuck(true),
-    onRollComplete: (rolls) => {
-      const roll1 = rolls.roll1;
-      const roll2 = rolls.roll2;
-      const sum = rolls.sum;
-      const currentLuck = parseInt(luck) || 0;
-      const isLucky = sum <= currentLuck;
+    // Play sound if lucky
+    actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
 
-      actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
+    // Set result (used by FightSection)
+    setTestLuckResult({ roll1, roll2, isLucky });
 
-      setTestLuckResult({ roll1, roll2, isLucky });
-      const newLuck = Math.max(0, currentLuck - 1);
-      setLuck(String(newLuck));
-      setIsTestingLuck(false);
-    },
-  });
-
-  const handleTestYourSkill = diceRollHandlers.testSkill({
-    onRollComplete: (rolls) => {
-      const roll1 = rolls.roll1;
-      const roll2 = rolls.roll2;
-      const sum = rolls.sum;
-      const currentSkill = parseInt(skill) || 0;
-      const passed = sum <= currentSkill;
-      setTestSkillResult({ roll1, roll2, passed });
-    },
-  });
-
-  const handleRollDie = diceRollHandlers.rollDie({
-    onRollComplete: (result) => {
-      setRollDieResult(result);
-    },
-  });
-
-  const handleRollDice = diceRollHandlers.rollDice({
-    onRollComplete: (results) => {
-      setRollDiceResults([results.roll1, results.roll2]);
-    },
-  });
+    // Decrement luck
+    const newLuck = Math.max(0, currentLuck - 1);
+    setLuck(String(newLuck));
+  };
 
   // Fight handlers
   const checkFightEnd = (heroHealthValue = null, monsterHealthValue = null) => {
@@ -1984,10 +1933,7 @@ function App() {
     setFightResult(null);
     setFightOutcome(null);
     setLuckUsed(false);
-    setRollDieResult(null);
-    setRollDiceResults(null);
     setTestLuckResult(null);
-    setTestSkillResult(null);
 
     fightTimeoutRef.current = setTimeout(() => {
       if (fightAnimationIdRef.current !== animationId) {
@@ -1995,13 +1941,13 @@ function App() {
       }
 
       try {
-        // Roll dice for both hero and monster using utility functions
-        const heroRolls = rollTwoDice();
+        // Roll dice for both hero and monster using DiceRoller
+        const heroRolls = diceRollerRef.current.rollDiceTwo();
         const heroRoll1 = heroRolls.roll1;
         const heroRoll2 = heroRolls.roll2;
         const heroDiceSum = heroRolls.sum;
 
-        const monsterRolls = rollTwoDice();
+        const monsterRolls = diceRollerRef.current.rollDiceTwo();
         const monsterRoll1 = monsterRolls.roll1;
         const monsterRoll2 = monsterRolls.roll2;
         const monsterDiceSum = monsterRolls.sum;
@@ -2131,12 +2077,9 @@ function App() {
     setDiceRollingType('useLuck');
     setTestLuckResult(null);
     setLuckUsed(true);
-    setRollDieResult(null);
-    setRollDiceResults(null);
-    setTestSkillResult(null);
 
     setTimeout(() => {
-      const rolls = rollTwoDice();
+      const rolls = diceRollerRef.current.rollDiceTwo();
       const roll1 = rolls.roll1;
       const roll2 = rolls.roll2;
       const sum = rolls.sum;
@@ -2253,11 +2196,8 @@ function App() {
         heroDiceRolls,
         monsterDiceRolls,
         rollingButton,
-        rollDieResult,
-        rollDiceResults,
         testLuckResult,
         isTestingLuck,
-        testSkillResult,
         diceRollingType,
         trailSequence,
         soundUrls,
@@ -2451,18 +2391,10 @@ function App() {
           <div className="col-12 col-xl-4">
             <DiceRollsSection
               key={`dice-${sectionResetKey}`}
-              skill={skill}
-              luck={luck}
-              diceRollingType={diceRollingType}
-              isTestingLuck={isTestingLuck}
-              rollDieResult={rollDieResult}
-              rollDiceResults={rollDiceResults}
-              testLuckResult={testLuckResult}
-              testSkillResult={testSkillResult}
-              onTestYourLuck={handleTestYourLuck}
-              onTestYourSkill={handleTestYourSkill}
-              onRollDie={handleRollDie}
-              onRollDice={handleRollDice}
+              // TODO: Move canTestLuck logic to GameMaster once implemented
+              // GameMaster should listen to luck value changes and control button state
+              canTestLuck={parseInt(luck) > 0}
+              onTestLuckComplete={handleTestLuckComplete}
               initialExpanded={sectionsExpanded.diceRolls}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('diceRolls', expanded)
