@@ -10,6 +10,7 @@ import {
 } from '../../utils/stateManager';
 import { getFromStorage, saveToStorage } from '../../utils/localStorage';
 
+//TODO: this should be a responsibility of the GameStateManager
 describe('Game state manager', () => {
   beforeEach(() => {
     localStorage.clear();

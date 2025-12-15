@@ -5,6 +5,7 @@ import {
   convertNoteItemtoColor,
 } from '../../utils/trailMapping';
 
+//TODO: consider if we should have a TrailManager
 describe('Trail mapping utilities', () => {
   describe('convertColorToNote', () => {
     it.each([

@@ -4,7 +4,8 @@ import {
   BADGE_ANIMATION_DURATION_MS,
 } from '../../utils/fieldBadges';
 
-describe("Manages of field's badges", () => {
+//TODO: consider if we should be part of the GameStateManager component
+describe('Visual feedback of game state updates', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

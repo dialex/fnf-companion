@@ -9,6 +9,7 @@ import {
   mdiDice6,
 } from '@mdi/js';
 
+//TODO: this should be a responsibility of the DiceRoller component
 describe('UI utilities', () => {
   describe('getDiceIcon', () => {
     it('should return correct icon for value 1', () => {

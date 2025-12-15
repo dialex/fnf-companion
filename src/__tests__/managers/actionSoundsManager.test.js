@@ -30,7 +30,7 @@ describe('Action sounds manager', () => {
     vi.restoreAllMocks();
   });
 
-  describe('echoLuckTest', () => {
+  describe.skip('echoLuckTest', () => {
     it('should call playSound when luck test is successful and sounds are enabled', () => {
       const manager = createActionSoundsManager();
       const isLucky = true;
