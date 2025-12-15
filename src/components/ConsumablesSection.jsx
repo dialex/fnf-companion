@@ -11,7 +11,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { useT } from '../contexts/I18nContext';
+import { i18nManager } from '../managers/i18nManager';
 
 export default function ConsumablesSection({
   coins,
@@ -40,7 +40,7 @@ export default function ConsumablesSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
-  const t = useT();
+  const t = i18nManager.t.bind(i18nManager);
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   useEffect(() => {

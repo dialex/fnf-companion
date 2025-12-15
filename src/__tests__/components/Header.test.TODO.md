@@ -16,6 +16,7 @@
 ## Notes
 
 These tests should verify behavior, not implementation details. Focus on:
+
 - What the user sees (menu options, text updates)
 - What the user experiences (no reload needed, persistence)
 - Integration with i18nManager and theme/palette systems

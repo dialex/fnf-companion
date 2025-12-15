@@ -7,7 +7,7 @@ import {
   mdiBrightness5,
   mdiPalette,
 } from '@mdi/js';
-import { useI18n } from '../contexts/I18nContext';
+import { i18nManager } from '../managers/i18nManager';
 import {
   setTheme,
   getCurrentTheme,
@@ -22,7 +22,8 @@ import {
 } from '../utils/palette';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
-  const i18n = useI18n();
+  const i18n = i18nManager;
+  const t = i18nManager.t.bind(i18nManager);
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
@@ -364,7 +365,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                     overflow: 'hidden',
                   }}
                 >
-                  {getAvailableLanguages().map((lang) => (
+                  {i18n.getAvailableLanguages().map((lang) => (
                     <button
                       key={lang}
                       className="btn btn-link text-white text-decoration-none d-block w-100 text-start p-2"

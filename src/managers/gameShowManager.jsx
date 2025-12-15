@@ -4,14 +4,14 @@
  */
 
 import React from 'react';
+import { i18nManager } from './i18nManager';
 
 /**
  * Creates a GameShowManager instance
  * @param {Object} soundManager - SoundManager instance for playing sounds
- * @param {Object} i18nManager - i18nManager instance for translations
  * @returns {Object} GameShowManager with methods to show feedback
  */
-export const createGameShowManager = (soundManager, i18nManager) => {
+export const createGameShowManager = (soundManager) => {
   const t = i18nManager.t.bind(i18nManager);
   let displayState = {
     diceRolling: null, // 1 or 2 (number of dice rolling), or null

@@ -130,3 +130,6 @@ export const createI18nManager = () => {
     t: getTranslation, // Shorthand
   };
 };
+
+// Export singleton instance for app use
+export const i18nManager = createI18nManager();

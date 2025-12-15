@@ -12,7 +12,7 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { useT } from '../contexts/I18nContext';
+import { i18nManager } from '../managers/i18nManager';
 import { convertNoteItemtoColor } from '../utils/trailMapping';
 
 export default function MapSection({
@@ -25,7 +25,7 @@ export default function MapSection({
   initialExpanded = true,
   onExpandedChange,
 }) {
-  const t = useT();
+  const t = i18nManager.t.bind(i18nManager);
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
   const [isExpanded, setIsExpanded] = useState(initialExpanded);

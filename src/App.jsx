@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { I18nProvider, useT } from './contexts/I18nContext';
+import { i18nManager } from './managers/i18nManager';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import {
   loadState,
@@ -15,7 +15,6 @@ import { createActionSoundsManager } from './utils/actionSoundsManager';
 import { createDiceRoller } from './managers/diceRoller';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
-import { createI18nManager } from './managers/i18nManager';
 import confetti from 'canvas-confetti';
 import yaml from 'js-yaml';
 import './styles/variables.css';
@@ -39,8 +38,7 @@ import NotificationBanner from './components/NotificationBanner';
 import ConfirmationDialog from './components/ConfirmationDialog';
 
 function AppContent({ onLanguageChange }) {
-  const t = useT();
-  const i18n = useI18n();
+  const t = i18nManager.t.bind(i18nManager);
 
   // Theme state to trigger re-renders when theme changes
   const [, setCurrentTheme] = useState(getCurrentTheme());
@@ -126,11 +124,10 @@ function AppContent({ onLanguageChange }) {
   // Action sounds manager
   const actionSoundsPlayer = useRef(createActionSoundsManager());
 
-  // SoundManager and GameShowManager (use same i18nManager instance from context)
+  // SoundManager and GameShowManager (use singleton i18nManager)
   const soundManagerRef = useRef(createSoundManager());
-  const i18n = useI18n();
   const gameShowManagerRef = useRef(
-    createGameShowManager(soundManagerRef.current, i18n)
+    createGameShowManager(soundManagerRef.current)
   );
 
   // Notification banner
@@ -2496,25 +2493,16 @@ function AppContent({ onLanguageChange }) {
 }
 
 function App() {
-  // Create i18nManager instance (single instance for entire app)
-  const i18nManagerRef = useRef(createI18nManager());
-
   // Language state to trigger re-renders when language changes
-  const [, setCurrentLang] = useState(
-    i18nManagerRef.current.getCurrentLanguage()
-  );
+  const [, setCurrentLang] = useState(i18nManager.getCurrentLanguage());
 
   // Handler to update language and trigger re-render
   const handleLanguageChange = (lang) => {
-    i18nManagerRef.current.setLanguage(lang);
+    i18nManager.setLanguage(lang);
     setCurrentLang(lang);
   };
 
-  return (
-    <I18nProvider i18nManager={i18nManagerRef.current}>
-      <AppContent onLanguageChange={handleLanguageChange} />
-    </I18nProvider>
-  );
+  return <AppContent onLanguageChange={handleLanguageChange} />;
 }
 
 export default App;
