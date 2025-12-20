@@ -8,7 +8,7 @@ import {
   applyLoadedState,
   createDebouncedSave,
   getDefaultState,
-} from './utils/stateManager';
+} from './managers/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
 import { createActionSoundsManager } from './utils/actionSoundsManager';

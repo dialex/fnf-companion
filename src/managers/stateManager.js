@@ -2,7 +2,7 @@
  * State management utilities for saving and loading game state
  */
 
-import { getFromStorage, saveToStorage } from './localStorage';
+import { getFromStorage, saveToStorage } from '../utils/localStorage';
 import packageJson from '../../package.json';
 
 const CURRENT_VERSION = packageJson.version;

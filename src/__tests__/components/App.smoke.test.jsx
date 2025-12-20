@@ -17,7 +17,7 @@ vi.mock('../../utils/palette', () => ({
   setPalette: vi.fn(),
 }));
 
-vi.mock('../../utils/stateManager', () => ({
+vi.mock('../../managers/stateManager', () => ({
   loadState: () => null,
   saveState: vi.fn(),
   buildStateObject: vi.fn(),

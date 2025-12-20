@@ -7,7 +7,7 @@ import {
   createDebouncedSave,
   applyLoadedState,
   DEBOUNCE_DELAY,
-} from '../../utils/stateManager';
+} from '../../managers/stateManager';
 import { getFromStorage, saveToStorage } from '../../utils/localStorage';
 
 //TODO: this should be a responsibility of the GameStateManager
