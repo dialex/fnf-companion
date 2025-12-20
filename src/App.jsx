@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { i18nManager } from './managers/i18nManager';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
-import {
-  loadState,
-  saveState,
-  buildStateObject,
-  applyLoadedState,
-  createDebouncedSave,
-  getDefaultState,
-  saveStateToFile,
-  loadStateFromFile,
-} from './managers/stateManager';
+import { createGameStateManager } from './managers/gameStateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
 import { createDiceRoller } from './managers/diceRoller';
@@ -59,52 +50,70 @@ function AppContent({ onLanguageChange }) {
   const handleThemeChange = (theme) => {
     setCurrentTheme(theme);
   };
-  // Game state
-  const [book, setBook] = useState('');
 
-  // Character state
-  const [name, setName] = useState('');
-  const [skill, setSkill] = useState('');
-  const [health, setHealth] = useState('');
-  const [luck, setLuck] = useState('');
-  const [isLocked, setIsLocked] = useState(false);
-  const [maxSkill, setMaxSkill] = useState(null);
-  const [maxHealth, setMaxHealth] = useState(null);
-  const [maxLuck, setMaxLuck] = useState(null);
+  // GameStateManager - single source of truth for all game state
+  const gameStateManagerRef = useRef(createGameStateManager());
+  const [, forceUpdate] = useState({});
 
-  // Consumables state
-  const [coins, setCoins] = useState('0');
-  const [meals, setMeals] = useState('10');
-  const [transactionObject, setTransactionObject] = useState('');
-  const [transactionCost, setTransactionCost] = useState('');
-  const [potionType, setPotionType] = useState('');
-  const [potionUsed, setPotionUsed] = useState(false);
+  // Subscribe to GameStateManager for re-renders
+  useEffect(() => {
+    //TODO: think if this should be handled by GameMaster
+    const unsubscribe = gameStateManagerRef.current.subscribe(() => {
+      forceUpdate({});
+    });
 
-  // Inventory and notes
-  const [inventory, setInventory] = useState('');
-  const [notes, setNotes] = useState('');
+    // Load state from localStorage on mount
+    gameStateManagerRef.current.loadFromStorage();
 
-  // Trail state - each item is { number: number, color: string }
-  const [trailSequence, setTrailSequence] = useState([
-    { number: 1, annotation: null },
-  ]);
+    return unsubscribe;
+  }, []);
+
+  // GameStateManager - single source of truth
+  const gsm = gameStateManagerRef.current;
+
+  // Setters (wrapped for stable references when passed as props)
+  const setName = (v) => gsm.setName(v);
+  const setBook = (v) => gsm.setBook(v);
+  const setSkill = (v) => gsm.setSkill(v);
+  const setHealth = (v) => gsm.setHealth(v);
+  const setLuck = (v) => gsm.setLuck(v);
+  const setIsLocked = (v) => gsm.setIsLocked(v);
+  const setMaxSkill = (v) => gsm.setMaxSkill(v);
+  const setMaxHealth = (v) => gsm.setMaxHealth(v);
+  const setMaxLuck = (v) => gsm.setMaxLuck(v);
+  const setCoins = (v) => gsm.setCoins(v);
+  const setMeals = (v) => gsm.setMeals(v);
+  const setTransactionObject = (v) => gsm.setTransactionObject(v);
+  const setTransactionCost = (v) => gsm.setTransactionCost(v);
+  const setPotionType = (v) => gsm.setPotionType(v);
+  const setPotionUsed = (v) => gsm.setPotionUsed(v);
+  const setInventory = (v) => gsm.setInventory(v);
+  const setNotes = (v) => gsm.setNotes(v);
+  const setTrailSequence = (v) => gsm.setTrailSequence(v);
+  const setMonsterSkill = (v) => gsm.setMonsterSkill(v);
+  const setMonsterHealth = (v) => gsm.setMonsterHealth(v);
+  const setMonsterCreature = (v) => gsm.setMonsterCreature(v);
+  const setGraveyard = (v) => gsm.setGraveyard(v);
+  const setShowUseLuck = (v) => gsm.setShowUseLuck(v);
+  const setLuckUsed = (v) => gsm.setLuckUsed(v);
+  const setIsFighting = (v) => gsm.setIsFighting(v);
+  const setFightResult = (v) => gsm.setFightResult(v);
+  const setFightOutcome = (v) => gsm.setFightOutcome(v);
+  const setHeroDiceRolls = (v) => gsm.setHeroDiceRolls(v);
+  const setMonsterDiceRolls = (v) => gsm.setMonsterDiceRolls(v);
+  const setSoundUrls = (v) => gsm.setSoundUrls(v);
+  const setSoundVolumes = (v) => gsm.setSoundVolumes(v);
+  const setActionSoundsEnabled = (v) => gsm.setActionSoundsEnabled(v);
+  const setAllSoundsMuted = (v) => gsm.setAllSoundsMuted(v);
+  const setSectionsExpanded = (v) => gsm.setSectionsExpanded(v);
+  const setCustomSounds = (v) => gsm.setCustomSounds(v);
+  const setCustomSoundVolumes = (v) => gsm.setCustomSoundVolumes(v);
+
+  // Trail state - UI-only (input field)
   const [trailInput, setTrailInput] = useState('');
 
-  // Fight state
-  const [monsterSkill, setMonsterSkill] = useState('');
-  const [monsterHealth, setMonsterHealth] = useState('');
-  const [monsterCreature, setMonsterCreature] = useState('');
-  const [graveyard, setGraveyard] = useState('');
-  const [showUseLuck, setShowUseLuck] = useState(false);
-  const [luckUsed, setLuckUsed] = useState(false);
-  const [isFighting, setIsFighting] = useState(false);
-  const [fightResult, setFightResult] = useState(null);
-  const [fightOutcome, setFightOutcome] = useState(null);
-  const [heroDiceRolls, setHeroDiceRolls] = useState(null);
-  const [monsterDiceRolls, setMonsterDiceRolls] = useState(null);
+  // Fight state - UI-only (fight started flag, dice rolling UI state)
   const [isFightStarted, setIsFightStarted] = useState(false);
-
-  // Dice rolling state (kept for FightSection compatibility)
   const [rollingButton, setRollingButton] = useState(null);
   const [testLuckResult, setTestLuckResult] = useState(null);
   const [isTestingLuck, setIsTestingLuck] = useState(false);
@@ -136,13 +145,7 @@ function AppContent({ onLanguageChange }) {
   // Section reset key for remounting sections
   const [sectionResetKey, setSectionResetKey] = useState(0);
 
-  // Sound state
-  const [soundUrls, setSoundUrls] = useState({
-    ambience: '',
-    battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
-    victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
-    defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-  });
+  // Sound state - UI-only (input fields, errors, playing status)
   const [soundInputs, setSoundInputs] = useState({
     ambience: '',
     battle: '',
@@ -161,31 +164,10 @@ function AppContent({ onLanguageChange }) {
     victory: false,
     defeat: false,
   });
-  // Custom sounds: array of { id, label, url }
-  const [customSounds, setCustomSounds] = useState([]);
+  // Custom sounds: UI-only state (input fields, errors, playing status)
   const [customSoundInputs, setCustomSoundInputs] = useState({}); // { id: { label: '', url: '' } }
   const [customSoundErrors, setCustomSoundErrors] = useState({}); // { id: error }
   const [customSoundPlaying, setCustomSoundPlaying] = useState({}); // { id: boolean }
-  const defaultState = getDefaultState();
-  const [soundVolumes, setSoundVolumes] = useState({
-    ambience: defaultState.sounds.ambienceVolume,
-    battle: defaultState.sounds.battleVolume,
-    victory: defaultState.sounds.victoryVolume,
-    defeat: defaultState.sounds.defeatVolume,
-  });
-  const [customSoundVolumes, setCustomSoundVolumes] = useState({}); // { id: volume }
-  const [actionSoundsEnabled, setActionSoundsEnabled] = useState(true);
-  const [allSoundsMuted, setAllSoundsMuted] = useState(false);
-  const [sectionsExpanded, setSectionsExpanded] = useState({
-    game: true,
-    character: true,
-    consumables: true,
-    diceRolls: true,
-    inventory: true,
-    map: true,
-    fight: false,
-    notes: false,
-  });
   const youtubePlayersRef = useRef({});
   const soundStoppedManuallyRef = useRef({
     ambience: false,
@@ -198,62 +180,14 @@ function AppContent({ onLanguageChange }) {
   // State management
   const isInitialMountRef = useRef(true);
   const preBattleSoundRef = useRef(null); // Track what sound was playing before battle
-  const debouncedSaveRef = useRef(
-    createDebouncedSave((state) => {
-      saveState(state);
-    })
-  );
 
-  // Load state on mount
+  // Load theme from saved state (if any) after GameStateManager loads
   useEffect(() => {
-    const savedState = loadState();
-    if (savedState) {
-      applyLoadedState(savedState, {
-        setName,
-        setSkill,
-        setHealth,
-        setLuck,
-        setIsLocked,
-        setMaxSkill,
-        setMaxHealth,
-        setMaxLuck,
-        setCoins,
-        setMeals,
-        setTransactionObject,
-        setTransactionCost,
-        setPotionType,
-        setPotionUsed,
-        setInventory,
-        setNotes,
-        setMonsterSkill,
-        setMonsterHealth,
-        setMonsterCreature,
-        setGraveyard,
-        setShowUseLuck,
-        setLuckUsed,
-        setIsFighting,
-        setFightResult,
-        setFightOutcome,
-        setHeroDiceRolls,
-        setMonsterDiceRolls,
-        setRollingButton,
-        setTestLuckResult,
-        setIsTestingLuck,
-        setDiceRollingType,
-        setTrailSequence,
-        setSoundUrls,
-        setSoundVolumes,
-        setActionSoundsEnabled,
-        setAllSoundsMuted,
-        setTheme,
-        getCurrentTheme,
-        setBook,
-        setSectionsExpanded,
-        setCustomSounds,
-        setCustomSoundVolumes,
-      });
+    const currentTheme = getCurrentTheme();
+    const savedTheme = gsm.getState().metadata.theme;
+    if (savedTheme && savedTheme !== currentTheme) {
+      setTheme(savedTheme);
     }
-
     // Mark initial mount as complete after a small delay
     setTimeout(() => {
       isInitialMountRef.current = false;
@@ -265,106 +199,14 @@ function AppContent({ onLanguageChange }) {
     // Skip auto-sync on initial mount to preserve loaded state
     if (isInitialMountRef.current) return;
 
-    if (allSoundsMuted) {
+    if (gsm.getAllSoundsMuted()) {
       setActionSoundsEnabled(false);
     } else {
       setActionSoundsEnabled(true);
     }
-  }, [allSoundsMuted]);
+  }, [gsm.getAllSoundsMuted()]);
 
-  // Save state on changes (debounced)
-  useEffect(() => {
-    // Skip save on initial mount
-    if (isInitialMountRef.current) {
-      return;
-    }
-
-    const stateToSave = buildStateObject({
-      book,
-      name,
-      skill,
-      health,
-      luck,
-      isLocked,
-      maxSkill,
-      maxHealth,
-      maxLuck,
-      coins,
-      meals,
-      transactionObject,
-      transactionCost,
-      potionType,
-      potionUsed,
-      inventory,
-      notes,
-      monsterSkill,
-      monsterHealth,
-      monsterCreature,
-      graveyard,
-      showUseLuck,
-      luckUsed,
-      isFighting,
-      fightResult,
-      fightOutcome,
-      heroDiceRolls,
-      monsterDiceRolls,
-      rollingButton,
-      testLuckResult,
-      isTestingLuck,
-      diceRollingType,
-      trailSequence,
-      soundUrls,
-      soundVolumes,
-      actionSoundsEnabled,
-      allSoundsMuted,
-      theme: getCurrentTheme(),
-      sectionsExpanded,
-      customSounds,
-      customSoundVolumes,
-    });
-
-    debouncedSaveRef.current(stateToSave);
-  }, [
-    name,
-    skill,
-    health,
-    luck,
-    isLocked,
-    maxSkill,
-    maxHealth,
-    maxLuck,
-    coins,
-    meals,
-    transactionObject,
-    transactionCost,
-    potionType,
-    potionUsed,
-    inventory,
-    notes,
-    monsterSkill,
-    monsterHealth,
-    monsterCreature,
-    graveyard,
-    showUseLuck,
-    luckUsed,
-    isFighting,
-    fightResult,
-    fightOutcome,
-    heroDiceRolls,
-    monsterDiceRolls,
-    rollingButton,
-    testLuckResult,
-    isTestingLuck,
-    diceRollingType,
-    trailSequence,
-    soundUrls,
-    soundVolumes,
-    actionSoundsEnabled,
-    allSoundsMuted,
-    sectionsExpanded,
-    customSounds,
-    customSoundVolumes,
-  ]);
+  // Note: GameStateManager handles auto-save to localStorage automatically
 
   // Section expanded state handler
   const handleSectionExpandedChange = (sectionName, isExpanded) => {
@@ -585,7 +427,7 @@ function AppContent({ onLanguageChange }) {
 
   const handleSoundPlayPause = (soundType) => {
     // Don't play if all sounds are muted
-    if (allSoundsMuted) return;
+    if (gsm.getAllSoundsMuted()) return;
 
     const player = youtubePlayersRef.current[soundType];
     if (!player) return;
@@ -919,10 +761,10 @@ function AppContent({ onLanguageChange }) {
   // Auto-play sound from the beginning (stop then play)
   const autoPlaySound = (soundType) => {
     // Don't play if all sounds are muted
-    if (allSoundsMuted) return;
+    if (gsm.getAllSoundsMuted()) return;
 
     const player = youtubePlayersRef.current[soundType];
-    if (!player || !soundUrls[soundType]) return;
+    if (!player || !gsm.getSoundUrls()[soundType]) return;
 
     try {
       // Clear manual stop flag
@@ -996,7 +838,7 @@ function AppContent({ onLanguageChange }) {
     }
 
     const initPlayer = (soundType) => {
-      if (!soundUrls[soundType]) {
+      if (!gsm.getSoundUrls()[soundType]) {
         return;
       }
 
@@ -1012,7 +854,7 @@ function AppContent({ onLanguageChange }) {
       }
 
       if (window.YT && window.YT.Player) {
-        const videoId = extractVideoId(soundUrls[soundType]);
+        const videoId = extractVideoId(gsm.getSoundUrls()[soundType]);
         if (videoId) {
           const playerId = `youtube-player-${soundType}`;
           // Create hidden iframe container
@@ -1048,7 +890,7 @@ function AppContent({ onLanguageChange }) {
                   const player = event.target;
                   if (player && typeof player.setVolume === 'function') {
                     try {
-                      player.setVolume(soundVolumes[soundType]);
+                      player.setVolume(gsm.getSoundVolumes()[soundType]);
                     } catch (e) {
                       console.error('Error setting initial volume:', e);
                     }
@@ -1127,7 +969,10 @@ function AppContent({ onLanguageChange }) {
 
     // Initialize all players
     soundTypes.forEach((soundType) => {
-      if (soundUrls[soundType] && !youtubePlayersRef.current[soundType]) {
+      if (
+        gsm.getSoundUrls()[soundType] &&
+        !youtubePlayersRef.current[soundType]
+      ) {
         if (window.YT && window.YT.Player) {
           initPlayer(soundType);
         } else {
@@ -1140,7 +985,7 @@ function AppContent({ onLanguageChange }) {
         }
       }
     });
-  }, [soundUrls, soundVolumes]);
+  }, [gsm]);
 
   // Initialize YouTube players for custom sounds
   useEffect(() => {
@@ -1148,7 +993,7 @@ function AppContent({ onLanguageChange }) {
       return;
     }
 
-    customSounds.forEach((customSound) => {
+    gsm.getCustomSounds().forEach((customSound) => {
       const playerKey = `custom-${customSound.id}`;
       if (youtubePlayersRef.current[playerKey]) {
         return; // Player already exists
@@ -1186,7 +1031,8 @@ function AppContent({ onLanguageChange }) {
             const player = event.target;
             if (player && typeof player.setVolume === 'function') {
               try {
-                const volume = customSoundVolumes[customSound.id] ?? 25;
+                const volume =
+                  gsm.getCustomSoundVolumes()[customSound.id] ?? 25;
                 player.setVolume(volume);
               } catch (e) {
                 console.error('Error setting initial volume:', e);
@@ -1235,7 +1081,7 @@ function AppContent({ onLanguageChange }) {
         },
       });
     });
-  }, [customSounds, customSoundVolumes]);
+  }, [gsm]);
 
   // Update volumes on existing YouTube players when soundVolumes changes
   useEffect(() => {
@@ -1244,40 +1090,40 @@ function AppContent({ onLanguageChange }) {
       const player = youtubePlayersRef.current[soundType];
       if (player && typeof player.setVolume === 'function') {
         try {
-          player.setVolume(soundVolumes[soundType]);
+          player.setVolume(gsm.getSoundVolumes()[soundType]);
         } catch (e) {
           console.error('Error setting volume on existing player:', e);
         }
       }
     });
-  }, [soundVolumes]);
+  }, [gsm]);
 
   // Update volumes on existing custom sound players
   useEffect(() => {
-    customSounds.forEach((customSound) => {
+    gsm.getCustomSounds().forEach((customSound) => {
       const playerKey = `custom-${customSound.id}`;
       const player = youtubePlayersRef.current[playerKey];
       if (player && typeof player.setVolume === 'function') {
         try {
-          const volume = customSoundVolumes[customSound.id] ?? 50;
+          const volume = gsm.getCustomSoundVolumes()[customSound.id] ?? 50;
           player.setVolume(volume);
         } catch (e) {
           console.error('Error setting volume on custom sound player:', e);
         }
       }
     });
-  }, [customSoundVolumes, customSounds]);
+  }, [gsm]);
 
   // Monitor creature name changes to start battle theme
-  const prevMonsterCreatureRef = useRef(monsterCreature);
+  const prevMonsterCreatureRef = useRef(gsm.getMonsterCreature());
   useEffect(() => {
     const prevCreature = prevMonsterCreatureRef.current;
-    const currentCreature = monsterCreature.trim();
+    const currentCreature = gsm.getMonsterCreature().trim();
     const prevWasEmpty = !prevCreature || prevCreature.length === 0;
     const currentHasContent = currentCreature.length > 0;
 
     // If creature name goes from empty to having at least one character, start battle theme
-    if (prevWasEmpty && currentHasContent && !allSoundsMuted) {
+    if (prevWasEmpty && currentHasContent && !gsm.getAllSoundsMuted()) {
       // Save what sound was playing before battle (ambience or custom sound, not battle)
       if (soundPlaying.ambience) {
         preBattleSoundRef.current = 'ambience';
@@ -1300,7 +1146,7 @@ function AppContent({ onLanguageChange }) {
       soundPlaying.victory &&
       currentHasContent &&
       prevCreature !== currentCreature &&
-      !allSoundsMuted
+      !gsm.getAllSoundsMuted()
     ) {
       // Stop victory theme
       const victoryPlayer = youtubePlayersRef.current.victory;
@@ -1319,27 +1165,21 @@ function AppContent({ onLanguageChange }) {
       autoPlaySound('battle');
     }
 
-    prevMonsterCreatureRef.current = monsterCreature;
-  }, [
-    monsterCreature,
-    allSoundsMuted,
-    soundPlaying.victory,
-    soundPlaying.ambience,
-    customSoundPlaying,
-  ]);
+    prevMonsterCreatureRef.current = gsm.getMonsterCreature();
+  }, [gsm, soundPlaying.victory, soundPlaying.ambience, customSoundPlaying]);
 
   // Monitor trail sequence changes to stop victory and resume ambience
-  const prevTrailSequenceRef = useRef(trailSequence);
+  const prevTrailSequenceRef = useRef(gsm.getTrailSequence());
   useEffect(() => {
     const prevSequence = prevTrailSequenceRef.current;
-    const currentSequence = trailSequence;
+    const currentSequence = gsm.getTrailSequence();
 
     // Check if trail sequence actually changed (not just a reference change)
     const sequenceChanged =
       JSON.stringify(prevSequence) !== JSON.stringify(currentSequence);
 
     // If victory theme is playing and trail sequence changes, stop victory and resume previous sound
-    if (sequenceChanged && soundPlaying.victory && !allSoundsMuted) {
+    if (sequenceChanged && soundPlaying.victory && !gsm.getAllSoundsMuted()) {
       // Stop victory theme
       const victoryPlayer = youtubePlayersRef.current.victory;
       if (victoryPlayer) {
@@ -1355,12 +1195,14 @@ function AppContent({ onLanguageChange }) {
       }
       // Resume the sound that was playing before battle (ambience or custom sound)
       const preBattleSound = preBattleSoundRef.current;
-      if (preBattleSound === 'ambience' && soundUrls.ambience) {
+      if (preBattleSound === 'ambience' && gsm.getSoundUrls().ambience) {
         autoPlaySound('ambience');
       } else if (preBattleSound && preBattleSound.startsWith('custom-')) {
         // Extract custom sound ID (remove 'custom-' prefix)
         const customId = preBattleSound.replace('custom-', '');
-        const customSound = customSounds.find((s) => s.id === customId);
+        const customSound = gsm
+          .getCustomSounds()
+          .find((s) => s.id === customId);
         if (customSound && customSound.url) {
           // Resume custom sound
           const customPlayer = youtubePlayersRef.current[preBattleSound];
@@ -1381,14 +1223,8 @@ function AppContent({ onLanguageChange }) {
       preBattleSoundRef.current = null;
     }
 
-    prevTrailSequenceRef.current = trailSequence;
-  }, [
-    trailSequence,
-    soundPlaying.victory,
-    allSoundsMuted,
-    soundUrls.ambience,
-    customSounds,
-  ]);
+    prevTrailSequenceRef.current = gsm.getTrailSequence();
+  }, [gsm, soundPlaying.victory, customSoundPlaying]);
 
   // Character handlers
   const handleRandomStats = () => {
@@ -1419,9 +1255,9 @@ function AppContent({ onLanguageChange }) {
 
   const handleToggleLock = () => {
     if (!isLocked) {
-      setMaxSkill(parseInt(skill) || null);
-      setMaxHealth(parseInt(health) || null);
-      setMaxLuck(parseInt(luck) || null);
+      setMaxSkill(parseInt(gsm.getSkill()) || null);
+      setMaxHealth(parseInt(gsm.getHealth()) || null);
+      setMaxLuck(parseInt(gsm.getLuck()) || null);
     } else {
       setMaxSkill(null);
       setMaxHealth(null);
@@ -1432,7 +1268,7 @@ function AppContent({ onLanguageChange }) {
 
   // Consumables handlers
   const handleConsumeMeal = () => {
-    const currentMeals = parseInt(meals) || 0;
+    const currentMeals = parseInt(gsm.getMeals()) || 0;
     if (currentMeals > 0) {
       if (actionSoundsEnabled) {
         const audio = new Audio(
@@ -1446,7 +1282,7 @@ function AppContent({ onLanguageChange }) {
       setMeals(String(currentMeals - 1));
       showFieldBadge('meals', '-1', 'danger');
 
-      const currentHealth = parseInt(health) || 0;
+      const currentHealth = parseInt(gsm.getHealth()) || 0;
       const newHealth = currentHealth + 4;
       const actualIncrease =
         maxHealth !== null ? Math.min(newHealth, maxHealth) - currentHealth : 4;
@@ -1471,22 +1307,22 @@ function AppContent({ onLanguageChange }) {
       });
     }
 
-    if (potionType === 'skill' && maxSkill !== null) {
-      const currentSkill = parseInt(skill) || 0;
+    if (gsm.getPotionType() === 'skill' && gsm.getMaxSkill() !== null) {
+      const currentSkill = parseInt(gsm.getSkill()) || 0;
       const difference = maxSkill - currentSkill;
       setSkill(String(maxSkill));
       if (difference > 0) {
         showFieldBadge('skill', `+${difference}`, 'success');
       }
     } else if (potionType === 'health' && maxHealth !== null) {
-      const currentHealth = parseInt(health) || 0;
+      const currentHealth = parseInt(gsm.getHealth()) || 0;
       const difference = maxHealth - currentHealth;
       setHealth(String(maxHealth));
       if (difference > 0) {
         showFieldBadge('health', `+${difference}`, 'success');
       }
-    } else if (potionType === 'luck' && maxLuck !== null) {
-      const currentLuck = parseInt(luck) || 0;
+    } else if (gsm.getPotionType() === 'luck' && gsm.getMaxLuck() !== null) {
+      const currentLuck = parseInt(gsm.getLuck()) || 0;
       const difference = maxLuck - currentLuck;
       setLuck(String(maxLuck));
       if (difference > 0) {
@@ -1503,49 +1339,15 @@ function AppContent({ onLanguageChange }) {
 
   const confirmReset = () => {
     setShowResetConfirm(false);
-    // Reset all state to defaults
-    setBook('');
-    setName('');
-    setSkill('');
-    setHealth('');
-    setLuck('');
-    setIsLocked(false);
-    setMaxSkill(null);
-    setMaxHealth(null);
-    setMaxLuck(null);
-    setCoins('0');
-    setMeals('10');
-    setTransactionObject('');
-    setTransactionCost('');
-    setPotionType('');
-    setPotionUsed(false);
-    setInventory('');
-    setNotes('');
-    setMonsterSkill('');
-    setMonsterHealth('');
-    setMonsterCreature('');
-    setGraveyard('');
-    setShowUseLuck(false);
-    setLuckUsed(false);
-    setIsFighting(false);
+    // Reset all game state to defaults via GameStateManager
+    gsm.reset();
+    // Reset UI-only state
+    setTrailInput('');
     setIsFightStarted(false);
-    setFightResult(null);
-    setFightOutcome(null);
-    setHeroDiceRolls(null);
-    setMonsterDiceRolls(null);
     setRollingButton(null);
     setTestLuckResult(null);
     setIsTestingLuck(false);
     setDiceRollingType(null);
-    setTrailSequence([{ number: 1, annotation: null }]);
-    setTrailInput('');
-    setActionSoundsEnabled(true);
-    setSoundUrls({
-      ambience: '',
-      battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
-      victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
-      defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-    });
     setSoundInputs({
       ambience: '',
       battle: '',
@@ -1564,15 +1366,9 @@ function AppContent({ onLanguageChange }) {
       victory: false,
       defeat: false,
     });
-    const defaultState = getDefaultState();
-    setSoundVolumes({
-      ambience: defaultState.sounds.ambienceVolume,
-      battle: defaultState.sounds.battleVolume,
-      victory: defaultState.sounds.victoryVolume,
-      defeat: defaultState.sounds.defeatVolume,
-    });
-    // Reset custom sounds
-    customSounds.forEach((customSound) => {
+    // Reset custom sounds UI state
+    const currentCustomSounds = gsm.getCustomSounds();
+    currentCustomSounds.forEach((customSound) => {
       const player = youtubePlayersRef.current[`custom-${customSound.id}`];
       if (player) {
         try {
@@ -1584,11 +1380,9 @@ function AppContent({ onLanguageChange }) {
         delete youtubePlayersRef.current[`custom-${customSound.id}`];
       }
     });
-    setCustomSounds([]);
     setCustomSoundInputs({});
     setCustomSoundErrors({});
     setCustomSoundPlaying({});
-    setCustomSoundVolumes({});
     // Reset manual stop flags
     soundStoppedManuallyRef.current = {
       ambience: false,
@@ -1597,7 +1391,7 @@ function AppContent({ onLanguageChange }) {
       defeat: false,
     };
     // Clear custom sound stop flags
-    customSounds.forEach((customSound) => {
+    gsm.getCustomSounds().forEach((customSound) => {
       soundStoppedManuallyRef.current[`custom-${customSound.id}`] = false;
     });
     // Stop and remove all YouTube players
@@ -1614,110 +1408,21 @@ function AppContent({ onLanguageChange }) {
   };
 
   const handleSaveGame = () => {
-    const stateToSave = buildStateObject({
-      book,
-      name,
-      skill,
-      health,
-      luck,
-      isLocked,
-      maxSkill,
-      maxHealth,
-      maxLuck,
-      coins,
-      meals,
-      transactionObject,
-      transactionCost,
-      potionType,
-      potionUsed,
-      inventory,
-      notes,
-      monsterSkill,
-      monsterHealth,
-      monsterCreature,
-      graveyard,
-      showUseLuck,
-      luckUsed,
-      isFighting,
-      fightResult,
-      fightOutcome,
-      heroDiceRolls,
-      monsterDiceRolls,
-      rollingButton,
-      testLuckResult,
-      isTestingLuck,
-      diceRollingType,
-      trailSequence,
-      soundUrls,
-      soundVolumes,
-      actionSoundsEnabled,
-      allSoundsMuted,
-      theme: getCurrentTheme(),
-      sectionsExpanded,
-      customSounds,
-      customSoundVolumes,
-    });
-
-    saveStateToFile(stateToSave, book, name);
+    gsm.saveToFile(gsm.getBook(), gsm.getName());
     setNotification({ message: t('game.saved'), type: 'success' });
   };
 
   const handleLoadGame = async () => {
-    const loadedState = await loadStateFromFile();
-    if (!loadedState) {
-      return;
+    const loaded = await gsm.loadFromFile();
+    if (loaded) {
+      // Load theme if present in saved state
+      const savedTheme = gsm.getState().metadata.theme;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      }
+      //TODO: should be handled by GameShowManager
+      setNotification({ message: t('game.loaded'), type: 'success' });
     }
-
-    // Restore book name
-    if (loadedState.metadata?.bookname) {
-      setBook(loadedState.metadata.bookname);
-    }
-
-    // Apply loaded state
-    applyLoadedState(loadedState, {
-      setName,
-      setSkill,
-      setHealth,
-      setLuck,
-      setIsLocked,
-      setMaxSkill,
-      setMaxHealth,
-      setMaxLuck,
-      setCoins,
-      setMeals,
-      setTransactionObject,
-      setTransactionCost,
-      setPotionType,
-      setPotionUsed,
-      setInventory,
-      setNotes,
-      setMonsterSkill,
-      setMonsterHealth,
-      setMonsterCreature,
-      setGraveyard,
-      setShowUseLuck,
-      setLuckUsed,
-      setIsFighting,
-      setFightResult,
-      setFightOutcome,
-      setHeroDiceRolls,
-      setMonsterDiceRolls,
-      setRollingButton,
-      setTestLuckResult,
-      setIsTestingLuck,
-      setDiceRollingType,
-      setTrailSequence,
-      setSoundUrls,
-      setSoundVolumes,
-      setActionSoundsEnabled,
-      setAllSoundsMuted,
-      setTheme,
-      setSectionsExpanded,
-      setCustomSounds,
-      setCustomSoundVolumes,
-    });
-
-    setNotification({ message: t('game.loaded'), type: 'success' });
   };
 
   const handlePurchase = () => {
@@ -1730,14 +1435,14 @@ function AppContent({ onLanguageChange }) {
 
     const objectName = transactionObject.trim();
     const cost = parseInt(transactionCost) || 0;
-    const currentCoins = parseInt(coins) || 0;
+    const currentCoins = parseInt(gsm.getCoins()) || 0;
 
     if (objectName && cost > 0 && currentCoins >= cost) {
       const newCoins = Math.max(0, currentCoins - cost);
       setCoins(String(newCoins));
       showFieldBadge('coins', `-${cost}`, 'danger');
 
-      const currentInventory = inventory.trim();
+      const currentInventory = gsm.getInventory().trim();
       const separator = currentInventory ? '\n' : '';
       setInventory(`${currentInventory}${separator}${objectName}`);
       showFieldBadge('inventory', t('consumables.added'), 'success');
@@ -1757,8 +1462,8 @@ function AppContent({ onLanguageChange }) {
 
     // Show luck test result (message + sound via GameShowManager)
     const gameState = {
-      allSoundsMuted,
-      actionSoundsEnabled,
+      allSoundsMuted: gsm.getAllSoundsMuted(),
+      actionSoundsEnabled: gsm.getActionSoundsEnabled(),
     };
     gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
 
@@ -1773,7 +1478,9 @@ function AppContent({ onLanguageChange }) {
   // Fight handlers
   const checkFightEnd = (heroHealthValue = null, monsterHealthValue = null) => {
     const currentHealth =
-      heroHealthValue !== null ? heroHealthValue : parseInt(health) || 0;
+      heroHealthValue !== null
+        ? heroHealthValue
+        : parseInt(gsm.getHealth()) || 0;
     const currentMonsterHealth =
       monsterHealthValue !== null
         ? monsterHealthValue
@@ -1908,7 +1615,7 @@ function AppContent({ onLanguageChange }) {
         const heroTotal = heroDiceSum + heroSkill;
         const monsterTotal = monsterDiceSum + monsterSkillValue;
 
-        const currentHealth = parseInt(health) || 0;
+        const currentHealth = parseInt(gsm.getHealth()) || 0;
         const currentMonsterHealth = parseInt(monsterHealth) || 0;
 
         let resultType = '';
@@ -2043,7 +1750,7 @@ function AppContent({ onLanguageChange }) {
       gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
 
       const heroWonLastFight = fightResult.type === 'heroWins';
-      const currentHealth = parseInt(health) || 0;
+      const currentHealth = parseInt(gsm.getHealth()) || 0;
       const currentMonsterHealth = parseInt(monsterHealth) || 0;
       let newHealth = currentHealth;
       let newMonsterHealth = currentMonsterHealth;
@@ -2120,97 +1827,24 @@ function AppContent({ onLanguageChange }) {
   // Save immediately when page is closing
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Save immediately with current state using buildStateObject to ensure all fields are included
-      const stateToSave = buildStateObject({
-        book,
-        name,
-        skill,
-        health,
-        luck,
-        isLocked,
-        maxSkill,
-        maxHealth,
-        maxLuck,
-        coins,
-        meals,
-        transactionObject,
-        transactionCost,
-        potionType,
-        potionUsed,
-        inventory,
-        notes,
-        monsterSkill,
-        monsterHealth,
-        monsterCreature,
-        graveyard,
-        showUseLuck,
-        luckUsed,
-        isFighting,
-        fightResult,
-        fightOutcome,
-        heroDiceRolls,
-        monsterDiceRolls,
-        rollingButton,
-        testLuckResult,
-        isTestingLuck,
-        diceRollingType,
-        trailSequence,
-        soundUrls,
-        soundVolumes,
-        actionSoundsEnabled,
-        allSoundsMuted,
-        theme: getCurrentTheme(),
-        sectionsExpanded,
-        customSounds,
-        customSoundVolumes,
+      // Force immediate save (GameStateManager handles the actual save)
+      const stateToSave = gsm.getState();
+      // Save directly to localStorage (bypass debounce)
+      const { saveToStorage } = require('../utils/localStorage');
+      saveToStorage('fnf-companion-state', {
+        ...stateToSave,
+        metadata: {
+          ...stateToSave.metadata,
+          savedAt: new Date().toISOString(),
+        },
       });
-      saveState(stateToSave);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [
-    book,
-    name,
-    skill,
-    health,
-    luck,
-    isLocked,
-    maxSkill,
-    maxHealth,
-    maxLuck,
-    coins,
-    meals,
-    transactionObject,
-    transactionCost,
-    potionType,
-    potionUsed,
-    inventory,
-    notes,
-    monsterSkill,
-    monsterHealth,
-    monsterCreature,
-    graveyard,
-    showUseLuck,
-    luckUsed,
-    isFighting,
-    fightResult,
-    fightOutcome,
-    heroDiceRolls,
-    monsterDiceRolls,
-    rollingButton,
-    testLuckResult,
-    isTestingLuck,
-    diceRollingType,
-    trailSequence,
-    soundUrls,
-    soundVolumes,
-    actionSoundsEnabled,
-    allSoundsMuted,
-    sectionsExpanded,
-  ]);
+  }, []); // Empty deps - gsm is stable ref
 
   return (
     <div className="min-vh-100 bg-beige d-flex flex-column">
@@ -2241,31 +1875,31 @@ function AppContent({ onLanguageChange }) {
         <div className="row gx-4 mb-4">
           <div className="col-12">
             <GameSection
-              book={book}
+              book={gsm.getBook()}
               onBookChange={setBook}
               onLoadGame={handleLoadGame}
               onSaveGame={handleSaveGame}
               onReset={handleReset}
-              allSoundsMuted={allSoundsMuted}
+              allSoundsMuted={gsm.getAllSoundsMuted()}
               onAllSoundsMutedChange={setAllSoundsMuted}
-              actionSoundsEnabled={actionSoundsEnabled}
+              actionSoundsEnabled={gsm.getActionSoundsEnabled()}
               onActionSoundsEnabledChange={setActionSoundsEnabled}
-              soundUrls={soundUrls}
+              soundUrls={gsm.getSoundUrls()}
               soundInputs={soundInputs}
               soundErrors={soundErrors}
               soundPlaying={soundPlaying}
-              soundVolumes={soundVolumes}
+              soundVolumes={gsm.getSoundVolumes()}
               onSoundInputChange={handleSoundInputChange}
               onSoundSubmit={handleSoundSubmit}
               onSoundDelete={handleSoundDelete}
               onSoundPlayPause={handleSoundPlayPause}
               onSoundStop={handleSoundStop}
               onSoundVolumeChange={handleSoundVolumeChange}
-              customSounds={customSounds}
+              customSounds={gsm.getCustomSounds()}
               customSoundInputs={customSoundInputs}
               customSoundErrors={customSoundErrors}
               customSoundPlaying={customSoundPlaying}
-              customSoundVolumes={customSoundVolumes}
+              customSoundVolumes={gsm.getCustomSoundVolumes()}
               onCustomSoundInputChange={handleCustomSoundInputChange}
               onCustomSoundSubmit={handleCustomSoundSubmit}
               onCustomSoundDelete={handleCustomSoundDelete}
@@ -2274,7 +1908,7 @@ function AppContent({ onLanguageChange }) {
               onCustomSoundVolumeChange={handleCustomSoundVolumeChange}
               onAddCustomSound={handleAddCustomSound}
               onRemovePendingCustomSound={handleRemovePendingCustomSound}
-              initialExpanded={sectionsExpanded.game}
+              initialExpanded={gsm.getSectionsExpanded().game}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('game', expanded)
               }
@@ -2285,14 +1919,14 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12 col-xl-4">
             <CharacterSection
               key={`character-${sectionResetKey}`}
-              name={name}
-              skill={skill}
-              health={health}
-              luck={luck}
-              maxSkill={maxSkill}
-              maxHealth={maxHealth}
-              maxLuck={maxLuck}
-              isLocked={isLocked}
+              name={gsm.getName()}
+              skill={gsm.getSkill()}
+              health={gsm.getHealth()}
+              luck={gsm.getLuck()}
+              maxSkill={gsm.getMaxSkill()}
+              maxHealth={gsm.getMaxHealth()}
+              maxLuck={gsm.getMaxLuck()}
+              isLocked={gsm.getIsLocked()}
               fieldBadges={fieldBadges}
               rollingButton={rollingButton}
               onNameChange={setName}
@@ -2302,7 +1936,7 @@ function AppContent({ onLanguageChange }) {
               onRandomStats={handleRandomStatsWithAnimation}
               onToggleLock={handleToggleLock}
               onNumberChange={handleNumberChange}
-              initialExpanded={sectionsExpanded.character}
+              initialExpanded={gsm.getSectionsExpanded().character}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('character', expanded)
               }
@@ -2311,20 +1945,20 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12 col-xl-4">
             <ConsumablesSection
               key={`consumables-${sectionResetKey}`}
-              coins={coins}
-              meals={meals}
-              health={health}
-              maxHealth={maxHealth}
-              skill={skill}
-              maxSkill={maxSkill}
-              luck={luck}
-              maxLuck={maxLuck}
-              transactionObject={transactionObject}
-              transactionCost={transactionCost}
+              coins={gsm.getCoins()}
+              meals={gsm.getMeals()}
+              health={gsm.getHealth()}
+              maxHealth={gsm.getMaxHealth()}
+              skill={gsm.getSkill()}
+              maxSkill={gsm.getMaxSkill()}
+              luck={gsm.getLuck()}
+              maxLuck={gsm.getMaxLuck()}
+              transactionObject={gsm.getTransactionObject()}
+              transactionCost={gsm.getTransactionCost()}
               fieldBadges={fieldBadges}
-              isLocked={isLocked}
-              potionType={potionType}
-              potionUsed={potionUsed}
+              isLocked={gsm.getIsLocked()}
+              potionType={gsm.getPotionType()}
+              potionUsed={gsm.getPotionUsed()}
               onCoinsChange={setCoins}
               onMealsChange={setMeals}
               onTransactionObjectChange={setTransactionObject}
@@ -2334,7 +1968,7 @@ function AppContent({ onLanguageChange }) {
               onPotionTypeChange={setPotionType}
               onConsumePotion={handleConsumePotion}
               onNumberChange={handleNumberChange}
-              initialExpanded={sectionsExpanded.consumables}
+              initialExpanded={gsm.getSectionsExpanded().consumables}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('consumables', expanded)
               }
@@ -2345,10 +1979,10 @@ function AppContent({ onLanguageChange }) {
               key={`dice-${sectionResetKey}`}
               // TODO: Move canTestLuck logic to GameMaster once implemented
               // GameMaster should listen to luck value changes and control button state
-              canTestLuck={parseInt(luck) > 0}
+              canTestLuck={parseInt(gsm.getLuck()) > 0}
               gameShowManager={gameShowManagerRef.current}
               onTestLuckComplete={handleTestLuckComplete}
-              initialExpanded={sectionsExpanded.diceRolls}
+              initialExpanded={gsm.getSectionsExpanded().diceRolls}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('diceRolls', expanded)
               }
@@ -2359,10 +1993,10 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12 col-xl-4">
             <InventorySection
               key={`inventory-${sectionResetKey}`}
-              inventory={inventory}
+              inventory={gsm.getInventory()}
               onInventoryChange={setInventory}
               fieldBadges={fieldBadges}
-              initialExpanded={sectionsExpanded.inventory}
+              initialExpanded={gsm.getSectionsExpanded().inventory}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('inventory', expanded)
               }
@@ -2371,13 +2005,13 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12 col-xl-8">
             <MapSection
               key={`map-${sectionResetKey}`}
-              trailSequence={trailSequence}
+              trailSequence={gsm.getTrailSequence()}
               trailInput={trailInput}
               onTrailInputChange={setTrailInput}
               onTrailSubmit={handleTrailSubmit}
               onTrailPillColorChange={handleTrailPillColorChange}
               onTrailPillDelete={handleTrailPillDelete}
-              initialExpanded={sectionsExpanded.map}
+              initialExpanded={gsm.getSectionsExpanded().map}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('map', expanded)
               }
@@ -2388,21 +2022,21 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12">
             <FightSection
               key={`fight-${sectionResetKey}`}
-              skill={skill}
-              health={health}
-              luck={luck}
-              monsterCreature={monsterCreature}
-              monsterSkill={monsterSkill}
-              monsterHealth={monsterHealth}
-              graveyard={graveyard}
-              showUseLuck={showUseLuck}
-              luckUsed={luckUsed}
-              isFighting={isFighting}
+              skill={gsm.getSkill()}
+              health={gsm.getHealth()}
+              luck={gsm.getLuck()}
+              monsterCreature={gsm.getMonsterCreature()}
+              monsterSkill={gsm.getMonsterSkill()}
+              monsterHealth={gsm.getMonsterHealth()}
+              graveyard={gsm.getGraveyard()}
+              showUseLuck={gsm.getShowUseLuck()}
+              luckUsed={gsm.getLuckUsed()}
+              isFighting={gsm.getIsFighting()}
               isFightStarted={isFightStarted}
-              fightResult={fightResult}
-              fightOutcome={fightOutcome}
-              heroDiceRolls={heroDiceRolls}
-              monsterDiceRolls={monsterDiceRolls}
+              fightResult={gsm.getFightResult()}
+              fightOutcome={gsm.getFightOutcome()}
+              heroDiceRolls={gsm.getHeroDiceRolls()}
+              monsterDiceRolls={gsm.getMonsterDiceRolls()}
               testLuckResult={testLuckResult}
               isTestingLuck={isTestingLuck}
               diceRollingType={diceRollingType}
@@ -2413,7 +2047,7 @@ function AppContent({ onLanguageChange }) {
               onFight={handleFight}
               onUseLuck={handleUseLuck}
               onNumberChange={handleNumberChange}
-              initialExpanded={sectionsExpanded.fight}
+              initialExpanded={gsm.getSectionsExpanded().fight}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('fight', expanded)
               }
@@ -2424,9 +2058,9 @@ function AppContent({ onLanguageChange }) {
           <div className="col-12">
             <NotesSection
               key={`notes-${sectionResetKey}`}
-              notes={notes}
+              notes={gsm.getNotes()}
               onNotesChange={setNotes}
-              initialExpanded={sectionsExpanded.notes}
+              initialExpanded={gsm.getSectionsExpanded().notes}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('notes', expanded)
               }
