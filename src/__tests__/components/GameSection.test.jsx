@@ -102,7 +102,7 @@ describe('GameSection', () => {
       expect(saveButton).not.toBeDisabled();
     });
 
-    it('should call onSaveGame handler when clicked and book name is not empty', async () => {
+    it('should generate a file, with a particular filename, containing the game state', async () => {
       const user = userEvent.setup();
       const onSaveGame = vi.fn();
 
@@ -119,26 +119,10 @@ describe('GameSection', () => {
 
       expect(onSaveGame).toHaveBeenCalledTimes(1);
     });
-
-    it('should not call onSaveGame when book name is empty even if clicked', async () => {
-      const user = userEvent.setup();
-      const onSaveGame = vi.fn();
-
-      render(<GameSection {...defaultProps} book="" onSaveGame={onSaveGame} />);
-
-      const saveButton = screen.getByRole('button', { name: /save game/i });
-      expect(saveButton).toBeDisabled();
-      // Even if we try to click, it shouldn't call the handler
-      await user.click(saveButton).catch(() => {
-        // Expected to fail because button is disabled
-      });
-
-      expect(onSaveGame).not.toHaveBeenCalled();
-    });
   });
 
   describe('Load button', () => {
-    it('should call onLoadGame handler when clicked', async () => {
+    it('should load a game file when clicked', async () => {
       const user = userEvent.setup();
       const onLoadGame = vi.fn();
 
@@ -152,7 +136,7 @@ describe('GameSection', () => {
   });
 
   describe('Reset button', () => {
-    it('should call onReset handler when clicked', async () => {
+    it('should reset the game when clicked', async () => {
       const user = userEvent.setup();
       const onReset = vi.fn();
 

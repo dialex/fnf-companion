@@ -8,6 +8,8 @@ import {
   applyLoadedState,
   createDebouncedSave,
   getDefaultState,
+  saveStateToFile,
+  loadStateFromFile,
 } from './managers/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
@@ -15,7 +17,6 @@ import { createDiceRoller } from './managers/diceRoller';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
 import confetti from 'canvas-confetti';
-import yaml from 'js-yaml';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -1657,120 +1658,66 @@ function AppContent({ onLanguageChange }) {
       customSoundVolumes,
     });
 
-    // Generate filename: <book>-<charactername>-<YYYYMMDD>-<HHMMSS>.yaml
-    const now = new Date();
-    const datePart =
-      now.getFullYear().toString() +
-      String(now.getMonth() + 1).padStart(2, '0') +
-      String(now.getDate()).padStart(2, '0');
-    const timePart =
-      String(now.getHours()).padStart(2, '0') +
-      String(now.getMinutes()).padStart(2, '0') +
-      String(now.getSeconds()).padStart(2, '0');
-
-    const sanitizeFilename = (str) => {
-      return str.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-    };
-
-    const bookPart = sanitizeFilename(book || 'book');
-    const namePart = sanitizeFilename(name || 'character');
-    const filename = `${bookPart}-${namePart}-${datePart}-${timePart}.yaml`;
-
-    const yamlString = yaml.dump(stateToSave, { indent: 2, lineWidth: -1 });
-    const blob = new Blob([yamlString], { type: 'text/yaml' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
+    saveStateToFile(stateToSave, book, name);
     setNotification({ message: t('game.saved'), type: 'success' });
   };
 
-  const handleLoadGame = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.yaml';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  const handleLoadGame = async () => {
+    const loadedState = await loadStateFromFile();
+    if (!loadedState) {
+      return;
+    }
 
-      // Validate file extension
-      if (!file.name.toLowerCase().endsWith('.yaml')) {
-        return;
-      }
+    // Restore book name
+    if (loadedState.metadata?.bookname) {
+      setBook(loadedState.metadata.bookname);
+    }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const fileContent = event.target.result;
-          const loadedState = yaml.load(fileContent);
+    // Apply loaded state
+    applyLoadedState(loadedState, {
+      setName,
+      setSkill,
+      setHealth,
+      setLuck,
+      setIsLocked,
+      setMaxSkill,
+      setMaxHealth,
+      setMaxLuck,
+      setCoins,
+      setMeals,
+      setTransactionObject,
+      setTransactionCost,
+      setPotionType,
+      setPotionUsed,
+      setInventory,
+      setNotes,
+      setMonsterSkill,
+      setMonsterHealth,
+      setMonsterCreature,
+      setGraveyard,
+      setShowUseLuck,
+      setLuckUsed,
+      setIsFighting,
+      setFightResult,
+      setFightOutcome,
+      setHeroDiceRolls,
+      setMonsterDiceRolls,
+      setRollingButton,
+      setTestLuckResult,
+      setIsTestingLuck,
+      setDiceRollingType,
+      setTrailSequence,
+      setSoundUrls,
+      setSoundVolumes,
+      setActionSoundsEnabled,
+      setAllSoundsMuted,
+      setTheme,
+      setSectionsExpanded,
+      setCustomSounds,
+      setCustomSoundVolumes,
+    });
 
-          // Validate it's a valid state object
-          if (!loadedState || typeof loadedState !== 'object') {
-            return;
-          }
-
-          // Restore book name
-          if (loadedState.metadata?.bookname) {
-            setBook(loadedState.metadata.bookname);
-          }
-
-          // Apply loaded state
-          applyLoadedState(loadedState, {
-            setName,
-            setSkill,
-            setHealth,
-            setLuck,
-            setIsLocked,
-            setMaxSkill,
-            setMaxHealth,
-            setMaxLuck,
-            setCoins,
-            setMeals,
-            setTransactionObject,
-            setTransactionCost,
-            setPotionType,
-            setPotionUsed,
-            setInventory,
-            setNotes,
-            setMonsterSkill,
-            setMonsterHealth,
-            setMonsterCreature,
-            setGraveyard,
-            setShowUseLuck,
-            setLuckUsed,
-            setIsFighting,
-            setFightResult,
-            setFightOutcome,
-            setHeroDiceRolls,
-            setMonsterDiceRolls,
-            setRollingButton,
-            setTestLuckResult,
-            setIsTestingLuck,
-            setDiceRollingType,
-            setTrailSequence,
-            setSoundUrls,
-            setSoundVolumes,
-            setActionSoundsEnabled,
-            setAllSoundsMuted,
-            setTheme,
-            setSectionsExpanded,
-            setCustomSounds,
-            setCustomSoundVolumes,
-          });
-
-          setNotification({ message: t('game.loaded'), type: 'success' });
-        } catch (error) {
-          console.error('Error loading game file:', error);
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
+    setNotification({ message: t('game.loaded'), type: 'success' });
   };
 
   const handlePurchase = () => {

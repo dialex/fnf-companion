@@ -3,6 +3,7 @@
  */
 
 import { getFromStorage, saveToStorage } from '../utils/localStorage';
+import { saveToFile, loadFromFile } from './fileManager';
 import packageJson from '../../package.json';
 
 const CURRENT_VERSION = packageJson.version;
@@ -334,4 +335,22 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.metadata?.theme !== undefined && setters.setTheme) {
     setters.setTheme(savedState.metadata.theme);
   }
+};
+
+/**
+ * Save state to YAML file
+ * @param {Object} state - Game state object to save
+ * @param {string} bookName - Book name for filename
+ * @param {string} characterName - Character name for filename
+ */
+export const saveStateToFile = (state, bookName, characterName) => {
+  saveToFile(state, bookName, characterName);
+};
+
+/**
+ * Load state from YAML file
+ * @returns {Promise<Object|null>} Loaded state object or null if cancelled/invalid
+ */
+export const loadStateFromFile = () => {
+  return loadFromFile();
 };
