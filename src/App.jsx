@@ -1806,7 +1806,7 @@ function AppContent({ onLanguageChange }) {
     const roll2 = rolls.roll2;
     const sum = rolls.sum;
     const currentLuck = parseInt(luck) || 0;
-    const isLucky = sum <= currentLuck;
+    const isLucky = sum <= currentLuck; //TODO: move this logic to GameMaster
 
     // Show luck test result (message + sound via GameShowManager)
     const gameState = {
@@ -2087,7 +2087,7 @@ function AppContent({ onLanguageChange }) {
       const roll1 = rolls.roll1;
       const roll2 = rolls.roll2;
       const sum = rolls.sum;
-      const isLucky = sum <= currentLuck;
+      const isLucky = sum <= currentLuck; //TODO: move this logic to GameMaster
 
       const gameState = {
         allSoundsMuted,
