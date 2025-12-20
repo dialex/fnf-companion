@@ -19,13 +19,17 @@
 
 ## Game Section (`src/components/GameSection.jsx`)
 
-- [ ] Save and load file logic
-  - [ ] Creates yaml file
-  - [ ] Saves file and has the right values
-  - [ ] Loads file
-  - [ ] Loads file and overrides current state (and local storage)
-- [ ] Reset game functionality
-- [ ] All user-facing text is translated
+- [ ] Save button
+  - [ ] Button is disabled while the book's name is empty
+  - [ ] Creates a file in desktop with the expected filename (naming rules)
+  - [ ] File contains all the relevant game state
+  - [ ] File is a valid yaml
+- [ ] Load button
+  - [ ] Asks user for a yaml file
+  - [ ] If file is invalid yaml, stops and shows error message below the button area
+  - [ ] If file is valid it loads its values into the current state, overriding it (and local storage too)
+- [ ] Reset button
+  - [ ] Clears the current game state, empties fields, and returns everything to their default state (also clears local storage)
 
 ## Character Section (`src/components/CharacterSection.jsx`)
 
@@ -41,17 +45,6 @@
 - [ ] Meals can be updated
 - [ ] Transaction logic works
 - [ ] Potion usage works
-- [ ] All user-facing text is translated
-
-## Dice Rolls Section (`src/components/DiceRollsSection.jsx`)
-
-- [x] Roll one die functionality
-- [x] Roll two dice functionality
-- [x] Test luck functionality
-- [x] Buttons are disabled during rolls
-- [x] Luck test button is disabled when luck is 0
-- [x] Dice results are displayed correctly
-- [x] Luck test messages are displayed with correct styling
 - [ ] All user-facing text is translated
 
 ## Inventory Section (`src/components/InventorySection.jsx`)
@@ -97,15 +90,6 @@
 - [ ] Dialog displays messages correctly
 - [ ] Confirm/cancel actions work
 - [ ] All user-facing text is translated
-
-## Translations logic
-
-- [x] User-facing strings are not hardcoded in the code
-- [x] User-facing strings are listed in a language specific json
-- [x] User-facing strings are loaded from its respective language file and then displayed to the user
-- [x] Languages can be changed without a page reload
-- [x] There's a menu in the page that lets the user switch languages
-- [x] There's an entry in the menu for each Language file
 
 ## 🎵 Sound Management (Hard)
 

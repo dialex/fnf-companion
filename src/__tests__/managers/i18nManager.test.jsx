@@ -108,7 +108,7 @@ describe('i18nManager', () => {
   });
 
   describe('component rendering', () => {
-    it('should display translated text in component, not the key', () => {
+    it('should display translated text (value) in component, not the key', () => {
       const TestComponent = ({ i18n }) => {
         return (
           <div>
