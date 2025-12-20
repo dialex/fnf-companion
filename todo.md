@@ -1,0 +1,3 @@
+- After loading game, custom sounds don't play and there are no errors
+- Not playing ambient sound automatically again after death sound playing
+- Allow the player stats in the fight panel to be modifiable
