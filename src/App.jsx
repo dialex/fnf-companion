@@ -11,7 +11,6 @@ import {
 } from './managers/stateManager';
 import { getCurrentTheme, setTheme } from './utils/theme';
 import { convertColorToNote } from './utils/trailMapping';
-import { createActionSoundsManager } from './utils/actionSoundsManager';
 import { createDiceRoller } from './managers/diceRoller';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
@@ -120,9 +119,6 @@ function AppContent({ onLanguageChange }) {
 
   // Field badges
   const [fieldBadges, setFieldBadges] = useState({});
-
-  // Action sounds manager
-  const actionSoundsPlayer = useRef(createActionSoundsManager());
 
   // SoundManager and GameShowManager (use singleton i18nManager)
   const soundManagerRef = useRef(createSoundManager());
@@ -2093,7 +2089,11 @@ function AppContent({ onLanguageChange }) {
       const sum = rolls.sum;
       const isLucky = sum <= currentLuck;
 
-      actionSoundsPlayer.current.echoLuckTest(isLucky, actionSoundsEnabled);
+      const gameState = {
+        allSoundsMuted,
+        actionSoundsEnabled,
+      };
+      gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
 
       const heroWonLastFight = fightResult.type === 'heroWins';
       const currentHealth = parseInt(health) || 0;

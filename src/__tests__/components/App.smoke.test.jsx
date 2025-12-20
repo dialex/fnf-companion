@@ -33,12 +33,6 @@ vi.mock('../../managers/stateManager', () => ({
   }),
 }));
 
-vi.mock('../../utils/actionSoundsManager', () => ({
-  createActionSoundsManager: () => ({
-    echoLuckTest: vi.fn(),
-  }),
-}));
-
 // Mock YouTube API
 class MockYTPlayer {
   constructor() {
