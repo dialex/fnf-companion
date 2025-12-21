@@ -8,18 +8,7 @@ import {
   mdiPalette,
 } from '@mdi/js';
 import { i18nManager } from '../managers/i18nManager';
-import {
-  setTheme,
-  getCurrentTheme,
-  getAvailableThemes,
-  THEMES,
-} from '../utils/theme';
-import {
-  setPalette,
-  getCurrentPalette,
-  getAvailablePalettes,
-  checkPaletteVariants,
-} from '../utils/palette';
+import { themeManager } from '../managers/themeManager';
 
 export default function Header({ onLanguageChange, onThemeChange }) {
   const i18n = i18nManager;
@@ -28,45 +17,52 @@ export default function Header({ onLanguageChange, onThemeChange }) {
   const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
-  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
-  const [currentPalette, setCurrentPalette] = useState(getCurrentPalette());
+  const [, forceUpdate] = useState({});
   const [paletteVariants, setPaletteVariants] = useState({
     hasLight: true,
     hasDark: true,
   });
+  const currentMode = themeManager.getMode();
+  const currentPalette = themeManager.getPalette();
 
-  // Get available themes filtered by palette variants
-  const getFilteredThemes = () => {
-    const allThemes = getAvailableThemes();
+  // Get available modes filtered by palette variants
+  const getFilteredModes = () => {
+    const allModes = themeManager.getAvailableModes();
     const { hasLight, hasDark } = paletteVariants;
 
-    // If only one variant is available, hide the opposite variant
-    if (hasLight && !hasDark) {
-      // Only light available - hide dark
-      return allThemes.filter((theme) => theme !== THEMES.DARK);
-    } else if (hasDark && !hasLight) {
-      // Only dark available - hide light
-      return allThemes.filter((theme) => theme !== THEMES.LIGHT);
-    }
-
-    return allThemes;
+    // Filter out modes that don't have a corresponding palette variant
+    return allModes.filter((mode) => {
+      if (mode === 'light') return hasLight;
+      if (mode === 'dark') return hasDark;
+      return true; // Keep other modes if any
+    });
   };
 
-  const filteredThemes = getFilteredThemes();
-  const hasOnlyOneTheme = filteredThemes.length === 1;
+  const filteredModes = getFilteredModes();
+  const hasOnlyOneMode = filteredModes.length === 1;
 
-  // Sync theme and palette state on mount (with small delay to ensure they are initialized)
+  // Subscribe to mode/palette changes and update palette variants
   useEffect(() => {
-    // Use setTimeout to ensure theme and palette are initialized from main.jsx
-    const timer = setTimeout(() => {
-      setCurrentTheme(getCurrentTheme());
-      setCurrentPalette(getCurrentPalette());
-      // Check palette variants after initial load
-      const variants = checkPaletteVariants();
+    const updateVariants = () => {
+      const variants = themeManager.checkPaletteVariants();
       setPaletteVariants(variants);
-    }, 100); // Slightly longer delay to ensure CSS is loaded
-    return () => clearTimeout(timer);
-  }, []);
+      forceUpdate({});
+      if (onThemeChange) {
+        onThemeChange(themeManager.getMode());
+      }
+    };
+
+    // Initial check
+    const timer = setTimeout(() => {
+      updateVariants();
+    }, 100);
+
+    const unsubscribe = themeManager.subscribe(updateVariants);
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [onThemeChange]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,48 +85,20 @@ export default function Header({ onLanguageChange, onThemeChange }) {
     setShowLanguageSelect(!showLanguageSelect);
   };
 
-  const handleThemeToggle = () => {
-    // Don't toggle if only one theme is available
-    if (hasOnlyOneTheme) {
+  const handleModeToggle = () => {
+    // Don't toggle if only one mode is available
+    if (hasOnlyOneMode) {
       return;
     }
     // Toggle between light and dark
-    const newTheme = currentTheme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
-    setTheme(newTheme);
-    setCurrentTheme(newTheme);
-    // Notify parent component to trigger re-render
-    if (onThemeChange) {
-      onThemeChange(newTheme);
-    }
+    const newMode = currentMode === 'light' ? 'dark' : 'light';
+    themeManager.setMode(newMode);
   };
 
   const handlePaletteChange = (palette) => {
-    setPalette(palette, () => {
-      // Callback after palette loads - refresh theme state to reflect auto-switch
-      setCurrentPalette(palette);
-      setCurrentTheme(getCurrentTheme());
-
-      // Update palette variants state
-      const variants = checkPaletteVariants();
-      setPaletteVariants(variants);
-
-      // Notify parent component to trigger re-render
-      if (onThemeChange) {
-        onThemeChange(getCurrentTheme());
-      }
-    });
+    themeManager.setPalette(palette);
     setShowPaletteSelect(false);
   };
-
-  // Check palette variants on mount and when palette changes
-  useEffect(() => {
-    // Delay to ensure CSS is loaded
-    const timer = setTimeout(() => {
-      const variants = checkPaletteVariants();
-      setPaletteVariants(variants);
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [currentPalette]);
 
   const handlePaletteIconClick = () => {
     setShowPaletteSelect(!showPaletteSelect);
@@ -257,7 +225,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                 {t('navigation.notes')}
               </a>
             </div>
-            {/* Palette, Theme and Language selectors - visible on both desktop and mobile */}
+            {/* Palette, Mode and Language selectors - visible on both desktop and mobile */}
             <div className="position-relative palette-selector">
               <div
                 className="d-flex align-items-center"
@@ -284,7 +252,7 @@ export default function Header({ onLanguageChange, onThemeChange }) {
                     overflow: 'hidden',
                   }}
                 >
-                  {getAvailablePalettes().map((palette) => (
+                  {themeManager.getAvailablePalettes().map((palette) => (
                     <button
                       key={palette}
                       className="btn btn-link text-white text-decoration-none d-block w-100 text-start p-2"
@@ -323,16 +291,14 @@ export default function Header({ onLanguageChange, onThemeChange }) {
               <div
                 className="d-flex align-items-center"
                 style={{
-                  cursor: hasOnlyOneTheme ? 'not-allowed' : 'pointer',
-                  opacity: hasOnlyOneTheme ? 0.5 : 1,
+                  cursor: hasOnlyOneMode ? 'not-allowed' : 'pointer',
+                  opacity: hasOnlyOneMode ? 0.5 : 1,
                 }}
-                onClick={handleThemeToggle}
+                onClick={handleModeToggle}
               >
                 <Icon
                   path={
-                    currentTheme === THEMES.LIGHT
-                      ? mdiBrightness5
-                      : mdiBrightness4
+                    currentMode === 'light' ? mdiBrightness5 : mdiBrightness4
                   }
                   size={1}
                   className="text-white"

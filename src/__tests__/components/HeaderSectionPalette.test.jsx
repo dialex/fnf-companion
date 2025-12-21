@@ -50,25 +50,43 @@ vi.mock('../../utils/theme', () => ({
   THEMES: { LIGHT: 'light', DARK: 'dark' },
 }));
 
-// Mock palette utilities
+// Mock themeManager
 const {
-  mockGetCurrentPalette,
+  mockGetPalette,
   mockGetAvailablePalettes,
   mockSetPalette,
   mockCheckPaletteVariants,
-} = vi.hoisted(() => ({
-  mockGetCurrentPalette: vi.fn(() => 'default'),
-  mockGetAvailablePalettes: vi.fn(() => ['default', 'beach', 'forest']),
-  mockSetPalette: vi.fn(),
-  mockCheckPaletteVariants: vi.fn(() => ({ hasLight: true, hasDark: true })),
-}));
+} = vi.hoisted(() => {
+  const listeners = new Set();
+  return {
+    mockGetPalette: vi.fn(() => 'default'),
+    mockGetAvailablePalettes: vi.fn(() => ['default', 'beach', 'forest']),
+    mockSetPalette: vi.fn((palette) => {
+      mockGetPalette.mockReturnValue(palette);
+      listeners.forEach((cb) => cb());
+    }),
+    mockCheckPaletteVariants: vi.fn(() => ({ hasLight: true, hasDark: true })),
+  };
+});
 
-vi.mock('../../utils/palette', () => ({
-  getCurrentPalette: () => mockGetCurrentPalette(),
-  getAvailablePalettes: () => mockGetAvailablePalettes(),
-  setPalette: mockSetPalette,
-  checkPaletteVariants: mockCheckPaletteVariants,
-}));
+vi.mock('../../managers/themeManager', () => {
+  const listeners = new Set();
+  return {
+    themeManager: {
+      getMode: vi.fn(() => 'light'),
+      getAvailableModes: vi.fn(() => ['light', 'dark']),
+      setMode: vi.fn(),
+      getPalette: () => mockGetPalette(),
+      getAvailablePalettes: () => mockGetAvailablePalettes(),
+      setPalette: mockSetPalette,
+      checkPaletteVariants: () => mockCheckPaletteVariants(),
+      subscribe: vi.fn((callback) => {
+        listeners.add(callback);
+        return () => listeners.delete(callback);
+      }),
+    },
+  };
+});
 
 describe('Header Section - Palette', () => {
   let user;
@@ -78,7 +96,7 @@ describe('Header Section - Palette', () => {
     vi.clearAllMocks();
     mockCurrentLanguage.set('en');
     mockGetCurrentLanguage.mockReturnValue('en');
-    mockGetCurrentPalette.mockReturnValue('default');
+    mockGetPalette.mockReturnValue('default');
     mockGetAvailablePalettes.mockReturnValue(['default', 'beach', 'forest']);
     const translations = {
       en: {
@@ -164,7 +182,7 @@ describe('Header Section - Palette', () => {
     await user.click(beachOption);
 
     // Verify setPalette was called (which loads the CSS)
-    expect(mockSetPalette).toHaveBeenCalledWith('beach', expect.any(Function));
+    expect(mockSetPalette).toHaveBeenCalledWith('beach');
 
     // Restore original appendChild
     document.head.appendChild = originalAppendChild;
@@ -172,16 +190,16 @@ describe('Header Section - Palette', () => {
 
   it('should persist palette preference after page reload', () => {
     // Simulate a persisted palette preference
-    localStorage.setItem('fnf-companion-palette', 'beach');
+    localStorage.setItem('fnf-companion-palette', JSON.stringify('beach'));
 
-    // Mock getCurrentPalette to return persisted palette
-    mockGetCurrentPalette.mockReturnValue('beach');
+    // Mock getPalette to return persisted palette
+    mockGetPalette.mockReturnValue('beach');
 
     render(<Header />);
 
     // Header should work with persisted palette
-    // The actual persistence is tested in palette utility tests,
+    // The actual persistence is tested in ThemeManager tests,
     // but we verify Header correctly uses the persisted palette
-    expect(mockGetCurrentPalette).toHaveBeenCalled();
+    expect(mockGetPalette).toHaveBeenCalled();
   });
 });
