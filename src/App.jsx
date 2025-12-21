@@ -1282,6 +1282,9 @@ function AppContent({ onLanguageChange }) {
     }
   };
 
+  // TODO: Move potion consumption logic to GameMaster once implemented
+  // GameMaster should handle: validation, restoring stat to max value, playing drink sound, showing badges, marking potion as used
+  // Missing tests (should be in GameMaster): potion restores trait to max value, drink sound plays when potion is consumed
   const handleConsumePotion = () => {
     if (potionUsed || !potionType || !isLocked) return;
 
