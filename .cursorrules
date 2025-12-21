@@ -26,8 +26,12 @@ When adding user-facing text:
 - When fixing a bug, first create a test that reproduces the issue, then change just enough code to make the test pass. That test becomes a regression test, in the regressions test folder.
 - Test descriptions must focus on behavior and business rules, not implementation details.
   - BAD: "should call i18nManager.setLanguage when clicked"
+  - BAD: "should call onNameChange when name is changed"
   - GOOD: "should change the language when a language option is clicked"
+  - GOOD: "should save character name when name input is changed"
   - Test descriptions should read as non-technical requirements that a product manager could understand.
+  - **CRITICAL**: NEVER use function names, method names, or "call" in test descriptions. Always describe what the user experiences or what the system does, not how it's implemented.
+  - **Before finalizing any test**: Review the test description and ask "Does this describe what the user sees/experiences, or does it describe code implementation?" If it describes implementation, rewrite it.
 - Tests must verify real behavior, not mocked behavior. After writing a test, verify it catches real failures by temporarily breaking the code and confirming the test fails.
 - Prefer using real code over mocks. Only mock when necessary (e.g., external APIs, timers, or when testing in isolation is required).
 - Avoid "dummy tests" that would pass even if the code is broken. Tests should assert actual behavior, not just that functions were called.
