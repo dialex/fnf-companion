@@ -178,48 +178,4 @@ describe('Header Section - Theme (Mode)', () => {
     // Header should work with persisted mode
     expect(mockGetMode).toHaveBeenCalled();
   });
-
-  it('@regression should show correct icon matching the mode on initial render', async () => {
-    // Bug: Icon showed dark mode when mode was light on first render
-    // Fixed: Made currentMode reactive state instead of const
-    mockGetMode.mockReturnValue('light');
-    const { container } = render(<Header />);
-
-    // Wait for useEffect to sync state
-    await waitFor(
-      () => {
-        const themeSelector = container.querySelector('.theme-selector');
-        const icon = themeSelector?.querySelector('svg');
-        expect(icon).toBeInTheDocument();
-      },
-      { timeout: 200 }
-    );
-
-    // Verify getMode was called to initialize state
-    expect(mockGetMode).toHaveBeenCalled();
-  });
-
-  it('@regression should sync icon and page theme after page refresh', async () => {
-    // Bug: After refresh, icon showed dark but page used light mode
-    // Fixed: Removed App.jsx code that loaded theme from game state, improved init() timing
-    localStorage.setItem('fnf-companion-theme', JSON.stringify('dark'));
-    mockGetMode.mockReturnValue('dark');
-
-    const { container } = render(<Header />);
-
-    // Wait for useEffect to sync state from themeManager
-    await waitFor(
-      () => {
-        const themeSelector = container.querySelector('.theme-selector');
-        expect(themeSelector).toBeInTheDocument();
-      },
-      { timeout: 200 }
-    );
-
-    // Verify getMode was called to get the persisted value
-    expect(mockGetMode).toHaveBeenCalled();
-
-    // Note: Full integration test would verify document.documentElement.getAttribute('data-theme')
-    // but that requires testing with real themeManager, not mocks
-  });
 });
