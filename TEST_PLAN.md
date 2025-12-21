@@ -2,11 +2,6 @@
 
 - [ ] Page loads and there's no console error when the page finished loading
 
-## Footer Section (`src/components/Footer.jsx`)
-
-- [ ] Footer displays correctly
-- [ ] Footer content is translated
-
 ## Character Section (`src/components/CharacterSection.jsx`)
 
 - [ ] Character stats can be edited
