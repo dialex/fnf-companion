@@ -122,4 +122,96 @@ describe('Consumables Section', () => {
       );
     });
   });
+
+  describe('Trade button', () => {
+    const getBuyButton = (container) => {
+      const buyLabel = screen.getByText('Buy');
+      const fieldGroup = buyLabel.closest('.field-group');
+      return fieldGroup?.querySelector('button');
+    };
+
+    it('should allow typing the name of an item', () => {
+      render(<ConsumablesSection {...defaultProps} />);
+
+      const textInputs = document.querySelectorAll('input[type="text"]');
+      const itemInput = textInputs[0];
+      expect(itemInput).toBeInTheDocument();
+      expect(itemInput).toHaveAttribute('placeholder', 'Item');
+
+      fireEvent.change(itemInput, { target: { value: 'Sword' } });
+      expect(defaultProps.onTransactionObjectChange).toHaveBeenCalledWith(
+        'Sword'
+      );
+    });
+
+    it('should allow typing the cost of an item', () => {
+      render(<ConsumablesSection {...defaultProps} />);
+
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      const costInput = numberInputs[2];
+      expect(costInput).toBeInTheDocument();
+      expect(costInput).toHaveAttribute('placeholder', '0');
+
+      fireEvent.change(costInput, { target: { value: '5' } });
+      expect(defaultProps.onTransactionCostChange).toHaveBeenCalledWith('5');
+    });
+
+    it('should be enabled when user has enough coins', () => {
+      const { container } = render(
+        <ConsumablesSection
+          {...defaultProps}
+          coins="10"
+          transactionObject="Sword"
+          transactionCost="5"
+        />
+      );
+
+      const buyButton = getBuyButton(container);
+      expect(buyButton).not.toBeDisabled();
+    });
+
+    it('should be disabled when item name is empty', () => {
+      const { container } = render(
+        <ConsumablesSection
+          {...defaultProps}
+          coins="10"
+          transactionObject=""
+          transactionCost="5"
+        />
+      );
+
+      const buyButton = getBuyButton(container);
+      expect(buyButton).toBeDisabled();
+    });
+
+    it('should be disabled when cost is invalid', () => {
+      const { container } = render(
+        <ConsumablesSection
+          {...defaultProps}
+          coins="10"
+          transactionObject="Sword"
+          transactionCost="0"
+        />
+      );
+
+      const buyButton = getBuyButton(container);
+      expect(buyButton).toBeDisabled();
+    });
+
+    it('should call onPurchase when buy button is clicked', () => {
+      const { container } = render(
+        <ConsumablesSection
+          {...defaultProps}
+          coins="10"
+          transactionObject="Sword"
+          transactionCost="5"
+        />
+      );
+
+      const buyButton = getBuyButton(container);
+      fireEvent.click(buyButton);
+
+      expect(defaultProps.onPurchase).toHaveBeenCalledTimes(1);
+    });
+  });
 });

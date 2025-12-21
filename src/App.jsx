@@ -1412,6 +1412,8 @@ function AppContent({ onLanguageChange }) {
     }
   };
 
+  // TODO: Move purchase logic to GameMaster once implemented
+  // GameMaster should handle: validation, deducting coins, adding to inventory, playing sound, showing badges
   const handlePurchase = () => {
     if (actionSoundsEnabled) {
       const audio = new Audio(`${import.meta.env.BASE_URL}audio/purchase.mp3`);
