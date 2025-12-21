@@ -4,11 +4,12 @@
 
 ## Character Section (`src/components/CharacterSection.jsx`)
 
-- [ ] Character stats can be edited
-- [ ] Character stats are saved to state
-- [ ] Lock/unlock functionality works
-- [ ] Max values are enforced
-- [ ] All user-facing text is translated
+- [x] Character stats can be edited
+- [x] Character stats are saved to state
+- [ ] As the user types the name of the char, it renames the section title to have the same text
+- [x] Lock/unlock functionality works
+- [x] Max values are enforced
+- [x] All user-facing text is translated
 
 ## Consumables Section (`src/components/ConsumablesSection.jsx`)
 
