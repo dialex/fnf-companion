@@ -4,32 +4,29 @@
 
 ## Header Section (`src/components/Header.jsx`)
 
-- [ ] Language menu shows available language options
-- [ ] Clicking a language option updates all text on the page without reload
-- [ ] Language preference persists after page reload
-- [ ] Theme toggle switches between light/dark themes
-- [ ] Theme preference persists after page reload
-- [ ] Palette menu shows available palettes
-- [ ] Palette changes take immediate effect without page reload
+- Title
+  - [ ] Shows a title
+  - [ ] Shows a logo to the left of the title
+- Language
+  - [x] There's a button icon with a dropdown of languages
+  - [x] When clicked shows list of languages available
+  - [x] Changing language changes the text in the page without the need for a page refresh
+  - [x] Language preference persists after page reload
+- Theme
+  - [ ] There's a button icon to toggle between light and dark
+  - [ ] The button's icon shows the current theme
+  - [ ] If the current palette only has one theme available (light or dark), then button is disabled in the current state
+  - [ ] Theme preference persists after page reload
+- Palette
+  - [ ] There's a button icon with a dropdown of palettes
+  - [ ] When clicked shows list of palettes available
+  - [ ] Changing palette changes the colors of the page without the need for a page refresh
+  - [ ] Palette preference persists after page reload
 
 ## Footer Section (`src/components/Footer.jsx`)
 
 - [ ] Footer displays correctly
 - [ ] Footer content is translated
-
-## Game Section (`src/components/GameSection.jsx`)
-
-- [ ] Save button
-  - [ ] Button is disabled while the book's name is empty
-  - [ ] Creates a file in desktop with the expected filename (naming rules)
-  - [ ] File contains all the relevant game state
-  - [ ] File is a valid yaml
-- [ ] Load button
-  - [ ] Asks user for a yaml file
-  - [ ] If file is invalid yaml, stops and shows error message below the button area
-  - [ ] If file is valid it loads its values into the current state, overriding it (and local storage too)
-- [ ] Reset button
-  - [ ] Clears the current game state, empties fields, and returns everything to their default state (also clears local storage)
 
 ## Character Section (`src/components/CharacterSection.jsx`)
 
