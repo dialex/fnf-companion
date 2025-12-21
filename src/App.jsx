@@ -5,6 +5,7 @@ import { createGameStateManager } from './managers/gameStateManager';
 import { themeManager } from './managers/themeManager';
 import { convertColorToNote } from './utils/trailMapping';
 import { createDiceRoller } from './managers/diceRoller';
+import { rollDie, rollTwoDice } from './utils/dice';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
 import confetti from 'canvas-confetti';

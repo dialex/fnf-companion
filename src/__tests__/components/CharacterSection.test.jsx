@@ -1,5 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import CharacterSection from '../../components/CharacterSection';
@@ -68,6 +74,10 @@ describe('Character Section', () => {
   beforeEach(() => {
     user = userEvent.setup();
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('Character stats are editable', () => {
@@ -326,19 +336,76 @@ describe('Character Section', () => {
       expect(defaultProps.onRandomStats).toHaveBeenCalled();
     });
 
-    it('should disable randomize button when rolling is in progress', () => {
+    it('should show roll animation and disable the button while randomize is in progress', () => {
       render(<CharacterSection {...defaultProps} rollingButton="randomize" />);
 
       const randomizeButton = screen.getByText('Randomize');
       expect(randomizeButton).toBeDisabled();
-    });
-
-    it('should show rolling animation when randomize is in progress', () => {
-      render(<CharacterSection {...defaultProps} rollingButton="randomize" />);
-
-      const randomizeButton = screen.getByText('Randomize');
       const icon = randomizeButton.querySelector('svg');
       expect(icon).toHaveClass('dice-rolling');
+    });
+
+    it('should update stats and stop animation after randomize completes', () => {
+      vi.useFakeTimers();
+
+      let currentRollingButton = null;
+      const mockOnRandomStats = vi.fn(() => {
+        currentRollingButton = 'randomize';
+        setTimeout(() => {
+          defaultProps.onSkillChange('15');
+          defaultProps.onHealthChange('25');
+          defaultProps.onLuckChange('12');
+          currentRollingButton = null;
+        }, 1000);
+      });
+
+      const { rerender } = render(
+        <CharacterSection
+          {...defaultProps}
+          onRandomStats={mockOnRandomStats}
+          rollingButton={currentRollingButton}
+        />
+      );
+
+      const randomizeButton = screen.getByText('Randomize');
+      expect(randomizeButton).not.toBeDisabled();
+
+      fireEvent.click(randomizeButton);
+      expect(mockOnRandomStats).toHaveBeenCalledTimes(1);
+
+      rerender(
+        <CharacterSection
+          {...defaultProps}
+          onRandomStats={mockOnRandomStats}
+          rollingButton={currentRollingButton}
+        />
+      );
+
+      const buttonDuringRoll = screen.getByText('Randomize');
+      expect(buttonDuringRoll).toBeDisabled();
+      const icon = buttonDuringRoll.querySelector('svg');
+      expect(icon).toHaveClass('dice-rolling');
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(defaultProps.onSkillChange).toHaveBeenCalled();
+      expect(defaultProps.onHealthChange).toHaveBeenCalled();
+      expect(defaultProps.onLuckChange).toHaveBeenCalled();
+
+      rerender(
+        <CharacterSection
+          {...defaultProps}
+          onRandomStats={mockOnRandomStats}
+          rollingButton={currentRollingButton}
+        />
+      );
+
+      const buttonAfter = screen.getByText('Randomize');
+      expect(buttonAfter).not.toBeDisabled();
+      const iconAfter = buttonAfter.querySelector('svg');
+      expect(iconAfter).not.toHaveClass('dice-rolling');
     });
   });
 
