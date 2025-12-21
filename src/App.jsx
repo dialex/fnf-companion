@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { i18nManager } from './managers/i18nManager';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import { createGameStateManager } from './managers/gameStateManager';
-import { getCurrentTheme, setTheme } from './utils/theme';
+import { themeManager } from './managers/themeManager';
 import { convertColorToNote } from './utils/trailMapping';
 import { createDiceRoller } from './managers/diceRoller';
 import { createSoundManager } from './managers/soundManager';
@@ -32,11 +32,20 @@ function AppContent({ onLanguageChange }) {
   const t = i18nManager.t.bind(i18nManager);
 
   // Theme state to trigger re-renders when theme changes
-  const [, setCurrentTheme] = useState(getCurrentTheme());
+  const [, setCurrentTheme] = useState(themeManager.getMode());
 
-  // Sync theme state on mount (theme is already initialized in main.jsx)
+  // Sync theme state on mount and subscribe to changes
   useEffect(() => {
-    setCurrentTheme(getCurrentTheme());
+    const updateTheme = () => {
+      setCurrentTheme(themeManager.getMode());
+    };
+
+    // Initial sync
+    updateTheme();
+
+    // Subscribe to theme changes
+    const unsubscribe = themeManager.subscribe(updateTheme);
+    return unsubscribe;
   }, []);
 
   // Handler to update language and trigger re-render
@@ -143,14 +152,8 @@ function AppContent({ onLanguageChange }) {
   const isInitialMountRef = useRef(true);
   const preBattleSoundRef = useRef(null); // Track what sound was playing before battle
 
-  // Load theme from saved state (if any) after GameStateManager loads
+  // Mark initial mount as complete after a small delay
   useEffect(() => {
-    const currentTheme = getCurrentTheme();
-    const savedTheme = gsm.getState().metadata.theme;
-    if (savedTheme && savedTheme !== currentTheme) {
-      setTheme(savedTheme);
-    }
-    // Mark initial mount as complete after a small delay
     setTimeout(() => {
       isInitialMountRef.current = false;
     }, 100);
@@ -1401,11 +1404,8 @@ function AppContent({ onLanguageChange }) {
   const handleLoadGame = async () => {
     const loaded = await gsm.loadFromFile();
     if (loaded) {
-      // Load theme if present in saved state
-      const savedTheme = gsm.getState().metadata.theme;
-      if (savedTheme) {
-        setTheme(savedTheme);
-      }
+      // Note: Theme is NOT loaded from game save files - it's session-specific
+      // and stored only in localStorage via themeManager
       //TODO: should be handled by GameShowManager
       setNotification({ message: t('game.loaded'), type: 'success' });
     }
@@ -1803,10 +1803,6 @@ function AppContent({ onLanguageChange }) {
       setDiceRollingType(null);
     }, 1000);
   };
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'default');
-  }, []);
 
   // Save immediately when page is closing
   useEffect(() => {

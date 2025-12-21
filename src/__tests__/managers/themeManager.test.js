@@ -95,12 +95,14 @@ describe('ThemeManager', () => {
     it('should load mode from localStorage', () => {
       localStorage.setItem('fnf-companion-theme', JSON.stringify('dark'));
       const newManager = createThemeManager();
+      newManager.init(); // Must call init() to load from localStorage
       expect(newManager.getMode()).toBe('dark');
     });
 
     it('should load palette from localStorage', () => {
       localStorage.setItem('fnf-companion-palette', JSON.stringify('beach'));
       const newManager = createThemeManager();
+      newManager.init(); // Must call init() to load from localStorage
       expect(newManager.getPalette()).toBe('beach');
     });
   });

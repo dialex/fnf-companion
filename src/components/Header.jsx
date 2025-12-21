@@ -17,13 +17,14 @@ export default function Header({ onLanguageChange, onThemeChange }) {
   const [showPaletteSelect, setShowPaletteSelect] = useState(false);
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1200);
-  const [, forceUpdate] = useState({});
+  const [currentMode, setCurrentMode] = useState(() => themeManager.getMode());
+  const [currentPalette, setCurrentPalette] = useState(() =>
+    themeManager.getPalette()
+  );
   const [paletteVariants, setPaletteVariants] = useState({
     hasLight: true,
     hasDark: true,
   });
-  const currentMode = themeManager.getMode();
-  const currentPalette = themeManager.getPalette();
 
   // Get available modes filtered by palette variants
   const getFilteredModes = () => {
@@ -43,21 +44,26 @@ export default function Header({ onLanguageChange, onThemeChange }) {
 
   // Subscribe to mode/palette changes and update palette variants
   useEffect(() => {
-    const updateVariants = () => {
+    const updateState = () => {
+      // Update mode and palette from themeManager
+      setCurrentMode(themeManager.getMode());
+      setCurrentPalette(themeManager.getPalette());
+
+      // Update palette variants
       const variants = themeManager.checkPaletteVariants();
       setPaletteVariants(variants);
-      forceUpdate({});
+
       if (onThemeChange) {
         onThemeChange(themeManager.getMode());
       }
     };
 
-    // Initial check
+    // Initial state sync - ensure we have the correct values after init
     const timer = setTimeout(() => {
-      updateVariants();
+      updateState();
     }, 100);
 
-    const unsubscribe = themeManager.subscribe(updateVariants);
+    const unsubscribe = themeManager.subscribe(updateState);
     return () => {
       clearTimeout(timer);
       unsubscribe();

@@ -64,8 +64,10 @@ export const createThemeManager = () => {
     return 'default';
   };
 
-  let currentMode = getStoredMode();
-  let currentPalette = getStoredPalette();
+  // Don't initialize from storage here - wait for init() to be called
+  // This ensures init() is the single source of initialization
+  let currentMode = MODES.LIGHT; // Default, will be set by init()
+  let currentPalette = 'default'; // Default, will be set by init()
   let paletteLinkElement = null;
   const listeners = new Set();
 
@@ -309,7 +311,22 @@ export const createThemeManager = () => {
   const init = (onLoadCallback = null) => {
     currentMode = getStoredMode();
     currentPalette = getStoredPalette();
+
+    // Apply mode immediately and also ensure it's applied when DOM is ready
     applyMode();
+
+    // Ensure mode is applied even if DOM wasn't ready initially
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        applyMode();
+      });
+    } else {
+      // DOM is ready, but apply again to ensure it sticks
+      setTimeout(() => {
+        applyMode();
+      }, 0);
+    }
+
     loadPaletteCSS(currentPalette, onLoadCallback);
   };
 
