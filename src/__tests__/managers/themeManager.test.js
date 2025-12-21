@@ -332,7 +332,7 @@ describe('ThemeManager', () => {
       expect(variants.hasDark).toBe(true);
     });
 
-    it('should validate palette has all 4 required color variables', () => {
+    it('should consider valid a palette with all 4 required colors', () => {
       const mockSheet = {
         cssRules: [
           {
@@ -357,19 +357,86 @@ describe('ThemeManager', () => {
       expect(isValid).toBe(true);
     });
 
-    it.skip('should detect invalid palette missing required variables', () => {
+    it('should consider valid a palette with only light mode', () => {
+      const mockSheet = {
+        cssRules: [
+          {
+            type: 1,
+            selectorText: ':root[data-theme="light"]',
+            cssText: `
+              --palette-nav: #123;
+              --palette-section-header: #456;
+              --palette-button-primary: #789;
+              --palette-bg: #abc;
+            `,
+          },
+        ],
+      };
+
+      Object.defineProperty(mockLinkElement, 'sheet', {
+        value: mockSheet,
+        writable: true,
+        configurable: true,
+      });
+
+      document.getElementById = vi.fn((id) => {
+        if (id === 'palette-stylesheet') {
+          return mockLinkElement;
+        }
+        return null;
+      });
+
+      const isValid = themeManager.validatePalette();
+      expect(isValid).toBe(true);
+    });
+
+    it('should consider valid a palette with only dark mode', () => {
+      const mockSheet = {
+        cssRules: [
+          {
+            type: 1,
+            selectorText: ':root[data-theme="dark"]',
+            cssText: `
+              --palette-nav: #123;
+              --palette-section-header: #456;
+              --palette-button-primary: #789;
+              --palette-bg: #abc;
+            `,
+          },
+        ],
+      };
+
+      Object.defineProperty(mockLinkElement, 'sheet', {
+        value: mockSheet,
+        writable: true,
+        configurable: true,
+      });
+
+      document.getElementById = vi.fn((id) => {
+        if (id === 'palette-stylesheet') {
+          return mockLinkElement;
+        }
+        return null;
+      });
+
+      const isValid = themeManager.validatePalette();
+      expect(isValid).toBe(true);
+    });
+
+    it('should consider invalid a palette missing colors', () => {
+      // Ensure CSSRule is defined for the test
+      if (typeof global.CSSRule === 'undefined') {
+        global.CSSRule = { STYLE_RULE: 1 };
+      }
+
       // Create a mock sheet with only 3 out of 4 required variables
       const mockSheet = {
         cssRules: [
           {
             type: 1, // STYLE_RULE
             selectorText: ':root[data-theme="light"]',
-            cssText: `
-              --palette-nav: #123;
-              --palette-section-header: #456;
-              --palette-button-primary: #789;
-              /* Missing --palette-bg */
-            `,
+            cssText: `--palette-nav: #123; --palette-section-header: #456; --palette-button-primary: #789;`,
+            // Missing --palette-bg
           },
         ],
       };
@@ -396,9 +463,9 @@ describe('ThemeManager', () => {
         return null;
       });
 
-      // Mock getComputedStyle to return empty (for fallback case)
+      // Mock getComputedStyle to return empty for fallback validation
       mockGetComputedStyleReturn = {
-        getPropertyValue: vi.fn(() => ''), // Return empty
+        getPropertyValue: vi.fn(() => ''),
       };
 
       // The CSS text only has 3 variables, so validation should fail

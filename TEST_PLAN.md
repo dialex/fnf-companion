@@ -2,28 +2,6 @@
 
 - [ ] Page loads and there's no console error when the page finished loading
 
-## Header Section (`src/components/Header.jsx`)
-
-- Title
-  - [x] Shows a title
-  - [x] Shows a logo to the left of the title
-- Language
-  - [x] There's a button icon with a dropdown of languages
-  - [x] When clicked shows list of languages available
-  - [x] Changing language changes the text in the page without the need for a page refresh
-  - [x] Language preference persists after page reload
-- Theme
-  - [x] There's a button icon with a dropdown of palettes
-  - [x] When clicked shows list of palettes available
-  - [x] Changing palette changes the colors of the page without the need for a page refresh
-  - [x] Palette preference persists after page reload
-  - [ ] Can load palettes from a themes folder with CSS files
-  - [ ] The a palette to be valid needs to have one (light or dark) or two (both) themes, which contains 4 specific variable colors
-  - [ ] There's a button icon to toggle between light and dark
-  - [ ] The button's icon shows the current theme
-  - [ ] If the current palette only has one theme available (light or dark), then button is disabled in the current state
-  - [ ] Theme preference persists after page reload
-
 ## Footer Section (`src/components/Footer.jsx`)
 
 - [ ] Footer displays correctly
