@@ -8,16 +8,16 @@
 
 ## Inventory Section (`src/components/InventorySection.jsx`)
 
-- [X] Inventory items can be edited (free text field)
-- [X] Inventory is saved to state (local and file)
-- [X] All user-facing text is translated
+- [x] Inventory items can be edited (free text field)
+- [x] Inventory is saved to state (local and file)
+- [x] All user-facing text is translated
 
 ## Notes Section (`src/components/NotesSection.jsx`)
 
-- [ ] Notes section uses a special font (handwritten style)
-- [ ] Notes can be edited
-- [ ] Notes are saved to state and file
-- [ ] All user-facing text is translated
+- [x] Notes section uses a special font (handwritten style)
+- [x] Notes can be edited
+- [x] Notes are saved to state and file
+- [x] All user-facing text is translated
 
 ## Confirmation Dialog (`src/components/ConfirmationDialog.jsx`)
 
@@ -39,6 +39,10 @@
   - The user can edit the stats here, the same way as in Character section
 - Monster stats
   - Monster has a name, health and skill
+  - When the user starts typing the monster's name, the battle music starts (GameShowMaster)
+  - If the user has name, health and skill then the fight button is enabled, it is disabled by default
+- Fight logic
+  - The
 
 - [ ] Fight System (`src/App.jsx` - fight logic)
   - Fight logic needs to go into the new GameMaster
