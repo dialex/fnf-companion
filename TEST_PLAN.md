@@ -5,8 +5,8 @@
 ## Header Section (`src/components/Header.jsx`)
 
 - Title
-  - [ ] Shows a title
-  - [ ] Shows a logo to the left of the title
+  - [x] Shows a title
+  - [x] Shows a logo to the left of the title
 - Language
   - [x] There's a button icon with a dropdown of languages
   - [x] When clicked shows list of languages available
