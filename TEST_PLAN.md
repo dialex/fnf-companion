@@ -4,27 +4,25 @@
 
 ## Consumables Section (`src/components/ConsumablesSection.jsx`)
 
-- [ ] Coins can be updated and start with 0 by default
-- [ ] Meals can be updated and start with 10 by default
-- Trade button
-  - [ ] User can type the name of an item and its cost
-  - [ ] If the user has enough gold to pay the cost, then the buy button is enabled
-  - [ ] When the buy button is clicked, the field is cleared, the name of the item is appended to the bottom of the inventory list, and the cost is deducted from the coins amount
-  - [ ] When an item is bought, it plays a purchase sound
-- Potion button
-  - [ ] If stats are locked there's a potion field visible
-  - [ ] The user can chose from 3 types of potions
-  - [ ] Each potion will restore that trait to its max value when used (drinked)
-  - [ ] Use potion button is disabled if the respective stat is already maxed
-  - [ ] When potion is used, the potion cannot be changed or used again
-  - [ ] When potion is used, it plays a drink sound
 - [ ] All user-facing text is translated
 
 ## Inventory Section (`src/components/InventorySection.jsx`)
 
-- [ ] Inventory items can be added
-- [ ] Inventory items can be removed
-- [ ] Inventory is saved to state
+- [X] Inventory items can be edited (free text field)
+- [X] Inventory is saved to state (local and file)
+- [X] All user-facing text is translated
+
+## Notes Section (`src/components/NotesSection.jsx`)
+
+- [ ] Notes section uses a special font (handwritten style)
+- [ ] Notes can be edited
+- [ ] Notes are saved to state and file
+- [ ] All user-facing text is translated
+
+## Confirmation Dialog (`src/components/ConfirmationDialog.jsx`)
+
+- [ ] Dialog displays messages correctly
+- [ ] Confirm/cancel actions work
 - [ ] All user-facing text is translated
 
 ## Map Section (`src/components/MapSection.jsx`)
@@ -36,7 +34,14 @@
 
 ## Fight Section (`src/components/FightSection.jsx`)
 
+- Player stats
+  - Current player stats are displayed in this section
+  - The user can edit the stats here, the same way as in Character section
+- Monster stats
+  - Monster has a name, health and skill
+
 - [ ] Fight System (`src/App.jsx` - fight logic)
+  - Fight logic needs to go into the new GameMaster
   - [ ] Test `checkFightEnd` - detects when fight ends (hero wins/loses)
   - [ ] Test fight attack calculations (hero wins, monster wins, tie)
   - [ ] Test health updates on damage
@@ -46,22 +51,10 @@
 - [ ] Fight actions work correctly
 - [ ] All user-facing text is translated
 
-## Notes Section (`src/components/NotesSection.jsx`)
-
-- [ ] Notes can be edited
-- [ ] Notes are saved to state
-- [ ] All user-facing text is translated
-
 ## Notification Banner (`src/components/NotificationBanner.jsx`)
 
 - [ ] Banner displays messages correctly
 - [ ] Banner can be dismissed
-- [ ] All user-facing text is translated
-
-## Confirmation Dialog (`src/components/ConfirmationDialog.jsx`)
-
-- [ ] Dialog displays messages correctly
-- [ ] Confirm/cancel actions work
 - [ ] All user-facing text is translated
 
 ## 🎵 Sound Management (Hard)
