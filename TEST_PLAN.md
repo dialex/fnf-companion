@@ -2,21 +2,22 @@
 
 - [ ] Page loads and there's no console error when the page finished loading
 
-## Character Section (`src/components/CharacterSection.jsx`)
-
-- [x] Character stats can be edited
-- [x] Character stats are saved to state
-- [ ] As the user types the name of the char, it renames the section title to have the same text
-- [x] Lock/unlock functionality works
-- [x] Max values are enforced
-- [x] All user-facing text is translated
-
 ## Consumables Section (`src/components/ConsumablesSection.jsx`)
 
-- [ ] Coins can be updated
-- [ ] Meals can be updated
-- [ ] Transaction logic works
-- [ ] Potion usage works
+- [ ] Coins can be updated and start with 0 by default
+- [ ] Meals can be updated and start with 10 by default
+- Trade button
+  - [ ] User can type the name of an item and its cost
+  - [ ] If the user has enough gold to pay the cost, then the buy button is enabled
+  - [ ] When the buy button is clicked, the field is cleared, the name of the item is appended to the bottom of the inventory list, and the cost is deducted from the coins amount
+  - [ ] When an item is bought, it plays a purchase sound
+- Potion button
+  - [ ] If stats are locked there's a potion field visible
+  - [ ] The user can chose from 3 types of potions
+  - [ ] Each potion will restore that trait to its max value when used (drinked)
+  - [ ] Use potion button is disabled if the respective stat is already maxed
+  - [ ] When potion is used, the potion cannot be changed or used again
+  - [ ] When potion is used, it plays a drink sound
 - [ ] All user-facing text is translated
 
 ## Inventory Section (`src/components/InventorySection.jsx`)
