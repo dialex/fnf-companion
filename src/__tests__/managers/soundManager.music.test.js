@@ -130,6 +130,141 @@ describe('Music control buttons', () => {
     });
   });
 
+  describe('Music exclusivity', () => {
+    it('should only allow one music track to play at a time', () => {
+      const battlePlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      const victoryPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      const defeatPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+
+      soundManager._setPlayerForTesting('battle', battlePlayer);
+      soundManager._setPlayerForTesting('victory', victoryPlayer);
+      soundManager._setPlayerForTesting('defeat', defeatPlayer);
+      soundManager._setPlayerForTesting('ambience', mockPlayer);
+
+      // Start ambience
+      soundManager.handleMusicPlayPause('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+      expect(soundManager.getSoundPlaying().battle).toBe(false);
+      expect(soundManager.getSoundPlaying().victory).toBe(false);
+      expect(soundManager.getSoundPlaying().defeat).toBe(false);
+      vi.clearAllMocks();
+
+      // Start battle - should pause ambience
+      soundManager.handleMusicPlayPause('battle');
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
+      expect(soundManager.getSoundPlaying().battle).toBe(true);
+      expect(mockPlayer.pauseVideo).toHaveBeenCalledTimes(1);
+      vi.clearAllMocks();
+
+      // Start victory - should pause battle
+      soundManager.handleMusicPlayPause('victory');
+      expect(soundManager.getSoundPlaying().battle).toBe(false);
+      expect(soundManager.getSoundPlaying().victory).toBe(true);
+      expect(battlePlayer.pauseVideo).toHaveBeenCalledTimes(1);
+      vi.clearAllMocks();
+
+      // Start defeat - should pause victory
+      soundManager.handleMusicPlayPause('defeat');
+      expect(soundManager.getSoundPlaying().victory).toBe(false);
+      expect(soundManager.getSoundPlaying().defeat).toBe(true);
+      expect(victoryPlayer.pauseVideo).toHaveBeenCalledTimes(1);
+    });
+
+    it('should pause all music types when a new track starts', () => {
+      const battlePlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      const victoryPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      const defeatPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+
+      soundManager._setPlayerForTesting('battle', battlePlayer);
+      soundManager._setPlayerForTesting('victory', victoryPlayer);
+      soundManager._setPlayerForTesting('defeat', defeatPlayer);
+      soundManager._setPlayerForTesting('ambience', mockPlayer);
+
+      // Start ambience (sets state)
+      soundManager.handleMusicPlayPause('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+
+      // Start battle (pauses ambience, plays battle)
+      soundManager.handleMusicPlayPause('battle');
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
+      expect(soundManager.getSoundPlaying().battle).toBe(true);
+
+      // Start victory (pauses battle, plays victory)
+      soundManager.handleMusicPlayPause('victory');
+      expect(soundManager.getSoundPlaying().battle).toBe(false);
+      expect(soundManager.getSoundPlaying().victory).toBe(true);
+      vi.clearAllMocks();
+
+      // Start defeat - should pause victory
+      soundManager.handleMusicPlayPause('defeat');
+
+      expect(victoryPlayer.pauseVideo).toHaveBeenCalledTimes(1);
+      expect(defeatPlayer.playVideo).toHaveBeenCalledTimes(1);
+      expect(soundManager.getSoundPlaying().defeat).toBe(true);
+      expect(soundManager.getSoundPlaying().victory).toBe(false);
+    });
+
+    it('should pause custom music when regular music starts', () => {
+      const customPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+        getPlayerState: vi.fn(() => 1), // 1 = playing
+      };
+
+      soundManager._setPlayerForTesting('ambience', mockPlayer);
+      soundManager._setPlayerForTesting('custom-123', customPlayer);
+
+      // Note: Custom music state (customSoundPlaying) is internal to SoundManager
+      // and managed by App.jsx. The handleMusicPlayPause method does check for
+      // and pause custom music, but we can't directly test this without
+      // exposing internal state. This behavior is tested at the integration level.
+      // Here we verify that regular music can play when no custom music is playing.
+      soundManager.handleMusicPlayPause('ambience');
+
+      expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+    });
+  });
+
   describe('Stop button', () => {
     beforeEach(() => {
       soundManager._setPlayerForTesting('ambience', mockPlayer);

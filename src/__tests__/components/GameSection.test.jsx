@@ -18,6 +18,12 @@ vi.mock('../../managers/i18nManager', () => ({
         'game.sound': 'Sound',
         'game.muteAll': 'Mute all',
         'game.unmuteAll': 'Unmute all',
+        'game.ambience': 'Ambience',
+        'game.battle': 'Battle',
+        'game.victory': 'Victory',
+        'game.defeat': 'Defeat',
+        'game.youtubeUrl': 'YouTube link',
+        'game.invalidUrl': 'Please provide a valid YouTube link.',
       };
       return translations[key] || key;
     },
@@ -238,6 +244,109 @@ describe('GameSection', () => {
       expect(onAllSoundsMutedChange).toHaveBeenCalledWith(false);
       // Should auto-enable action sounds
       expect(onActionSoundsEnabledChange).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('Music URL validation', () => {
+    it('should show error message when invalid URL is submitted', async () => {
+      const user = userEvent.setup();
+      const onSoundInputChange = vi.fn();
+      const onSoundSubmit = vi.fn();
+
+      render(
+        <GameSection
+          {...defaultProps}
+          onSoundInputChange={onSoundInputChange}
+          onSoundSubmit={onSoundSubmit}
+        />
+      );
+
+      // Find the ambience input field
+      const inputs = document.querySelectorAll('input[type="text"]');
+      const ambienceInput = Array.from(inputs).find((input) =>
+        input.placeholder.includes('YouTube')
+      );
+      expect(ambienceInput).toBeInTheDocument();
+
+      // Type invalid URL
+      await user.type(ambienceInput, 'https://example.com/video');
+      expect(onSoundInputChange).toHaveBeenCalled();
+
+      // Submit (click check button or press Enter)
+      const checkButton = ambienceInput.parentElement?.querySelector('button');
+      if (checkButton) {
+        await user.click(checkButton);
+      }
+
+      // onSoundSubmit should be called, and it will set error in App.jsx
+      // The error will be passed as a prop, so we verify onSoundSubmit was called
+      expect(onSoundSubmit).toHaveBeenCalled();
+    });
+
+    it('should display error message when error is set', () => {
+      render(
+        <GameSection
+          {...defaultProps}
+          soundErrors={{
+            ambience: 'Please provide a valid YouTube link.',
+            battle: null,
+            victory: null,
+            defeat: null,
+          }}
+        />
+      );
+
+      const errorMessage = screen.getByText(
+        'Please provide a valid YouTube link.'
+      );
+      expect(errorMessage).toBeInTheDocument();
+      expect(errorMessage).toHaveClass('invalid-feedback');
+    });
+
+    it('should clear error when valid URL is submitted', async () => {
+      const user = userEvent.setup();
+      const onSoundInputChange = vi.fn();
+      const onSoundSubmit = vi.fn();
+
+      const { rerender } = render(
+        <GameSection
+          {...defaultProps}
+          soundErrors={{
+            ambience: 'Please provide a valid YouTube link.',
+            battle: null,
+            victory: null,
+            defeat: null,
+          }}
+          onSoundInputChange={onSoundInputChange}
+          onSoundSubmit={onSoundSubmit}
+        />
+      );
+
+      // Error should be visible
+      expect(
+        screen.getByText('Please provide a valid YouTube link.')
+      ).toBeInTheDocument();
+
+      // Submit valid URL (this would be handled by App.jsx, which clears the error)
+      // We simulate this by rerendering with no error
+      rerender(
+        <GameSection
+          {...defaultProps}
+          soundErrors={{
+            ambience: null,
+            battle: null,
+            victory: null,
+            defeat: null,
+          }}
+          onSoundInputChange={onSoundInputChange}
+          onSoundSubmit={onSoundSubmit}
+        />
+      );
+
+      // Error should be gone
+      expect(
+        screen.queryByText('Please provide a valid YouTube link.')
+      ).not.toBeInTheDocument();
     });
   });
 });

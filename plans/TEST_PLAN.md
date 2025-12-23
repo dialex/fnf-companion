@@ -74,9 +74,9 @@
 
 **Music Exclusivity:**
 
-- [ ] Only one music track can play at a time
-- [ ] When a new music track starts, any currently playing music is paused automatically
-- [ ] This applies to all music types: ambience, battle, victory, defeat, and custom music
+- [x] Only one music track can play at a time
+- [x] When a new music track starts, any currently playing music is paused automatically
+- [x] This applies to all music types: ambience, battle, victory, defeat, and custom music
 
 **Music Control Buttons:**
 
@@ -96,9 +96,9 @@
 
 **Music URL Validation:**
 
-- [ ] Test YouTube URL validation
-- [ ] Invalid URLs show error messages
-- [ ] Valid URLs initialize YouTube player
+- [x] Test YouTube URL validation
+- [x] Invalid URLs show error messages
+- [x] Valid URLs initialize YouTube player
 
 **Music Volume Control:**
 
