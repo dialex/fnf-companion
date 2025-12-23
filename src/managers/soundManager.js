@@ -27,6 +27,10 @@ export const createSoundManager = (options = {}) => {
     victory: false,
     defeat: false,
   };
+  // YouTube player instances
+  const youtubePlayers = {};
+  // State change listeners (for React updates)
+  const stateChangeListeners = new Set();
   /**
    * Gets the current mute state
    * @returns {boolean} Whether all sounds are muted
@@ -72,6 +76,23 @@ export const createSoundManager = (options = {}) => {
    * @returns {Object} Object with sound types as keys and boolean stopped status
    */
   const getSoundStoppedManually = () => ({ ...soundStoppedManually });
+
+  /**
+   * Notify listeners of state changes (for React updates)
+   */
+  const notifyStateChange = () => {
+    stateChangeListeners.forEach((callback) => callback());
+  };
+
+  /**
+   * Subscribe to state changes
+   * @param {Function} callback - Called when sound playing state changes
+   * @returns {Function} Unsubscribe function
+   */
+  const subscribe = (callback) => {
+    stateChangeListeners.add(callback);
+    return () => stateChangeListeners.delete(callback);
+  };
 
   /**
    * Plays a local mp3 sound file
@@ -133,14 +154,8 @@ export const createSoundManager = (options = {}) => {
   /**
    * Handles play/pause for music (YouTube tracks)
    * @param {string} soundType - The sound type ('ambience', 'battle', 'victory', 'defeat')
-   * @param {Object} params - Parameters object
-   * @param {Object} params.youtubePlayers - Object containing YouTube player instances (external - DOM objects)
-   * @param {Function} params.onStateChange - Optional callback when playing state changes (for React updates)
    */
-  const handleMusicPlayPause = (
-    soundType,
-    { youtubePlayers, onStateChange }
-  ) => {
+  const handleMusicPlayPause = (soundType) => {
     if (allSoundsMuted) return;
 
     const player = youtubePlayers[soundType];
@@ -151,7 +166,7 @@ export const createSoundManager = (options = {}) => {
         // Currently playing - pause it
         player.pauseVideo();
         soundPlaying[soundType] = false;
-        if (onStateChange) onStateChange();
+        notifyStateChange();
       } else {
         // Not playing - pause all other music and play this one
         // Pause all other regular sounds
@@ -186,7 +201,7 @@ export const createSoundManager = (options = {}) => {
         // Play the selected sound
         player.playVideo();
         soundPlaying[soundType] = true;
-        if (onStateChange) onStateChange();
+        notifyStateChange();
       }
     } catch (e) {
       console.error('Error controlling YouTube player:', e);
@@ -196,11 +211,8 @@ export const createSoundManager = (options = {}) => {
   /**
    * Handles stop for music (YouTube tracks)
    * @param {string} soundType - The sound type ('ambience', 'battle', 'victory', 'defeat')
-   * @param {Object} params - Parameters object
-   * @param {Object} params.youtubePlayers - Object containing YouTube player instances (external - DOM objects)
-   * @param {Function} params.onStateChange - Optional callback when playing state changes (for React updates)
    */
-  const handleMusicStop = (soundType, { youtubePlayers, onStateChange }) => {
+  const handleMusicStop = (soundType) => {
     const player = youtubePlayers[soundType];
     if (!player) return;
 
@@ -214,7 +226,7 @@ export const createSoundManager = (options = {}) => {
       player.pauseVideo();
       player.seekTo(0, true); // true = allowSeekAhead
       soundPlaying[soundType] = false;
-      if (onStateChange) onStateChange();
+      notifyStateChange();
     } catch (e) {
       console.error('Error stopping YouTube player:', e);
     }
@@ -223,15 +235,9 @@ export const createSoundManager = (options = {}) => {
   /**
    * Handles delete for music (YouTube tracks)
    * @param {string} soundType - The sound type ('ambience', 'battle', 'victory', 'defeat')
-   * @param {Object} params - Parameters object
-   * @param {Object} params.youtubePlayers - Object containing YouTube player instances (external - DOM objects)
-   * @param {Function} params.onDelete - Callback with delete actions (setSoundUrls, setSoundInputs, setSoundErrors)
-   * @param {Function} params.onStateChange - Optional callback when playing state changes (for React updates)
+   * @param {Function} onDelete - Callback for external cleanup (setSoundUrls, setSoundInputs, setSoundErrors)
    */
-  const handleMusicDelete = (
-    soundType,
-    { youtubePlayers, onDelete, onStateChange }
-  ) => {
+  const handleMusicDelete = (soundType, onDelete) => {
     // Stop and destroy the player
     const player = youtubePlayers[soundType];
     if (player) {
@@ -252,7 +258,259 @@ export const createSoundManager = (options = {}) => {
     if (onDelete) {
       onDelete(soundType);
     }
-    if (onStateChange) onStateChange();
+    notifyStateChange();
+  };
+
+  /**
+   * Initialize a YouTube player for a sound type
+   * @param {string} soundType - The sound type ('ambience', 'battle', 'victory', 'defeat')
+   * @param {string} videoId - YouTube video ID
+   * @param {Object} options - Options object
+   * @param {number} options.volume - Initial volume (0-100)
+   * @param {Function} options.onStateChange - Callback for player state changes
+   * @returns {Object|null} YouTube player instance or null if creation failed
+   */
+  const initPlayer = (
+    soundType,
+    videoId,
+    { volume = 25, onStateChange } = {}
+  ) => {
+    if (!window.YT || !window.YT.Player) {
+      return null;
+    }
+
+    // Destroy existing player if it exists
+    if (youtubePlayers[soundType]) {
+      try {
+        youtubePlayers[soundType].destroy();
+      } catch (e) {
+        // Ignore errors
+      }
+      delete youtubePlayers[soundType];
+    }
+
+    const playerId = `youtube-player-${soundType}`;
+    // Create hidden iframe container
+    let container = document.getElementById(playerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = playerId;
+      container.style.display = 'none';
+      document.body.appendChild(container);
+    }
+
+    try {
+      const shouldLoop = soundType === 'ambience' || soundType === 'battle';
+      youtubePlayers[soundType] = new window.YT.Player(playerId, {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          enablejsapi: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          ...(shouldLoop ? { loop: 1, playlist: videoId } : {}),
+        },
+        events: {
+          onReady: (event) => {
+            const player = event.target;
+            if (player && typeof player.setVolume === 'function') {
+              try {
+                player.setVolume(volume);
+              } catch (e) {
+                console.error('Error setting initial volume:', e);
+              }
+            }
+          },
+          onStateChange: (event) => {
+            // 0 = ended, 1 = playing, 2 = paused
+            if (soundStoppedManually[soundType]) {
+              if (event.data === 0 || event.data === 2) {
+                soundPlaying[soundType] = false;
+                notifyStateChange();
+              }
+              return;
+            }
+
+            if (event.data === 0) {
+              // Video ended
+              if (shouldLoop) {
+                // Restart if it should loop (ambience/battle)
+                try {
+                  const player = youtubePlayers[soundType];
+                  if (player) {
+                    player.seekTo(0);
+                    player.playVideo();
+                  }
+                } catch (e) {
+                  soundPlaying[soundType] = false;
+                  notifyStateChange();
+                }
+              } else {
+                // Stop for victory and defeat - ensure they don't loop
+                try {
+                  const player = youtubePlayers[soundType];
+                  if (player) {
+                    player.stopVideo();
+                  }
+                } catch (e) {
+                  // Ignore errors
+                }
+                soundPlaying[soundType] = false;
+                notifyStateChange();
+              }
+            } else if (event.data === 2) {
+              // Paused
+              soundPlaying[soundType] = false;
+              notifyStateChange();
+            } else if (event.data === 1) {
+              // Playing
+              soundPlaying[soundType] = true;
+              notifyStateChange();
+            }
+
+            // Call external callback if provided
+            if (onStateChange) {
+              onStateChange(event);
+            }
+          },
+        },
+      });
+      return youtubePlayers[soundType];
+    } catch (e) {
+      console.error('Error creating YouTube player:', e);
+      return null;
+    }
+  };
+
+  /**
+   * Initialize a YouTube player for a custom sound
+   * @param {string} customId - Custom sound ID
+   * @param {string} videoId - YouTube video ID
+   * @param {Object} options - Options object
+   * @param {number} options.volume - Initial volume (0-100)
+   * @returns {Object|null} YouTube player instance or null if creation failed
+   */
+  const initCustomPlayer = (customId, videoId, { volume = 25 } = {}) => {
+    if (!window.YT || !window.YT.Player) {
+      return null;
+    }
+
+    const playerKey = `custom-${customId}`;
+    if (youtubePlayers[playerKey]) {
+      return youtubePlayers[playerKey]; // Player already exists
+    }
+
+    const playerId = `youtube-player-${playerKey}`;
+    let container = document.getElementById(playerId);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = playerId;
+      container.style.display = 'none';
+      document.body.appendChild(container);
+    }
+
+    try {
+      youtubePlayers[playerKey] = new window.YT.Player(playerId, {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          enablejsapi: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: (event) => {
+            const player = event.target;
+            if (player && typeof player.setVolume === 'function') {
+              try {
+                player.setVolume(volume);
+              } catch (e) {
+                console.error('Error setting initial volume:', e);
+              }
+            }
+          },
+          onStateChange: (event) => {
+            if (soundStoppedManually[playerKey]) {
+              if (event.data === 0 || event.data === 2) {
+                delete customSoundPlaying[customId];
+                notifyStateChange();
+              }
+              return;
+            }
+
+            if (event.data === 0) {
+              // Video ended - stop it
+              try {
+                const player = youtubePlayers[playerKey];
+                if (player) {
+                  player.stopVideo();
+                }
+              } catch (e) {
+                // Ignore errors
+              }
+              delete customSoundPlaying[customId];
+              notifyStateChange();
+            } else if (event.data === 2) {
+              // Paused
+              delete customSoundPlaying[customId];
+              notifyStateChange();
+            } else if (event.data === 1) {
+              // Playing
+              customSoundPlaying[customId] = true;
+              notifyStateChange();
+            }
+          },
+        },
+      });
+      return youtubePlayers[playerKey];
+    } catch (e) {
+      console.error('Error creating custom YouTube player:', e);
+      return null;
+    }
+  };
+
+  /**
+   * Get a YouTube player instance
+   * @param {string} soundType - The sound type or custom sound key
+   * @returns {Object|undefined} YouTube player instance or undefined
+   */
+  const getPlayer = (soundType) => {
+    return youtubePlayers[soundType];
+  };
+
+  /**
+   * Set a player directly (for testing purposes)
+   * @param {string} soundType - The sound type or custom sound key
+   * @param {Object} player - YouTube player instance
+   */
+  const _setPlayerForTesting = (soundType, player) => {
+    youtubePlayers[soundType] = player;
+  };
+
+  /**
+   * Set volume on a player
+   * @param {string} soundType - The sound type or custom sound key
+   * @param {number} volume - Volume (0-100)
+   */
+  const setPlayerVolume = (soundType, volume) => {
+    const player = youtubePlayers[soundType];
+    if (player && typeof player.setVolume === 'function') {
+      try {
+        player.setVolume(volume);
+      } catch (e) {
+        console.error('Error setting volume:', e);
+      }
+    }
   };
 
   return {
@@ -276,5 +534,13 @@ export const createSoundManager = (options = {}) => {
     handleMusicPlayPause,
     handleMusicStop,
     handleMusicDelete,
+    // Player management
+    initPlayer,
+    initCustomPlayer,
+    getPlayer,
+    setPlayerVolume,
+    subscribe,
+    // Test helpers
+    _setPlayerForTesting,
   };
 };

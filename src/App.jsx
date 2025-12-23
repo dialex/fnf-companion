@@ -156,7 +156,15 @@ function AppContent({ onLanguageChange }) {
   const [customSoundPlaying, setCustomSoundPlaying] = useState(() =>
     soundManagerRef.current.getCustomSoundPlaying()
   );
-  const youtubePlayersRef = useRef({});
+
+  // Subscribe to SoundManager state changes for React updates
+  useEffect(() => {
+    const unsubscribe = soundManagerRef.current.subscribe(() => {
+      setSoundPlaying(soundManagerRef.current.getSoundPlaying());
+      setCustomSoundPlaying(soundManagerRef.current.getCustomSoundPlaying());
+    });
+    return unsubscribe;
+  }, []);
   const [showYouDied, setShowYouDied] = useState(false);
 
   // State management
@@ -331,7 +339,7 @@ function AppContent({ onLanguageChange }) {
 
     if (isValidYouTubeUrl(url)) {
       // Destroy old player if URL is changing
-      const oldPlayer = youtubePlayersRef.current[soundType];
+      const oldPlayer = soundManagerRef.current.getPlayer(soundType);
       if (oldPlayer) {
         try {
           oldPlayer.stopVideo();
@@ -339,7 +347,7 @@ function AppContent({ onLanguageChange }) {
         } catch (e) {
           // Ignore errors
         }
-        delete youtubePlayersRef.current[soundType];
+        // Player will be recreated by initPlayer when URL changes
       }
 
       gsm.setSoundUrls({
@@ -363,51 +371,31 @@ function AppContent({ onLanguageChange }) {
   };
 
   const handleSoundDelete = (soundType) => {
-    soundManagerRef.current.handleMusicDelete(soundType, {
-      youtubePlayers: youtubePlayersRef.current,
-      onDelete: (soundType) => {
-        // Update GameStateManager (persistent state)
-        const currentUrls = gsm.getSoundUrls();
-        gsm.setSoundUrls({
-          ...currentUrls,
-          [soundType]: '',
-        });
-        // Update UI state (input fields, errors)
-        setSoundInputs((prev) => ({
-          ...prev,
-          [soundType]: '',
-        }));
-        setSoundErrors((prev) => ({
-          ...prev,
-          [soundType]: null,
-        }));
-      },
-      onStateChange: () => {
-        // Sync SoundManager state with React for UI updates
-        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
-      },
+    soundManagerRef.current.handleMusicDelete(soundType, (soundType) => {
+      // Update GameStateManager (persistent state)
+      const currentUrls = gsm.getSoundUrls();
+      gsm.setSoundUrls({
+        ...currentUrls,
+        [soundType]: '',
+      });
+      // Update UI state (input fields, errors)
+      setSoundInputs((prev) => ({
+        ...prev,
+        [soundType]: '',
+      }));
+      setSoundErrors((prev) => ({
+        ...prev,
+        [soundType]: null,
+      }));
     });
   };
 
   const handleSoundPlayPause = (soundType) => {
-    soundManagerRef.current.handleMusicPlayPause(soundType, {
-      youtubePlayers: youtubePlayersRef.current,
-      onStateChange: () => {
-        // Sync SoundManager state with React for UI updates
-        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
-        setCustomSoundPlaying(soundManagerRef.current.getCustomSoundPlaying());
-      },
-    });
+    soundManagerRef.current.handleMusicPlayPause(soundType);
   };
 
   const handleSoundStop = (soundType) => {
-    soundManagerRef.current.handleMusicStop(soundType, {
-      youtubePlayers: youtubePlayersRef.current,
-      onStateChange: () => {
-        // Sync SoundManager state with React for UI updates
-        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
-      },
-    });
+    soundManagerRef.current.handleMusicStop(soundType);
   };
 
   const handleSoundVolumeChange = (soundType, volume) => {
@@ -415,14 +403,7 @@ function AppContent({ onLanguageChange }) {
       ...gsm.getSoundVolumes(),
       [soundType]: volume,
     });
-    const player = youtubePlayersRef.current[soundType];
-    if (player && typeof player.setVolume === 'function') {
-      try {
-        player.setVolume(volume);
-      } catch (e) {
-        console.error('Error setting volume:', e);
-      }
-    }
+    soundManagerRef.current.setPlayerVolume(soundType, volume);
   };
 
   // Custom sound handlers
@@ -509,7 +490,8 @@ function AppContent({ onLanguageChange }) {
 
   const handleCustomSoundDelete = (id) => {
     // Stop and destroy the player
-    const player = youtubePlayersRef.current[`custom-${id}`];
+    const playerKey = `custom-${id}`;
+    const player = soundManagerRef.current.getPlayer(playerKey);
     if (player) {
       try {
         player.stopVideo();
@@ -517,7 +499,7 @@ function AppContent({ onLanguageChange }) {
       } catch (e) {
         // Ignore errors
       }
-      delete youtubePlayersRef.current[`custom-${id}`];
+      // Player will be removed by SoundManager's delete handling
     }
 
     // Remove from custom sounds
@@ -533,7 +515,8 @@ function AppContent({ onLanguageChange }) {
   };
 
   const handleCustomSoundPlayPause = (id) => {
-    const player = youtubePlayersRef.current[`custom-${id}`];
+    const playerKey = `custom-${id}`;
+    const player = soundManagerRef.current.getPlayer(playerKey);
     if (!player) return;
 
     try {
@@ -547,7 +530,7 @@ function AppContent({ onLanguageChange }) {
         // Stop other sounds if needed
         Object.keys(soundPlaying).forEach((st) => {
           if (soundPlaying[st]) {
-            const otherPlayer = youtubePlayersRef.current[st];
+            const otherPlayer = soundManagerRef.current.getPlayer(st);
             if (otherPlayer) {
               try {
                 const playerState = otherPlayer.getPlayerState();
@@ -567,7 +550,9 @@ function AppContent({ onLanguageChange }) {
         // Stop other custom sounds
         Object.keys(customSoundPlaying).forEach((otherId) => {
           if (otherId !== id && customSoundPlaying[otherId]) {
-            const otherPlayer = youtubePlayersRef.current[`custom-${otherId}`];
+            const otherPlayerKey = `custom-${otherId}`;
+            const otherPlayer =
+              soundManagerRef.current.getPlayer(otherPlayerKey);
             if (otherPlayer) {
               try {
                 const playerState = otherPlayer.getPlayerState();
@@ -596,13 +581,14 @@ function AppContent({ onLanguageChange }) {
   };
 
   const handleCustomSoundStop = (id) => {
-    const player = youtubePlayersRef.current[`custom-${id}`];
+    const playerKey = `custom-${id}`;
+    const player = soundManagerRef.current.getPlayer(playerKey);
     if (!player) return;
 
     if (!customSoundPlaying[id]) return;
 
     try {
-      soundStoppedManuallyRef.current[`custom-${id}`] = true;
+      // Note: soundStoppedManually is now managed by SoundManager internally
       player.pauseVideo();
       player.seekTo(0, true);
       setCustomSoundPlaying((prev) => ({
@@ -619,14 +605,8 @@ function AppContent({ onLanguageChange }) {
       ...gsm.getCustomSoundVolumes(),
       [id]: volume,
     });
-    const player = youtubePlayersRef.current[`custom-${id}`];
-    if (player && typeof player.setVolume === 'function') {
-      try {
-        player.setVolume(volume);
-      } catch (e) {
-        console.error('Error setting volume:', e);
-      }
-    }
+    const playerKey = `custom-${id}`;
+    soundManagerRef.current.setPlayerVolume(playerKey, volume);
   };
 
   const handleAddCustomSound = () => {
@@ -663,17 +643,15 @@ function AppContent({ onLanguageChange }) {
     // Don't play if all sounds are muted
     if (gsm.getAllSoundsMuted()) return;
 
-    const player = youtubePlayersRef.current[soundType];
+    const player = soundManagerRef.current.getPlayer(soundType);
     if (!player || !gsm.getSoundUrls()[soundType]) return;
 
     try {
-      // Clear manual stop flag
-      soundStoppedManuallyRef.current[soundType] = false;
       // Pause all other sounds - check all players, not just those marked as playing
       const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
       soundTypes.forEach((st) => {
         if (st !== soundType) {
-          const otherPlayer = youtubePlayersRef.current[st];
+          const otherPlayer = soundManagerRef.current.getPlayer(st);
           if (otherPlayer) {
             try {
               // Check if video is actually playing and pause it
@@ -695,7 +673,9 @@ function AppContent({ onLanguageChange }) {
       // Pause all custom sounds
       Object.keys(customSoundPlaying).forEach((customId) => {
         if (customSoundPlaying[customId]) {
-          const customPlayer = youtubePlayersRef.current[`custom-${customId}`];
+          const customPlayerKey = `custom-${customId}`;
+          const customPlayer =
+            soundManagerRef.current.getPlayer(customPlayerKey);
           if (customPlayer) {
             try {
               const playerState = customPlayer.getPlayerState();
@@ -742,125 +722,12 @@ function AppContent({ onLanguageChange }) {
         return;
       }
 
-      // If player already exists, destroy it first (URL might have changed)
-      if (youtubePlayersRef.current[soundType]) {
-        const existingPlayer = youtubePlayersRef.current[soundType];
-        try {
-          existingPlayer.destroy();
-        } catch (e) {
-          // Ignore errors
-        }
-        delete youtubePlayersRef.current[soundType];
-      }
-
       if (window.YT && window.YT.Player) {
         const videoId = extractVideoId(gsm.getSoundUrls()[soundType]);
         if (videoId) {
-          const playerId = `youtube-player-${soundType}`;
-          // Create hidden iframe container
-          let container = document.getElementById(playerId);
-          if (!container) {
-            container = document.createElement('div');
-            container.id = playerId;
-            container.style.display = 'none';
-            document.body.appendChild(container);
-          }
-
-          youtubePlayersRef.current[soundType] = new window.YT.Player(
-            playerId,
-            {
-              videoId: videoId,
-              playerVars: {
-                autoplay: 0,
-                controls: 0,
-                disablekb: 1,
-                enablejsapi: 1,
-                fs: 0,
-                iv_load_policy: 3,
-                modestbranding: 1,
-                playsinline: 1,
-                rel: 0,
-                ...(soundType === 'ambience' || soundType === 'battle'
-                  ? { loop: 1, playlist: videoId } // Loop only for ambience and battle
-                  : {}),
-              },
-              events: {
-                onReady: (event) => {
-                  // Player is ready, set the volume
-                  const player = event.target;
-                  if (player && typeof player.setVolume === 'function') {
-                    try {
-                      player.setVolume(gsm.getSoundVolumes()[soundType]);
-                    } catch (e) {
-                      console.error('Error setting initial volume:', e);
-                    }
-                  }
-                },
-                onStateChange: (event) => {
-                  // 0 = ended, 1 = playing, 2 = paused
-                  const shouldLoop =
-                    soundType === 'ambience' || soundType === 'battle';
-
-                  // Don't auto-restart if user manually stopped
-                  if (soundStoppedManuallyRef.current[soundType]) {
-                    if (event.data === 0 || event.data === 2) {
-                      // Video ended or paused after manual stop - keep it stopped
-                      setSoundPlaying((prev) => ({
-                        ...prev,
-                        [soundType]: false,
-                      }));
-                    }
-                    return;
-                  }
-
-                  if (event.data === 0) {
-                    // Video ended
-                    if (shouldLoop) {
-                      // Restart if it should loop (ambience/battle)
-                      try {
-                        const player = youtubePlayersRef.current[soundType];
-                        if (player) {
-                          player.seekTo(0);
-                          player.playVideo();
-                        }
-                      } catch (e) {
-                        setSoundPlaying((prev) => ({
-                          ...prev,
-                          [soundType]: false,
-                        }));
-                      }
-                    } else {
-                      // Stop for victory and defeat - ensure they don't loop
-                      try {
-                        const player = youtubePlayersRef.current[soundType];
-                        if (player) {
-                          player.stopVideo();
-                        }
-                      } catch (e) {
-                        // Ignore errors
-                      }
-                      setSoundPlaying((prev) => ({
-                        ...prev,
-                        [soundType]: false,
-                      }));
-                    }
-                  } else if (event.data === 2) {
-                    // Paused
-                    setSoundPlaying((prev) => ({
-                      ...prev,
-                      [soundType]: false,
-                    }));
-                  } else if (event.data === 1) {
-                    // Playing
-                    setSoundPlaying((prev) => ({
-                      ...prev,
-                      [soundType]: true,
-                    }));
-                  }
-                },
-              },
-            }
-          );
+          soundManagerRef.current.initPlayer(soundType, videoId, {
+            volume: gsm.getSoundVolumes()[soundType],
+          });
         }
       } else {
         setTimeout(() => initPlayer(soundType), 100);
@@ -871,7 +738,7 @@ function AppContent({ onLanguageChange }) {
     soundTypes.forEach((soundType) => {
       if (
         gsm.getSoundUrls()[soundType] &&
-        !youtubePlayersRef.current[soundType]
+        !soundManagerRef.current.getPlayer(soundType)
       ) {
         if (window.YT && window.YT.Player) {
           initPlayer(soundType);
@@ -895,7 +762,7 @@ function AppContent({ onLanguageChange }) {
 
     gsm.getCustomSounds().forEach((customSound) => {
       const playerKey = `custom-${customSound.id}`;
-      if (youtubePlayersRef.current[playerKey]) {
+      if (soundManagerRef.current.getPlayer(playerKey)) {
         return; // Player already exists
       }
 
@@ -904,81 +771,8 @@ function AppContent({ onLanguageChange }) {
         return;
       }
 
-      const playerId = `youtube-player-${playerKey}`;
-      let container = document.getElementById(playerId);
-      if (!container) {
-        container = document.createElement('div');
-        container.id = playerId;
-        container.style.display = 'none';
-        document.body.appendChild(container);
-      }
-
-      youtubePlayersRef.current[playerKey] = new window.YT.Player(playerId, {
-        videoId: videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          enablejsapi: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          modestbranding: 1,
-          playsinline: 1,
-          rel: 0,
-        },
-        events: {
-          onReady: (event) => {
-            const player = event.target;
-            if (player && typeof player.setVolume === 'function') {
-              try {
-                const volume =
-                  gsm.getCustomSoundVolumes()[customSound.id] ?? 25;
-                player.setVolume(volume);
-              } catch (e) {
-                console.error('Error setting initial volume:', e);
-              }
-            }
-          },
-          onStateChange: (event) => {
-            if (soundStoppedManuallyRef.current[playerKey]) {
-              if (event.data === 0 || event.data === 2) {
-                setCustomSoundPlaying((prev) => ({
-                  ...prev,
-                  [customSound.id]: false,
-                }));
-              }
-              return;
-            }
-
-            if (event.data === 0) {
-              // Video ended - stop it
-              try {
-                const player = youtubePlayersRef.current[playerKey];
-                if (player) {
-                  player.stopVideo();
-                }
-              } catch (e) {
-                // Ignore errors
-              }
-              setCustomSoundPlaying((prev) => ({
-                ...prev,
-                [customSound.id]: false,
-              }));
-            } else if (event.data === 2) {
-              // Paused
-              setCustomSoundPlaying((prev) => ({
-                ...prev,
-                [customSound.id]: false,
-              }));
-            } else if (event.data === 1) {
-              // Playing
-              setCustomSoundPlaying((prev) => ({
-                ...prev,
-                [customSound.id]: true,
-              }));
-            }
-          },
-        },
+      soundManagerRef.current.initCustomPlayer(customSound.id, videoId, {
+        volume: gsm.getCustomSoundVolumes()[customSound.id] ?? 25,
       });
     });
   }, [gsm]);
@@ -987,14 +781,10 @@ function AppContent({ onLanguageChange }) {
   useEffect(() => {
     const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
     soundTypes.forEach((soundType) => {
-      const player = youtubePlayersRef.current[soundType];
-      if (player && typeof player.setVolume === 'function') {
-        try {
-          player.setVolume(gsm.getSoundVolumes()[soundType]);
-        } catch (e) {
-          console.error('Error setting volume on existing player:', e);
-        }
-      }
+      soundManagerRef.current.setPlayerVolume(
+        soundType,
+        gsm.getSoundVolumes()[soundType]
+      );
     });
   }, [gsm]);
 
@@ -1002,15 +792,8 @@ function AppContent({ onLanguageChange }) {
   useEffect(() => {
     gsm.getCustomSounds().forEach((customSound) => {
       const playerKey = `custom-${customSound.id}`;
-      const player = youtubePlayersRef.current[playerKey];
-      if (player && typeof player.setVolume === 'function') {
-        try {
-          const volume = gsm.getCustomSoundVolumes()[customSound.id] ?? 50;
-          player.setVolume(volume);
-        } catch (e) {
-          console.error('Error setting volume on custom sound player:', e);
-        }
-      }
+      const volume = gsm.getCustomSoundVolumes()[customSound.id] ?? 50;
+      soundManagerRef.current.setPlayerVolume(playerKey, volume);
     });
   }, [gsm]);
 
@@ -1049,7 +832,7 @@ function AppContent({ onLanguageChange }) {
       !gsm.getAllSoundsMuted()
     ) {
       // Stop victory theme
-      const victoryPlayer = youtubePlayersRef.current.victory;
+      const victoryPlayer = soundManagerRef.current.getPlayer('victory');
       if (victoryPlayer) {
         try {
           victoryPlayer.pauseVideo();
@@ -1081,7 +864,7 @@ function AppContent({ onLanguageChange }) {
     // If victory theme is playing and trail sequence changes, stop victory and resume previous sound
     if (sequenceChanged && soundPlaying.victory && !gsm.getAllSoundsMuted()) {
       // Stop victory theme
-      const victoryPlayer = youtubePlayersRef.current.victory;
+      const victoryPlayer = soundManagerRef.current.getPlayer('victory');
       if (victoryPlayer) {
         try {
           victoryPlayer.pauseVideo();
@@ -1105,7 +888,8 @@ function AppContent({ onLanguageChange }) {
           .find((s) => s.id === customId);
         if (customSound && customSound.url) {
           // Resume custom sound
-          const customPlayer = youtubePlayersRef.current[preBattleSound];
+          const customPlayer =
+            soundManagerRef.current.getPlayer(preBattleSound);
           if (customPlayer) {
             try {
               customPlayer.playVideo();
@@ -1285,7 +1069,8 @@ function AppContent({ onLanguageChange }) {
     // Reset custom sounds UI state
     const currentCustomSounds = gsm.getCustomSounds();
     currentCustomSounds.forEach((customSound) => {
-      const player = youtubePlayersRef.current[`custom-${customSound.id}`];
+      const playerKey = `custom-${customSound.id}`;
+      const player = soundManagerRef.current.getPlayer(playerKey);
       if (player) {
         try {
           player.stopVideo();
@@ -1293,21 +1078,12 @@ function AppContent({ onLanguageChange }) {
         } catch (e) {
           // Ignore errors
         }
-        delete youtubePlayersRef.current[`custom-${customSound.id}`];
       }
     });
     setCustomSoundInputs({});
     setCustomSoundErrors({});
     setCustomSoundPlaying({});
-    // Stop and remove all YouTube players
-    Object.keys(youtubePlayersRef.current).forEach((soundType) => {
-      try {
-        youtubePlayersRef.current[soundType].stopVideo();
-      } catch (e) {
-        // Ignore errors
-      }
-    });
-    youtubePlayersRef.current = {};
+    // Note: Players are managed by SoundManager, no need to manually clear them
     // Force all sections to remount
     setSectionResetKey((prev) => prev + 1);
   };
