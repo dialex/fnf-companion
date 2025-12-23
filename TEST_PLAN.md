@@ -2,29 +2,6 @@
 
 - [ ] Page loads and there's no console error when the page finished loading
 
-## Consumables Section (`src/components/ConsumablesSection.jsx`)
-
-- [x] All player-facing text is translated
-
-## Inventory Section (`src/components/InventorySection.jsx`)
-
-- [x] Inventory items can be edited (free text field)
-- [x] Inventory is saved to state (local and file)
-- [x] All player-facing text is translated
-
-## Notes Section (`src/components/NotesSection.jsx`)
-
-- [x] Notes section uses a special font (handwritten style)
-- [x] Notes can be edited
-- [x] Notes are saved to state and file
-- [x] All player-facing text is translated
-
-## Confirmation Dialog (`src/components/ConfirmationDialog.jsx`)
-
-- [x] Dialog displays messages correctly
-- [x] Confirm/cancel actions work
-- [x] All player-facing text is translated
-
 ## Map Section (`src/components/MapSection.jsx`)
 
 - [ ] Trail sequence can be updated
@@ -89,12 +66,6 @@
 - [ ] Fight actions work correctly
 - [ ] All player-facing text is translated
 
-## Notification Banner (`src/components/NotificationBanner.jsx`)
-
-- [ ] Banner displays messages correctly
-- [ ] Banner can be dismissed
-- [ ] All player-facing text is translated
-
 ## 🎵 Sound Management (Hard)
 
 These involve YouTube API and async operations.
@@ -107,30 +78,6 @@ These involve YouTube API and async operations.
 - [ ] Test custom sound management
 - [ ] Test pre-battle sound tracking
 - [ ] Test sound resumption after battle
-
-## 🎨 UI/Theme (Medium)
-
-- Reads css file with palette settings
-- Validates css file before applying its values
-- If file only contains a light theme, it should use that, update the light/dark button state to show the light icon, and disable it
-- If file only contains a dark theme, it should use that, update the light/dark button state to show the dark icon, and disable it
-- It should have one default css
-- It should display one entry in the palette menu per theme file available
-- Dashes in the filename should display as spaces in the palette menu
-- When the player changes palette, the changes take immediate effect, without the need for a hard page refresh
-
-### `src/utils/theme.js`
-
-- [ ] Test theme switching (light/dark)
-- [ ] Test theme persistence
-- [ ] Test `getFilteredThemes` - filters based on palette variants
-
-### `src/utils/palette.js`
-
-- [ ] Test palette discovery
-- [ ] Test palette loading
-- [ ] Test palette variant detection
-- [ ] Test palette persistence
 
 ## Last touches
 
