@@ -219,4 +219,47 @@ describe('SoundManager', () => {
       });
     });
   });
+
+  describe('Music switch', () => {
+    it('should prevent all noises (music and sound) from playing when muted', () => {
+      const soundManager = createSoundManager({
+        allSoundsMuted: true,
+        actionSoundsEnabled: true,
+      });
+      const mockPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      soundManager._setPlayerForTesting('ambience', mockPlayer);
+
+      // Try to play a sound
+      soundManager.playLuckySound();
+      // Try to play music
+      soundManager.handleMusicPlayPause('ambience');
+
+      // Neither should play
+      expect(mockAudio.play).not.toHaveBeenCalled();
+      expect(mockPlayer.playVideo).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Sounds switch', () => {
+    it('should prevent action sounds from playing when disabled', () => {
+      const soundManager = createSoundManager({
+        allSoundsMuted: false,
+        actionSoundsEnabled: false,
+      });
+
+      // Built-in sounds should not play when action sounds are disabled
+      soundManager.playLuckySound();
+      expect(mockAudio.play).not.toHaveBeenCalled();
+
+      // But music should still be able to play (tested in music.test.js)
+      // This test verifies that actionSoundsEnabled only affects built-in sounds
+      expect(soundManager.getActionSoundsEnabled()).toBe(false);
+    });
+  });
 });

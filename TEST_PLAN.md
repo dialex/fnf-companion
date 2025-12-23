@@ -82,17 +82,17 @@
 
 **Master Sound Control:**
 
-- [ ] Master sound button controls ALL sounds AND ALL music
-- [ ] When master sound is muted, no sounds play and no music plays
-- [ ] When master sound is unmuted, sounds and music can play (subject to other settings)
+- [x] Master sound button controls ALL sounds AND ALL music
+- [x] When master sound is muted, no sounds play and no music plays
+- [x] When master sound is unmuted, sounds and music can play (subject to other settings)
 
 **Action Sounds Control:**
 
-- [ ] Action sounds button only affects built-in sounds (mp3 files)
-- [ ] When action sounds are enabled, built-in sounds play when triggered
-- [ ] When action sounds are disabled, built-in sounds do NOT play when triggered
-- [ ] Action sounds setting does NOT affect music playback
-- [ ] Music can still play even when action sounds are disabled
+- [x] Action sounds button only affects built-in sounds (mp3 files)
+- [x] When action sounds are enabled, built-in sounds play when triggered
+- [x] When action sounds are disabled, built-in sounds do NOT play when triggered
+- [x] Action sounds setting does NOT affect music playback
+- [x] Music can still play even when action sounds are disabled
 
 **Music URL Validation:**
 

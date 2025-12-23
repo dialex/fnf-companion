@@ -33,6 +33,26 @@ describe('Music control buttons', () => {
     onDelete = vi.fn();
   });
 
+  describe('Master sound switch', () => {
+    it('should not play music when muted', () => {
+      const mutedManager = createSoundManager({ allSoundsMuted: true });
+      mutedManager._setPlayerForTesting('ambience', mockPlayer);
+
+      mutedManager.handleMusicPlayPause('ambience');
+
+      expect(mockPlayer.playVideo).not.toHaveBeenCalled();
+    });
+
+    it('should play music when enabled', () => {
+      const unmutedManager = createSoundManager({ allSoundsMuted: false });
+      unmutedManager._setPlayerForTesting('ambience', mockPlayer);
+
+      unmutedManager.handleMusicPlayPause('ambience');
+
+      expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('Play/Pause button', () => {
     beforeEach(() => {
       // Initialize a player for testing
@@ -158,7 +178,7 @@ describe('Music control buttons', () => {
       soundManager._setPlayerForTesting('ambience', mockPlayer);
     });
 
-    it('should call onDelete callback', () => {
+    it('should delete music track when delete is triggered', () => {
       soundManager.handleMusicDelete('ambience', onDelete);
 
       expect(onDelete).toHaveBeenCalledWith('ambience');

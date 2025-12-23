@@ -15,11 +15,33 @@ vi.mock('../../managers/i18nManager', () => ({
         'game.reset': 'Reset',
         'game.saved': 'Game saved',
         'game.loaded': 'Game loaded',
+        'game.sound': 'Sound',
+        'game.muteAll': 'Mute all',
+        'game.unmuteAll': 'Unmute all',
       };
       return translations[key] || key;
     },
   },
 }));
+
+// Mock bootstrap to avoid tooltip initialization errors
+const mockTooltip = vi.fn().mockImplementation(() => ({
+  dispose: vi.fn(),
+}));
+mockTooltip.getInstance = vi.fn(() => null);
+
+// Mock the dynamic import of bootstrap
+global.import = vi.fn((module) => {
+  if (module === 'bootstrap') {
+    return Promise.resolve({
+      default: {
+        Tooltip: mockTooltip,
+      },
+      Tooltip: mockTooltip,
+    });
+  }
+  return Promise.reject(new Error(`Unknown module: ${module}`));
+});
 
 describe('GameSection', () => {
   const defaultProps = {
@@ -146,6 +168,76 @@ describe('GameSection', () => {
       await user.click(resetButton);
 
       expect(onReset).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Master sound switch', () => {
+    it('should disable action sounds when master sound is muted', async () => {
+      const user = userEvent.setup();
+      const onAllSoundsMutedChange = vi.fn();
+      const onActionSoundsEnabledChange = vi.fn();
+      const onSoundStop = vi.fn();
+
+      render(
+        <GameSection
+          {...defaultProps}
+          allSoundsMuted={false}
+          actionSoundsEnabled={true}
+          soundPlaying={{
+            ambience: true,
+            battle: false,
+            victory: false,
+            defeat: false,
+          }}
+          onAllSoundsMutedChange={onAllSoundsMutedChange}
+          onActionSoundsEnabledChange={onActionSoundsEnabledChange}
+          onSoundStop={onSoundStop}
+        />
+      );
+
+      // Find the master sound button (it has a volume icon)
+      const masterSoundButton = document.querySelector(
+        'button[data-bs-toggle="tooltip"]'
+      );
+      expect(masterSoundButton).toBeInTheDocument();
+
+      await user.click(masterSoundButton);
+
+      // Should mute master sound
+      expect(onAllSoundsMutedChange).toHaveBeenCalledWith(true);
+      // Should auto-disable action sounds
+      expect(onActionSoundsEnabledChange).toHaveBeenCalledWith(false);
+      // Should stop playing sounds
+      expect(onSoundStop).toHaveBeenCalledWith('ambience');
+    });
+
+    it('should enable action sounds when master sound is unmuted', async () => {
+      const user = userEvent.setup();
+      const onAllSoundsMutedChange = vi.fn();
+      const onActionSoundsEnabledChange = vi.fn();
+
+      render(
+        <GameSection
+          {...defaultProps}
+          allSoundsMuted={true}
+          actionSoundsEnabled={false}
+          onAllSoundsMutedChange={onAllSoundsMutedChange}
+          onActionSoundsEnabledChange={onActionSoundsEnabledChange}
+        />
+      );
+
+      // Find the master sound button
+      const masterSoundButton = document.querySelector(
+        'button[data-bs-toggle="tooltip"]'
+      );
+      expect(masterSoundButton).toBeInTheDocument();
+
+      await user.click(masterSoundButton);
+
+      // Should unmute master sound
+      expect(onAllSoundsMutedChange).toHaveBeenCalledWith(false);
+      // Should auto-enable action sounds
+      expect(onActionSoundsEnabledChange).toHaveBeenCalledWith(true);
     });
   });
 });
