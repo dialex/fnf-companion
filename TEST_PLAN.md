@@ -54,30 +54,88 @@
     - GSM plays the Victory music
     - GSM appends the name of the monster to the bottom of the graveyard
 - Graveyard
+  - Read only text field
+  - Starts empty by default at the start of a game
+  - Whenever a monster is defeat, a new entry is added to the bottom of the list
+  - Each entry says "Defeated <name of monster>" and the first part of the string is i18n
+- Music switching
+  - When battle music starts, the previously playing ambience music must stop. The system must remember which ambience music was playing.
+  - When player moves on from battle, ie starts typing a new number in the trail section, the ambience music that was playing before the the battle must automatically resume
+  - Custom music follows the same rules as ambience rules (can be interrupted by battle, resumes after)
 
-- [ ] Fight System (`src/App.jsx` - fight logic)
-  - Fight logic needs to go into the new GameMaster
-  - [ ] Test `checkFightEnd` - detects when fight ends (hero wins/loses)
-  - [ ] Test fight attack calculations (hero wins, monster wins, tie)
-  - [ ] Test health updates on damage
-  - [ ] Test luck usage in fights
-  - [ ] Test fight outcome states
-- [ ] Monster stats can be set
-- [ ] Fight actions work correctly
-- [ ] All player-facing text is translated
+### SoundManager - Sounds vs Music
 
-## 🎵 Sound Management (Hard)
+**Distinction:**
 
-These involve YouTube API and async operations.
+- **Sounds**: Built-in local mp3 files that can play at any time, even without internet connection. Multiple sounds can play simultaneously.
+- **Music**: YouTube URLs that require internet connection. Only one music track can play at a time.
 
-### Sound Logic (`src/App.jsx` - sound management)
+### SoundManager - Local Sounds (Built-in mp3 files)
 
-- [ ] Test sound URL validation
-- [ ] Test sound volume updates
-- [ ] Test sound play/pause/stop logic
-- [ ] Test custom sound management
-- [ ] Test pre-battle sound tracking
-- [ ] Test sound resumption after battle
+- [x] Sounds respect mute settings (allSoundsMuted and actionSoundsEnabled)
+- [x] Test all built-in sound methods:
+  - [x] `playLuckySound()` - plays rayman-lucky.mp3
+  - [x] `playDrinkSound()` - plays minecraft-drink.mp3
+  - [x] `playEatSound()` - plays minecraft-eat.mp3
+  - [x] `playMonsterDamageSound()` - plays minecraft-hit-monster.mp3
+  - [x] `playPlayerDamageSound()` - plays minecraft-hurt.mp3
+  - [x] `playPurchaseSound()` - plays purchase.mp3
+
+### SoundManager - Music (YouTube tracks)
+
+**Music Exclusivity:**
+
+- [ ] Only one music track can play at a time
+- [ ] When a new music track starts, any currently playing music is paused automatically
+- [ ] This applies to all music types: ambience, battle, victory, defeat, and custom music
+
+**Music Control Buttons:**
+
+**Play/Pause Button:**
+
+- [ ] Play button plays music from the last position where it stopped
+- [ ] If music is playing, clicking play button pauses the music
+- [ ] If music is paused, clicking play button resumes from the same position
+
+**Stop Button:**
+
+- [ ] Stop button stops the music completely
+- [ ] Stop button resets the music progress tracker to the beginning
+- [ ] After stopping, clicking play will start from the beginning
+
+**Delete Button:**
+
+- [ ] Delete button clears the YouTube URL
+- [ ] Delete button updates the UI to show input field asking for a new YouTube link
+- [ ] Delete button stops and removes the music player
+
+**Master Sound Control:**
+
+- [ ] Master sound button controls ALL sounds AND ALL music
+- [ ] When master sound is muted, no sounds play and no music plays
+- [ ] When master sound is unmuted, sounds and music can play (subject to other settings)
+
+**Action Sounds Control:**
+
+- [ ] Action sounds button only affects built-in sounds (mp3 files)
+- [ ] When action sounds are enabled, built-in sounds play when triggered
+- [ ] When action sounds are disabled, built-in sounds do NOT play when triggered
+- [ ] Action sounds setting does NOT affect music playback
+- [ ] Music can still play even when action sounds are disabled
+
+**Music URL Validation:**
+
+- [ ] Test YouTube URL validation
+- [ ] Invalid URLs show error messages
+- [ ] Valid URLs initialize YouTube player
+
+**Music Volume Control:**
+
+- [ ] Test volume updates for each music track
+- [ ] Volume changes persist across play/pause cycles
+- [ ] Volume respects master mute setting
+- [ ] Volume persists on page refresh
+- [ ] Volume persists on game save and load
 
 ## Last touches
 
