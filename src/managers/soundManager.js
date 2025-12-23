@@ -35,8 +35,63 @@ export const createSoundManager = () => {
     playLocalSound('rayman-lucky.mp3', gameState);
   };
 
+  /**
+   * Plays the drink potion sound effect
+   * @param {Object} gameState - Game state containing mute settings
+   * @param {boolean} gameState.allSoundsMuted - Whether all sounds are muted
+   * @param {boolean} gameState.actionSoundsEnabled - Whether action sounds are enabled
+   */
+  const playDrinkSound = (gameState) => {
+    playLocalSound('minecraft-drink.mp3', gameState);
+  };
+
+  /**
+   * Plays the consume meal sound effect
+   * @param {Object} gameState - Game state containing mute settings
+   * @param {boolean} gameState.allSoundsMuted - Whether all sounds are muted
+   * @param {boolean} gameState.actionSoundsEnabled - Whether action sounds are enabled
+   */
+  const playEatSound = (gameState) => {
+    playLocalSound('minecraft-eat.mp3', gameState);
+  };
+
+  /**
+   * Plays the monster took damage sound effect
+   * @param {Object} gameState - Game state containing mute settings
+   * @param {boolean} gameState.allSoundsMuted - Whether all sounds are muted
+   * @param {boolean} gameState.actionSoundsEnabled - Whether action sounds are enabled
+   */
+  const playMonsterDamageSound = (gameState) => {
+    playLocalSound('minecraft-hit-monster.mp3', gameState);
+  };
+
+  /**
+   * Plays the player took damage sound effect
+   * @param {Object} gameState - Game state containing mute settings
+   * @param {boolean} gameState.allSoundsMuted - Whether all sounds are muted
+   * @param {boolean} gameState.actionSoundsEnabled - Whether action sounds are enabled
+   */
+  const playPlayerDamageSound = (gameState) => {
+    playLocalSound('minecraft-hurt.mp3', gameState);
+  };
+
+  /**
+   * Plays the purchase sound effect
+   * @param {Object} gameState - Game state containing mute settings
+   * @param {boolean} gameState.allSoundsMuted - Whether all sounds are muted
+   * @param {boolean} gameState.actionSoundsEnabled - Whether action sounds are enabled
+   */
+  const playPurchaseSound = (gameState) => {
+    playLocalSound('purchase.mp3', gameState);
+  };
+
   return {
     playLocalSound,
     playLuckySound,
+    playDrinkSound,
+    playEatSound,
+    playMonsterDamageSound,
+    playPlayerDamageSound,
+    playPurchaseSound,
   };
 };

@@ -24,7 +24,7 @@ describe('SoundManager', () => {
     vi.restoreAllMocks();
   });
 
-  describe('playLocalSound', () => {
+  describe('Action sounds player', () => {
     it('should play local mp3 file when sounds are not muted and action sounds enabled', () => {
       const soundManager = createSoundManager();
       const gameState = {
@@ -88,19 +88,80 @@ describe('SoundManager', () => {
     });
   });
 
-  describe('playLuckySound', () => {
-    it('should play the built-in sound for a lucky situation', () => {
+  describe('Built-in action sounds', () => {
+    const gameState = {
+      allSoundsMuted: false,
+      actionSoundsEnabled: true,
+    };
+
+    it('should be able toplay the lucky sound', () => {
       const soundManager = createSoundManager();
-      const gameState = {
-        allSoundsMuted: false,
-        actionSoundsEnabled: true,
-      };
       const AudioSpy = vi.spyOn(global, 'Audio');
 
       soundManager.playLuckySound(gameState);
 
       expect(AudioSpy).toHaveBeenCalledWith(
         expect.stringContaining('audio/rayman-lucky.mp3')
+      );
+      expect(mockAudio.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to play the drink potion sound', () => {
+      const soundManager = createSoundManager();
+      const AudioSpy = vi.spyOn(global, 'Audio');
+
+      soundManager.playDrinkSound(gameState);
+
+      expect(AudioSpy).toHaveBeenCalledWith(
+        expect.stringContaining('audio/minecraft-drink.mp3')
+      );
+      expect(mockAudio.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to play the consume meal sound', () => {
+      const soundManager = createSoundManager();
+      const AudioSpy = vi.spyOn(global, 'Audio');
+
+      soundManager.playEatSound(gameState);
+
+      expect(AudioSpy).toHaveBeenCalledWith(
+        expect.stringContaining('audio/minecraft-eat.mp3')
+      );
+      expect(mockAudio.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to play the monster took damage sound', () => {
+      const soundManager = createSoundManager();
+      const AudioSpy = vi.spyOn(global, 'Audio');
+
+      soundManager.playMonsterDamageSound(gameState);
+
+      expect(AudioSpy).toHaveBeenCalledWith(
+        expect.stringContaining('audio/minecraft-hit-monster.mp3')
+      );
+      expect(mockAudio.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to play the player took damage sound', () => {
+      const soundManager = createSoundManager();
+      const AudioSpy = vi.spyOn(global, 'Audio');
+
+      soundManager.playPlayerDamageSound(gameState);
+
+      expect(AudioSpy).toHaveBeenCalledWith(
+        expect.stringContaining('audio/minecraft-hurt.mp3')
+      );
+      expect(mockAudio.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to play the purchase sound', () => {
+      const soundManager = createSoundManager();
+      const AudioSpy = vi.spyOn(global, 'Audio');
+
+      soundManager.playPurchaseSound(gameState);
+
+      expect(AudioSpy).toHaveBeenCalledWith(
+        expect.stringContaining('audio/purchase.mp3')
       );
       expect(mockAudio.play).toHaveBeenCalledTimes(1);
     });
