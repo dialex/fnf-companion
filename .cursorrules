@@ -35,6 +35,10 @@ When adding user-facing text:
 - Tests must verify real behavior, not mocked behavior. After writing a test, verify it catches real failures by temporarily breaking the code and confirming the test fails.
 - Prefer using real code over mocks. Only mock when necessary (e.g., external APIs, timers, or when testing in isolation is required).
 - Avoid "dummy tests" that would pass even if the code is broken. Tests should assert actual behavior, not just that functions were called.
+- Test describe blocks must use Title case (only the first letter is uppercased).
+  - BAD: `describe('PLAY/PAUSE BUTTON', () => {`
+  - BAD: `describe('play/pause button', () => {`
+  - GOOD: `describe('Play/pause button', () => {`
 
 # Save File Structure Changes
 
