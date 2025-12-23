@@ -49,9 +49,8 @@ export const createGameShowManager = (soundManager) => {
   /**
    * Shows luck test result message and triggers sound if lucky
    * @param {boolean} isLucky - Whether the luck test was successful
-   * @param {Object} gameState - Game state for sound manager
    */
-  const showLuckTestResult = (isLucky, gameState) => {
+  const showLuckTestResult = (isLucky) => {
     const messageText = isLucky
       ? t('dice.youWereLucky')
       : t('dice.youWereUnlucky');
@@ -67,7 +66,7 @@ export const createGameShowManager = (soundManager) => {
     );
 
     if (isLucky) {
-      soundManager.playLuckySound(gameState);
+      soundManager.playLuckySound();
     }
 
     notifyListeners();

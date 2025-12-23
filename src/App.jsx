@@ -103,10 +103,24 @@ function AppContent({ onLanguageChange }) {
   const [fieldBadges, setFieldBadges] = useState({});
 
   // SoundManager and GameShowManager (use singleton i18nManager)
-  const soundManagerRef = useRef(createSoundManager());
+  // Initialize SoundManager with state from GameStateManager
+  const soundManagerRef = useRef(
+    createSoundManager({
+      allSoundsMuted: gsm.getAllSoundsMuted(),
+      actionSoundsEnabled: gsm.getActionSoundsEnabled(),
+    })
+  );
   const gameShowManagerRef = useRef(
     createGameShowManager(soundManagerRef.current)
   );
+
+  // Sync SoundManager with GameStateManager when mute/action sounds change
+  useEffect(() => {
+    soundManagerRef.current.setAllSoundsMuted(gsm.getAllSoundsMuted());
+    soundManagerRef.current.setActionSoundsEnabled(
+      gsm.getActionSoundsEnabled()
+    );
+  }, [gsm.getAllSoundsMuted(), gsm.getActionSoundsEnabled()]);
 
   // Notification banner
   const [notification, setNotification] = useState(null);
@@ -117,7 +131,8 @@ function AppContent({ onLanguageChange }) {
   // Section reset key for remounting sections
   const [sectionResetKey, setSectionResetKey] = useState(0);
 
-  // Sound state - UI-only (input fields, errors, playing status)
+  // Sound state - UI-only (input fields, errors)
+  // Playing status is now managed by SoundManager
   const [soundInputs, setSoundInputs] = useState({
     ambience: '',
     battle: '',
@@ -130,23 +145,18 @@ function AppContent({ onLanguageChange }) {
     victory: null,
     defeat: null,
   });
-  const [soundPlaying, setSoundPlaying] = useState({
-    ambience: false,
-    battle: false,
-    victory: false,
-    defeat: false,
-  });
-  // Custom sounds: UI-only state (input fields, errors, playing status)
+  // Sync SoundManager's playing state with React for UI updates
+  const [soundPlaying, setSoundPlaying] = useState(() =>
+    soundManagerRef.current.getSoundPlaying()
+  );
+  // Custom sounds: UI-only state (input fields, errors)
+  // Playing status is now managed by SoundManager
   const [customSoundInputs, setCustomSoundInputs] = useState({}); // { id: { label: '', url: '' } }
   const [customSoundErrors, setCustomSoundErrors] = useState({}); // { id: error }
-  const [customSoundPlaying, setCustomSoundPlaying] = useState({}); // { id: boolean }
+  const [customSoundPlaying, setCustomSoundPlaying] = useState(() =>
+    soundManagerRef.current.getCustomSoundPlaying()
+  );
   const youtubePlayersRef = useRef({});
-  const soundStoppedManuallyRef = useRef({
-    ambience: false,
-    battle: false,
-    victory: false,
-    defeat: false,
-  });
   const [showYouDied, setShowYouDied] = useState(false);
 
   // State management
@@ -353,128 +363,51 @@ function AppContent({ onLanguageChange }) {
   };
 
   const handleSoundDelete = (soundType) => {
-    // Stop and destroy the player
-    const player = youtubePlayersRef.current[soundType];
-    if (player) {
-      try {
-        player.stopVideo();
-        player.destroy();
-      } catch (e) {
-        // Ignore errors
-      }
-      delete youtubePlayersRef.current[soundType];
-    }
-
-    gsm.setSoundUrls({
-      ...gsm.getSoundUrls(),
-      [soundType]: '',
+    soundManagerRef.current.handleMusicDelete(soundType, {
+      youtubePlayers: youtubePlayersRef.current,
+      onDelete: (soundType) => {
+        // Update GameStateManager (persistent state)
+        const currentUrls = gsm.getSoundUrls();
+        gsm.setSoundUrls({
+          ...currentUrls,
+          [soundType]: '',
+        });
+        // Update UI state (input fields, errors)
+        setSoundInputs((prev) => ({
+          ...prev,
+          [soundType]: '',
+        }));
+        setSoundErrors((prev) => ({
+          ...prev,
+          [soundType]: null,
+        }));
+      },
+      onStateChange: () => {
+        // Sync SoundManager state with React for UI updates
+        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
+      },
     });
-    setSoundInputs((prev) => ({
-      ...prev,
-      [soundType]: '',
-    }));
-    setSoundErrors((prev) => ({
-      ...prev,
-      [soundType]: null,
-    }));
-    setSoundPlaying((prev) => ({
-      ...prev,
-      [soundType]: false,
-    }));
-    // Stop and remove player
-    if (youtubePlayersRef.current[soundType]) {
-      try {
-        youtubePlayersRef.current[soundType].stopVideo();
-      } catch (e) {
-        // Ignore errors
-      }
-      delete youtubePlayersRef.current[soundType];
-    }
   };
 
   const handleSoundPlayPause = (soundType) => {
-    // Don't play if all sounds are muted
-    if (gsm.getAllSoundsMuted()) return;
-
-    const player = youtubePlayersRef.current[soundType];
-    if (!player) return;
-
-    try {
-      if (soundPlaying[soundType]) {
-        player.pauseVideo();
-        setSoundPlaying((prev) => ({
-          ...prev,
-          [soundType]: false,
-        }));
-      } else {
-        // Pause all other regular sounds
-        const soundTypes = ['ambience', 'battle', 'victory', 'defeat'];
-        soundTypes.forEach((st) => {
-          if (st !== soundType && soundPlaying[st]) {
-            const otherPlayer = youtubePlayersRef.current[st];
-            if (otherPlayer) {
-              try {
-                otherPlayer.pauseVideo();
-                setSoundPlaying((prev) => ({
-                  ...prev,
-                  [st]: false,
-                }));
-              } catch (e) {
-                // Ignore errors
-              }
-            }
-          }
-        });
-        // Pause all custom sounds
-        Object.keys(customSoundPlaying).forEach((customId) => {
-          if (customSoundPlaying[customId]) {
-            const customPlayer =
-              youtubePlayersRef.current[`custom-${customId}`];
-            if (customPlayer) {
-              try {
-                customPlayer.pauseVideo();
-                setCustomSoundPlaying((prev) => ({
-                  ...prev,
-                  [customId]: false,
-                }));
-              } catch (e) {
-                // Ignore errors
-              }
-            }
-          }
-        });
-        // Play the selected sound
-        player.playVideo();
-        setSoundPlaying((prev) => ({
-          ...prev,
-          [soundType]: true,
-        }));
-      }
-    } catch (e) {
-      console.error('Error controlling YouTube player:', e);
-    }
+    soundManagerRef.current.handleMusicPlayPause(soundType, {
+      youtubePlayers: youtubePlayersRef.current,
+      onStateChange: () => {
+        // Sync SoundManager state with React for UI updates
+        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
+        setCustomSoundPlaying(soundManagerRef.current.getCustomSoundPlaying());
+      },
+    });
   };
 
   const handleSoundStop = (soundType) => {
-    const player = youtubePlayersRef.current[soundType];
-    if (!player) return;
-
-    // Only stop if it's currently playing
-    if (!soundPlaying[soundType]) return;
-
-    try {
-      // Mark as manually stopped to prevent auto-restart
-      soundStoppedManuallyRef.current[soundType] = true;
-      // Pause first, then seek to beginning
-      player.pauseVideo();
-      player.seekTo(0, true); // true = allowSeekAhead
-      setSoundPlaying((prev) => ({
-        ...prev,
-        [soundType]: false,
-      }));
-    } catch (e) {
-      console.error('Error stopping YouTube player:', e);
-    }
+    soundManagerRef.current.handleMusicStop(soundType, {
+      youtubePlayers: youtubePlayersRef.current,
+      onStateChange: () => {
+        // Sync SoundManager state with React for UI updates
+        setSoundPlaying(soundManagerRef.current.getSoundPlaying());
+      },
+    });
   };
 
   const handleSoundVolumeChange = (soundType, volume) => {
@@ -1251,14 +1184,7 @@ function AppContent({ onLanguageChange }) {
   const handleConsumeMeal = () => {
     const currentMeals = parseInt(gsm.getMeals()) || 0;
     if (currentMeals > 0) {
-      if (actionSoundsEnabled) {
-        const audio = new Audio(
-          `${import.meta.env.BASE_URL}audio/minecraft-eat.mp3`
-        );
-        audio.play().catch((error) => {
-          console.warn('Could not play audio:', error);
-        });
-      }
+      soundManagerRef.current.playEatSound();
 
       gsm.setMeals(String(currentMeals - 1));
       showFieldBadge('meals', '-1', 'danger');
@@ -1288,14 +1214,7 @@ function AppContent({ onLanguageChange }) {
   const handleConsumePotion = () => {
     if (potionUsed || !potionType || !isLocked) return;
 
-    if (actionSoundsEnabled) {
-      const audio = new Audio(
-        `${import.meta.env.BASE_URL}audio/minecraft-drink.mp3`
-      );
-      audio.play().catch((error) => {
-        console.warn('Could not play audio:', error);
-      });
-    }
+    soundManagerRef.current.playDrinkSound();
 
     if (gsm.getPotionType() === 'skill' && gsm.getMaxSkill() !== null) {
       const currentSkill = parseInt(gsm.getSkill()) || 0;
@@ -1355,6 +1274,8 @@ function AppContent({ onLanguageChange }) {
       victory: null,
       defeat: null,
     });
+    // Reset SoundManager playing state (internal state)
+    // Note: SoundManager state will be synced via getSoundPlaying() calls
     setSoundPlaying({
       ambience: false,
       battle: false,
@@ -1378,17 +1299,6 @@ function AppContent({ onLanguageChange }) {
     setCustomSoundInputs({});
     setCustomSoundErrors({});
     setCustomSoundPlaying({});
-    // Reset manual stop flags
-    soundStoppedManuallyRef.current = {
-      ambience: false,
-      battle: false,
-      victory: false,
-      defeat: false,
-    };
-    // Clear custom sound stop flags
-    gsm.getCustomSounds().forEach((customSound) => {
-      soundStoppedManuallyRef.current[`custom-${customSound.id}`] = false;
-    });
     // Stop and remove all YouTube players
     Object.keys(youtubePlayersRef.current).forEach((soundType) => {
       try {
@@ -1420,12 +1330,7 @@ function AppContent({ onLanguageChange }) {
   // TODO: Move purchase logic to GameMaster once implemented
   // GameMaster should handle: validation, deducting coins, adding to inventory, playing sound, showing badges
   const handlePurchase = () => {
-    if (actionSoundsEnabled) {
-      const audio = new Audio(`${import.meta.env.BASE_URL}audio/purchase.mp3`);
-      audio.play().catch((error) => {
-        console.warn('Could not play audio:', error);
-      });
-    }
+    soundManagerRef.current.playPurchaseSound();
 
     const objectName = transactionObject.trim();
     const cost = parseInt(transactionCost) || 0;
@@ -1455,11 +1360,7 @@ function AppContent({ onLanguageChange }) {
     const isLucky = sum <= currentLuck; //TODO: move this logic to GameMaster
 
     // Show luck test result (message + sound via GameShowManager)
-    const gameState = {
-      allSoundsMuted: gsm.getAllSoundsMuted(),
-      actionSoundsEnabled: gsm.getActionSoundsEnabled(),
-    };
-    gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
+    gameShowManagerRef.current.showLuckTestResult(isLucky);
 
     // Set result (used by FightSection)
     setTestLuckResult({ roll1, roll2, isLucky });
@@ -1638,28 +1539,13 @@ function AppContent({ onLanguageChange }) {
           gsm.setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-2', 'danger');
           // Play hurt sound when hero takes damage
-          if (gsm.getActionSoundsEnabled()) {
-            const audio = new Audio(
-              `${import.meta.env.BASE_URL}audio/minecraft-hurt.mp3`
-            );
-            audio.play().catch((error) => {
-              console.warn('Could not play audio:', error);
-            });
-          }
+          soundManagerRef.current.playPlayerDamageSound();
         }
         if (newMonsterHealth !== currentMonsterHealth) {
           gsm.setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-2', 'danger');
           // Play hit sound when monster takes damage
-          //TODO: use playActionSound
-          if (gsm.getActionSoundsEnabled()) {
-            const audio = new Audio(
-              `${import.meta.env.BASE_URL}audio/minecraft-hit-monster.mp3`
-            );
-            audio.play().catch((error) => {
-              console.warn('Could not play audio:', error);
-            });
-          }
+          soundManagerRef.current.playMonsterDamageSound();
         }
 
         // Now check if fight ended with the updated health values
@@ -1735,11 +1621,7 @@ function AppContent({ onLanguageChange }) {
       const sum = rolls.sum;
       const isLucky = sum <= currentLuck; //TODO: move this logic to GameMaster
 
-      const gameState = {
-        allSoundsMuted: gsm.getAllSoundsMuted(),
-        actionSoundsEnabled: gsm.getActionSoundsEnabled(),
-      };
-      gameShowManagerRef.current.showLuckTestResult(isLucky, gameState);
+      gameShowManagerRef.current.showLuckTestResult(isLucky);
 
       const heroWonLastFight = gsm.getFightResult().type === 'heroWins';
       const currentHealth = parseInt(gsm.getHealth()) || 0;
@@ -1753,14 +1635,7 @@ function AppContent({ onLanguageChange }) {
           gsm.setMonsterHealth(String(newMonsterHealth));
           showFieldBadge('monsterHealth', '-1', 'danger');
           // Play hit sound when monster takes extra damage
-          if (gsm.getActionSoundsEnabled()) {
-            const audio = new Audio(
-              `${import.meta.env.BASE_URL}audio/minecraft-hit-monster.mp3`
-            );
-            audio.play().catch((error) => {
-              console.warn('Could not play audio:', error);
-            });
-          }
+          soundManagerRef.current.playMonsterDamageSound();
         } else {
           newMonsterHealth = currentMonsterHealth + 1;
           gsm.setMonsterHealth(String(newMonsterHealth));
@@ -1784,14 +1659,7 @@ function AppContent({ onLanguageChange }) {
           gsm.setHealth(String(newHealth));
           showFieldBadge('heroHealth', '-1', 'danger');
           // Play hurt sound when hero takes extra damage
-          if (gsm.getActionSoundsEnabled()) {
-            const audio = new Audio(
-              `${import.meta.env.BASE_URL}audio/minecraft-hurt.mp3`
-            );
-            audio.play().catch((error) => {
-              console.warn('Could not play audio:', error);
-            });
-          }
+          soundManagerRef.current.playPlayerDamageSound();
         }
       }
 

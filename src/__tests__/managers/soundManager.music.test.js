@@ -1,23 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createSoundManager } from '../../managers/soundManager';
 
-/**
- * Tests for music control button behaviors
- *
- * NOTE: Currently the music logic is in App.jsx handlers (handleSoundPlayPause, handleSoundStop, handleSoundDelete).
- * These tests verify the expected behavior. Ideally, this logic should be moved to SoundManager.
- */
-
-describe('Music Control Buttons - Expected Behavior', () => {
+describe('Music control buttons', () => {
+  let soundManager;
   let mockPlayer;
-  let mockSetSoundPlaying;
-  let mockSetSoundInputs;
-  let mockSetSoundErrors;
-  let mockSetSoundUrls;
-  let soundPlaying;
-  let soundStoppedManually;
+  let youtubePlayers;
+  let onStateChange;
+  let onDelete;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    soundManager = createSoundManager({ allSoundsMuted: false });
 
     // Mock YouTube player
     mockPlayer = {
@@ -29,178 +22,227 @@ describe('Music Control Buttons - Expected Behavior', () => {
       getPlayerState: vi.fn(() => 1), // 1 = playing
     };
 
-    // Mock React state setters
-    mockSetSoundPlaying = vi.fn((updater) => {
-      if (typeof updater === 'function') {
-        soundPlaying = updater(soundPlaying);
-      } else {
-        soundPlaying = updater;
-      }
-    });
-
-    mockSetSoundInputs = vi.fn();
-    mockSetSoundErrors = vi.fn();
-    mockSetSoundUrls = vi.fn();
-
-    soundPlaying = {
-      ambience: false,
-      battle: false,
-      victory: false,
-      defeat: false,
+    youtubePlayers = {
+      ambience: mockPlayer,
+      battle: null,
+      victory: null,
+      defeat: null,
     };
 
-    soundStoppedManually = {
-      ambience: false,
-      battle: false,
-      victory: false,
-      defeat: false,
-    };
+    onStateChange = vi.fn();
+    onDelete = vi.fn();
   });
 
   describe('Play/Pause button', () => {
     it('should play music from the last position where it stopped', () => {
-      // When music is paused (not playing), clicking play should resume
-      soundPlaying.ambience = false;
-
-      // Simulate play action
-      mockPlayer.playVideo();
+      // Currently paused (default state)
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
       expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
       expect(mockPlayer.seekTo).not.toHaveBeenCalled(); // Should not seek, resumes from last position
+      expect(onStateChange).toHaveBeenCalled();
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
     });
 
     it('should pause music when it is currently playing', () => {
-      soundPlaying.ambience = true;
+      // Set playing state first
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+      vi.clearAllMocks();
 
-      // Simulate pause action
-      mockPlayer.pauseVideo();
-      soundPlaying.ambience = false;
+      // Now pause it
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
       expect(mockPlayer.pauseVideo).toHaveBeenCalledTimes(1);
-      expect(soundPlaying.ambience).toBe(false);
+      expect(onStateChange).toHaveBeenCalled();
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
     });
 
     it('should resume music from the same position when paused', () => {
-      soundPlaying.ambience = false; // Currently paused
+      // Play first
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+      // Pause
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+      vi.clearAllMocks();
 
-      // Simulate resume action
-      mockPlayer.playVideo();
-      soundPlaying.ambience = true;
+      // Resume
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
       expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
       expect(mockPlayer.seekTo).not.toHaveBeenCalled(); // Should not seek, resumes from same position
-      expect(soundPlaying.ambience).toBe(true);
+      expect(onStateChange).toHaveBeenCalled();
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+    });
+
+    it('should not play when all sounds are muted', () => {
+      const mutedManager = createSoundManager({ allSoundsMuted: true });
+
+      mutedManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+
+      expect(mockPlayer.playVideo).not.toHaveBeenCalled();
+      expect(onStateChange).not.toHaveBeenCalled();
+    });
+
+    it('should pause other music when starting new music', () => {
+      const battlePlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+      };
+      youtubePlayers.battle = battlePlayer;
+
+      // Start battle music
+      soundManager.handleMusicPlayPause('battle', {
+        youtubePlayers,
+        onStateChange,
+      });
+      vi.clearAllMocks();
+
+      // Start ambience - should pause battle
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+
+      expect(battlePlayer.pauseVideo).toHaveBeenCalledTimes(1);
+      expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
+      expect(soundManager.getSoundPlaying().battle).toBe(false);
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
     });
   });
 
   describe('Stop button', () => {
     it('should stop music completely', () => {
-      soundPlaying.ambience = true;
+      // Start playing first
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+      vi.clearAllMocks();
 
-      // Simulate stop action
-      mockPlayer.pauseVideo();
-      mockPlayer.seekTo(0, true);
-      soundPlaying.ambience = false;
-      soundStoppedManually.ambience = true;
+      soundManager.handleMusicStop('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
       expect(mockPlayer.pauseVideo).toHaveBeenCalledTimes(1);
       expect(mockPlayer.seekTo).toHaveBeenCalledWith(0, true);
-      expect(soundPlaying.ambience).toBe(false);
-      expect(soundStoppedManually.ambience).toBe(true);
+      expect(soundManager.getSoundStoppedManually().ambience).toBe(true);
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
+      expect(onStateChange).toHaveBeenCalled();
     });
 
     it('should reset music progress tracker to the beginning', () => {
-      soundPlaying.ambience = true;
+      // Start playing first
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
-      // Simulate stop action
-      mockPlayer.pauseVideo();
-      mockPlayer.seekTo(0, true);
+      soundManager.handleMusicStop('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
       expect(mockPlayer.seekTo).toHaveBeenCalledWith(0, true);
     });
 
-    it('should start from beginning when play is clicked after stop', () => {
-      // After stop, music is at position 0
-      soundPlaying.ambience = false;
-      soundStoppedManually.ambience = true;
+    it('should not stop if music is not currently playing', () => {
+      soundManager.handleMusicStop('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
-      // When play is clicked after stop, it should start from beginning
-      // (This is handled by seekTo(0) in stop, so playVideo will start from 0)
-      mockPlayer.playVideo();
+      expect(mockPlayer.pauseVideo).not.toHaveBeenCalled();
+      expect(mockPlayer.seekTo).not.toHaveBeenCalled();
+    });
 
-      expect(mockPlayer.playVideo).toHaveBeenCalledTimes(1);
-      // The position is already at 0 from the stop action
+    it('should not stop if player does not exist', () => {
+      youtubePlayers.ambience = null;
+
+      soundManager.handleMusicStop('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
+
+      expect(mockPlayer.pauseVideo).not.toHaveBeenCalled();
     });
   });
 
   describe('Delete button', () => {
-    it('should clear the YouTube URL', () => {
-      const soundUrls = {
-        ambience: 'https://www.youtube.com/watch?v=test123',
-        battle: '',
-        victory: '',
-        defeat: '',
-      };
+    it('should call onDelete callback', () => {
+      soundManager.handleMusicDelete('ambience', {
+        youtubePlayers,
+        onDelete,
+        onStateChange,
+      });
 
-      // Simulate delete action
-      const newSoundUrls = {
-        ...soundUrls,
-        ambience: '',
-      };
-
-      expect(newSoundUrls.ambience).toBe('');
+      expect(onDelete).toHaveBeenCalledWith('ambience');
     });
 
     it('should stop and remove the music player', () => {
-      // Simulate delete action
-      mockPlayer.stopVideo();
-      mockPlayer.destroy();
+      soundManager.handleMusicDelete('ambience', {
+        youtubePlayers,
+        onDelete,
+        onStateChange,
+      });
 
       expect(mockPlayer.stopVideo).toHaveBeenCalledTimes(1);
       expect(mockPlayer.destroy).toHaveBeenCalledTimes(1);
+      expect(youtubePlayers.ambience).toBeUndefined();
     });
 
-    it('should update UI to show input field asking for new YouTube link', () => {
-      const soundInputs = {
-        ambience: 'https://www.youtube.com/watch?v=test123',
-        battle: '',
-        victory: '',
-        defeat: '',
-      };
+    it('should clear playing state when deleting', () => {
+      // Start playing first
+      soundManager.handleMusicPlayPause('ambience', {
+        youtubePlayers,
+        onStateChange,
+      });
 
-      // Simulate delete action - clears input
-      const newSoundInputs = {
-        ...soundInputs,
-        ambience: '',
-      };
+      soundManager.handleMusicDelete('ambience', {
+        youtubePlayers,
+        onDelete,
+        onStateChange,
+      });
 
-      expect(newSoundInputs.ambience).toBe('');
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
+      expect(soundManager.getSoundStoppedManually().ambience).toBe(false);
+      expect(onStateChange).toHaveBeenCalled();
     });
 
-    it('should clear error state when deleting', () => {
-      const soundErrors = {
-        ambience: 'Invalid URL',
-        battle: null,
-        victory: null,
-        defeat: null,
-      };
+    it('should handle delete gracefully when player does not exist', () => {
+      youtubePlayers.ambience = null;
 
-      // Simulate delete action - clears error
-      const newSoundErrors = {
-        ...soundErrors,
-        ambience: null,
-      };
+      soundManager.handleMusicDelete('ambience', {
+        youtubePlayers,
+        onDelete,
+        onStateChange,
+      });
 
-      expect(newSoundErrors.ambience).toBe(null);
-    });
-
-    it('should set playing state to false when deleting', () => {
-      soundPlaying.ambience = true;
-
-      // Simulate delete action
-      soundPlaying.ambience = false;
-
-      expect(soundPlaying.ambience).toBe(false);
+      expect(onDelete).toHaveBeenCalledWith('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
     });
   });
 });

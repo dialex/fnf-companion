@@ -71,31 +71,23 @@ describe('GameShowManager', () => {
     it('should show lucky message and play sound when lucky', () => {
       const callback = vi.fn();
       gameShowManager.subscribe(callback);
-      const gameState = {
-        allSoundsMuted: false,
-        actionSoundsEnabled: true,
-      };
 
-      gameShowManager.showLuckTestResult(true, gameState);
+      gameShowManager.showLuckTestResult(true);
 
       const state = gameShowManager.getDisplayState();
       expect(state.luckTestMessage).toBeTruthy();
       expect(state.luckTestMessage.type).toBe('div');
       expect(state.luckTestMessage.props.className).toContain('alert-success');
       expect(state.luckTestMessage.props.children).toBe('You were lucky!');
-      expect(mockSoundManager.playLuckySound).toHaveBeenCalledWith(gameState);
+      expect(mockSoundManager.playLuckySound).toHaveBeenCalledWith();
       expect(callback).toHaveBeenCalled();
     });
 
     it('should show unlucky message and not play sound when not lucky', () => {
       const callback = vi.fn();
       gameShowManager.subscribe(callback);
-      const gameState = {
-        allSoundsMuted: false,
-        actionSoundsEnabled: true,
-      };
 
-      gameShowManager.showLuckTestResult(false, gameState);
+      gameShowManager.showLuckTestResult(false);
 
       const state = gameShowManager.getDisplayState();
       expect(state.luckTestMessage).toBeTruthy();
@@ -109,12 +101,8 @@ describe('GameShowManager', () => {
     it('should keep message displayed until new dice roll starts', () => {
       const callback = vi.fn();
       gameShowManager.subscribe(callback);
-      const gameState = {
-        allSoundsMuted: false,
-        actionSoundsEnabled: true,
-      };
 
-      gameShowManager.showLuckTestResult(true, gameState);
+      gameShowManager.showLuckTestResult(true);
       expect(callback).toHaveBeenCalledTimes(1);
 
       // Advance time - message should still be there
@@ -180,12 +168,7 @@ describe('GameShowManager', () => {
     });
 
     it('should return luck test message with correct CSS classes', () => {
-      const gameState = {
-        allSoundsMuted: false,
-        actionSoundsEnabled: true,
-      };
-
-      gameShowManager.showLuckTestResult(true, gameState);
+      gameShowManager.showLuckTestResult(true);
       const state = gameShowManager.getDisplayState();
 
       expect(state.luckTestMessage.props.className).toContain('alert');
