@@ -1326,6 +1326,8 @@ function AppContent({ onLanguageChange }) {
     gsm.setPotionUsed(true);
   };
 
+  // TODO: Move reset confirmation logic to GameMaster once implemented
+  // GameMaster should handle: showing confirmation dialog, validating reset conditions, orchestrating reset
   const handleReset = () => {
     setShowResetConfirm(true);
   };

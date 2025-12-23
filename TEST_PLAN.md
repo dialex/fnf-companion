@@ -4,7 +4,7 @@
 
 ## Consumables Section (`src/components/ConsumablesSection.jsx`)
 
-- [ ] All player-facing text is translated
+- [x] All player-facing text is translated
 
 ## Inventory Section (`src/components/InventorySection.jsx`)
 
@@ -21,9 +21,9 @@
 
 ## Confirmation Dialog (`src/components/ConfirmationDialog.jsx`)
 
-- [ ] Dialog displays messages correctly
-- [ ] Confirm/cancel actions work
-- [ ] All player-facing text is translated
+- [x] Dialog displays messages correctly
+- [x] Confirm/cancel actions work
+- [x] All player-facing text is translated
 
 ## Map Section (`src/components/MapSection.jsx`)
 
