@@ -70,17 +70,6 @@
 - **Sounds**: Built-in local mp3 files that can play at any time, even without internet connection. Multiple sounds can play simultaneously.
 - **Music**: YouTube URLs that require internet connection. Only one music track can play at a time.
 
-### SoundManager - Local Sounds (Built-in mp3 files)
-
-- [x] Sounds respect mute settings (allSoundsMuted and actionSoundsEnabled)
-- [x] Test all built-in sound methods:
-  - [x] `playLuckySound()` - plays rayman-lucky.mp3
-  - [x] `playDrinkSound()` - plays minecraft-drink.mp3
-  - [x] `playEatSound()` - plays minecraft-eat.mp3
-  - [x] `playMonsterDamageSound()` - plays minecraft-hit-monster.mp3
-  - [x] `playPlayerDamageSound()` - plays minecraft-hurt.mp3
-  - [x] `playPurchaseSound()` - plays purchase.mp3
-
 ### SoundManager - Music (YouTube tracks)
 
 **Music Exclusivity:**
@@ -90,24 +79,6 @@
 - [ ] This applies to all music types: ambience, battle, victory, defeat, and custom music
 
 **Music Control Buttons:**
-
-**Play/Pause Button:**
-
-- [ ] Play button plays music from the last position where it stopped
-- [ ] If music is playing, clicking play button pauses the music
-- [ ] If music is paused, clicking play button resumes from the same position
-
-**Stop Button:**
-
-- [ ] Stop button stops the music completely
-- [ ] Stop button resets the music progress tracker to the beginning
-- [ ] After stopping, clicking play will start from the beginning
-
-**Delete Button:**
-
-- [ ] Delete button clears the YouTube URL
-- [ ] Delete button updates the UI to show input field asking for a new YouTube link
-- [ ] Delete button stops and removes the music player
 
 **Master Sound Control:**
 
