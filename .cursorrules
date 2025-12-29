@@ -31,7 +31,9 @@ When adding user-facing text:
   - GOOD: "should save character name when name input is changed"
   - Test descriptions should read as non-technical requirements that a product manager could understand.
   - **CRITICAL**: NEVER use function names, method names, or "call" in test descriptions. Always describe what the user experiences or what the system does, not how it's implemented.
+  - **MANDATORY TEST DESCRIPTION REVIEW**: Before writing ANY test description, check for these forbidden words: "call", "should call", function names (onXxx, handleXxx, setXxx, getXxx), method names. If found, rewrite to describe user-visible behavior instead.
   - **Before finalizing any test**: Review the test description and ask "Does this describe what the user sees/experiences, or does it describe code implementation?" If it describes implementation, rewrite it.
+  - **VALIDATION**: After writing tests, run `npm run test:check-descriptions` to validate all test descriptions follow these rules.
 - Tests must verify real behavior, not mocked behavior. After writing a test, verify it catches real failures by temporarily breaking the code and confirming the test fails.
 - Prefer using real code over mocks. Only mock when necessary (e.g., external APIs, timers, or when testing in isolation is required).
 - Avoid "dummy tests" that would pass even if the code is broken. Tests should assert actual behavior, not just that functions were called.
