@@ -13,10 +13,7 @@ import {
   mdiChevronUp,
 } from '@mdi/js';
 import { i18nManager } from '../managers/i18nManager';
-import {
-  convertNoteItemtoColor,
-  convertColorToNote,
-} from '../utils/trailMapping';
+import { convertNoteItemtoColor } from '../utils/trailMapping';
 
 export default function MapSection({
   trailSequence,
@@ -98,10 +95,9 @@ export default function MapSection({
     };
   }, [displaySequence]);
 
-  const handlePillColorChange = (color) => {
+  const handlePillNoteChange = (note) => {
     if (!gsm) return;
 
-    const annotation = convertColorToNote(color);
     const current = gsm.getTrailSequence();
     if (current.length === 0) return;
 
@@ -109,12 +105,12 @@ export default function MapSection({
     const lastIndex = newSequence.length - 1;
     newSequence[lastIndex] = {
       ...newSequence[lastIndex],
-      annotation: annotation,
+      annotation: note,
     };
     gsm.setTrailSequence(newSequence);
 
     // Auto-play defeat sound and show "You Died" animation when died button is clicked
-    if (annotation === 'died' && onDied) {
+    if (note === 'died' && onDied) {
       onDied();
     }
   };
@@ -138,7 +134,7 @@ export default function MapSection({
 
     // Chapter 400 is automatically marked as important
     if (num === 400) {
-      handlePillColorChange('warning');
+      handlePillNoteChange('important');
       // Celebrate if the game was won
       onCelebrate();
     }
@@ -254,7 +250,7 @@ export default function MapSection({
                 className={`btn btn-light btn-sm ${selectedButton === 'default' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('default');
-                  handlePillColorChange('light');
+                  handlePillNoteChange(null);
                 }}
                 title={t('trail.default')}
               >
@@ -265,7 +261,7 @@ export default function MapSection({
                 className={`btn btn-info btn-sm text-white ${selectedButton === 'question' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('question');
-                  handlePillColorChange('info');
+                  handlePillNoteChange('question');
                 }}
                 title={t('trail.question')}
               >
@@ -276,7 +272,7 @@ export default function MapSection({
                 className={`btn btn-success btn-sm text-white ${selectedButton === 'good' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('good');
-                  handlePillColorChange('success');
+                  handlePillNoteChange('good');
                 }}
                 title={t('trail.good')}
               >
@@ -287,7 +283,7 @@ export default function MapSection({
                 className={`btn btn-danger btn-sm text-white ${selectedButton === 'bad' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('bad');
-                  handlePillColorChange('danger');
+                  handlePillNoteChange('bad');
                 }}
                 title={t('trail.bad')}
               >
@@ -298,7 +294,7 @@ export default function MapSection({
                 className={`btn btn-warning btn-sm text-white ${selectedButton === 'star' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('star');
-                  handlePillColorChange('warning');
+                  handlePillNoteChange('important');
                 }}
                 title={t('trail.important')}
               >
@@ -309,7 +305,7 @@ export default function MapSection({
                 className={`btn btn-dark btn-sm text-white ${selectedButton === 'died' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('died');
-                  handlePillColorChange('dark');
+                  handlePillNoteChange('died');
                 }}
                 title={t('trail.died')}
               >

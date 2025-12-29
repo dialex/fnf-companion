@@ -13,7 +13,7 @@
 - [x] When the died button is clicked it displays a special "YOU DIED" animation (tested in GameShowManager)
 - [x] If the user submits chapter 400, then it triggers a special "confetti" animation and marks the chapter as Important (yellow) (confetti tested in GameShowManager - note: Important marking not yet implemented)
 - [x] Trail is part of the game state, so it's persisted between refreshes and load games (tested in gameStateManager tests)
-- Refactor convertColorToNote: (color) => {
+- Refactor convertColorToNote: (color)
 
 ## Fight Section (`src/components/FightSection.jsx`)
 

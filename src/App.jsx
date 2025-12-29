@@ -3,7 +3,6 @@ import { i18nManager } from './managers/i18nManager';
 import { isValidYouTubeUrl, extractVideoId } from './utils/youtube';
 import { createGameStateManager } from './managers/gameStateManager';
 import { themeManager } from './managers/themeManager';
-import { convertColorToNote } from './utils/trailMapping';
 import { createDiceRoller } from './managers/diceRoller';
 import { rollDie, rollTwoDice } from './utils/dice';
 import { createSoundManager } from './managers/soundManager';
@@ -235,23 +234,21 @@ function AppContent({ onLanguageChange }) {
 
   // Trail handlers are now handled by MapSection internally
 
-  const handleTrailPillColorChange = (color) => {
+  const handleTrailPillNoteChange = (note) => {
     // This is now handled by MapSection internally
     // Kept for backward compatibility with fight section
     // When player dies in fight, we need to mark the trail as died
-    const { convertColorToNote } = require('./utils/trailMapping');
-    const annotation = convertColorToNote(color);
     const current = gsm.getTrailSequence();
     if (current.length === 0) return;
     const newSequence = [...current];
     const lastIndex = newSequence.length - 1;
     newSequence[lastIndex] = {
       ...newSequence[lastIndex],
-      annotation: annotation,
+      annotation: note,
     };
     gsm.setTrailSequence(newSequence);
     // Auto-play defeat sound and show "You Died" animation when died button is clicked
-    if (annotation === 'died') {
+    if (note === 'died') {
       autoPlaySound('defeat');
       gameShowManagerRef.current.showYouDied();
     }
@@ -1134,7 +1131,7 @@ function AppContent({ onLanguageChange }) {
         gsm.setTrailSequence([{ number: num, annotation: 'died' }]);
       }
       // Trigger died button in trail (which will play defeat sound)
-      handleTrailPillColorChange('dark');
+      handleTrailPillNoteChange('died');
       const currentGraveyard = gsm.getGraveyard().trim();
       const separator = currentGraveyard ? '\n' : '';
       gsm.setGraveyard(
