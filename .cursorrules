@@ -24,6 +24,7 @@ When adding user-facing text:
 - We should follow the TDD methodology and write the test first and use it to guide the structure of our code. That improves the testability of the code.
 - When adding a new feature, we should add at least one test, at the lowest layer (unit > integration > UI), that confirms that feature works
 - When fixing a bug, first create a test that reproduces the issue, then change just enough code to make the test pass. That test becomes a regression test, in the regressions test folder.
+- **REGRESSION TEST RULE**: One test per regression bug. Each regression test file should contain exactly one test that reproduces the specific bug that was fixed. This ensures we can quickly identify which bug has regressed if the test fails.
 - Test descriptions must focus on behavior and business rules, not implementation details.
   - BAD: "should call i18nManager.setLanguage when clicked"
   - BAD: "should call onNameChange when name is changed"

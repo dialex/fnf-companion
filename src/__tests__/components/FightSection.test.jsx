@@ -12,10 +12,10 @@ vi.mock('../../managers/i18nManager', () => ({
 
 // Mock DiceDisplay
 vi.mock('../../components/DiceDisplay', () => ({
-  default: ({ rollingType, result, color }) => (
+  default: ({ diceRolling, result, color }) => (
     <div
       data-testid="dice-display"
-      data-rolling={rollingType}
+      data-dice-rolling={diceRolling}
       data-result={JSON.stringify(result)}
       data-color={color}
     >
@@ -466,15 +466,15 @@ describe('FightSection', () => {
       render(<FightSection {...defaultProps} diceRollingType="fight" />);
 
       const diceDisplays = screen.getAllByTestId('dice-display');
-      expect(diceDisplays[0]).toHaveAttribute('data-rolling', 'fight');
-      expect(diceDisplays[1]).toHaveAttribute('data-rolling', 'fight');
+      expect(diceDisplays[0]).toHaveAttribute('data-dice-rolling', '2');
+      expect(diceDisplays[1]).toHaveAttribute('data-dice-rolling', '2');
     });
 
     it('should show dice rolling animation when diceRollingType is useLuck', () => {
       render(<FightSection {...defaultProps} diceRollingType="useLuck" />);
 
       const diceDisplays = screen.getAllByTestId('dice-display');
-      expect(diceDisplays[0]).toHaveAttribute('data-rolling', 'useLuck');
+      expect(diceDisplays[0]).toHaveAttribute('data-dice-rolling', '2');
     });
 
     it('should disable fight button when dice are rolling', () => {
