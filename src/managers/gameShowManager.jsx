@@ -1,10 +1,11 @@
 /**
  * Manager for visual/audio feedback to the user
- * Handles dice roll animations, results, messages, and triggers sounds
+ * Handles dice roll animations, results, messages, badges, and triggers sounds
  */
 
 import React from 'react';
 import { i18nManager } from './i18nManager';
+import { createFieldBadgeManager } from '../utils/fieldBadges';
 
 /**
  * Creates a GameShowManager instance
@@ -13,14 +14,22 @@ import { i18nManager } from './i18nManager';
  */
 export const createGameShowManager = (soundManager) => {
   const t = i18nManager.t.bind(i18nManager);
+  const fieldBadgeManager = createFieldBadgeManager();
   let displayState = {
     diceRolling: null, // 1 or 2 (number of dice rolling), or null
     diceResult: null, // number, array, or null
     luckTestMessage: null, // JSX element or null
     youDiedOverlay: null, // JSX element or null - YOU DIED animation overlay
+    fieldBadges: {}, // Field badges state
   };
 
   const listeners = new Set();
+
+  // Subscribe to field badge manager to sync badges into display state
+  fieldBadgeManager.subscribe((badges) => {
+    displayState.fieldBadges = badges;
+    notifyListeners();
+  });
 
   const notifyListeners = () => {
     listeners.forEach((callback) => callback({ ...displayState }));
@@ -94,6 +103,16 @@ export const createGameShowManager = (soundManager) => {
   };
 
   /**
+   * Shows a field badge (e.g., +5 health, -2 damage)
+   * @param {string} fieldName - Name of the field (e.g., 'health', 'skill')
+   * @param {string} value - Badge value to display (e.g., '+5', '-2')
+   * @param {string} type - Badge type ('success', 'danger', etc.)
+   */
+  const showFieldBadge = (fieldName, value, type = 'success') => {
+    fieldBadgeManager.showBadge(fieldName, value, type);
+  };
+
+  /**
    * Triggers confetti celebration animation
    * Used when player reaches chapter 400
    */
@@ -162,6 +181,7 @@ export const createGameShowManager = (soundManager) => {
     showDiceResult,
     showLuckTestResult,
     showYouDied,
+    showFieldBadge,
     celebrate,
     subscribe,
     getDisplayState,

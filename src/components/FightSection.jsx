@@ -298,10 +298,10 @@ export default function FightSection({
                     style={{ minHeight: '80px' }}
                   >
                     <DiceDisplay
-                      rollingType={
+                      diceRolling={
                         diceRollingType === 'fight' ||
                         diceRollingType === 'useLuck'
-                          ? diceRollingType
+                          ? 2
                           : null
                       }
                       result={
@@ -321,7 +321,7 @@ export default function FightSection({
                     style={{ minHeight: '80px' }}
                   >
                     <DiceDisplay
-                      rollingType={diceRollingType === 'fight' ? 'fight' : null}
+                      diceRolling={diceRollingType === 'fight' ? 2 : null}
                       result={monsterDiceRolls || null}
                       color="#7e000f"
                     />

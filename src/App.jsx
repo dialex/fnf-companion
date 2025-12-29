@@ -178,6 +178,7 @@ function AppContent({ onLanguageChange }) {
   useEffect(() => {
     const unsubscribe = gameShowManagerRef.current.subscribe((state) => {
       setGameShowState(state);
+      setFieldBadges(state.fieldBadges || {});
     });
     return unsubscribe;
   }, []);
@@ -224,21 +225,6 @@ function AppContent({ onLanguageChange }) {
         setter(String(maxValue));
       }
     }
-  };
-
-  const showFieldBadge = (fieldName, value, type = 'success') => {
-    const id = Date.now();
-    setFieldBadges((prev) => ({
-      ...prev,
-      [fieldName]: { value, type, id },
-    }));
-    setTimeout(() => {
-      setFieldBadges((prev) => {
-        const updated = { ...prev };
-        delete updated[fieldName];
-        return updated;
-      });
-    }, BADGE_ANIMATION_DURATION_MS);
   };
 
   // Trail handlers are now handled by MapSection internally
@@ -858,6 +844,7 @@ function AppContent({ onLanguageChange }) {
   }, [gsm, soundPlaying.victory, customSoundPlaying]);
 
   // Character handlers
+  // TODO: Should be CharacterSection or GameMaster internal logic, because this is character creation
   const handleRandomStats = () => {
     const skillRoll = rollDie();
     const newSkill = skillRoll + 6;
@@ -890,6 +877,7 @@ function AppContent({ onLanguageChange }) {
     );
   };
 
+  // TODO: Should be CharacterSection internal logic
   const handleRandomStatsWithAnimation = () => {
     setRollingButton('randomize');
     setTimeout(() => {
@@ -898,6 +886,7 @@ function AppContent({ onLanguageChange }) {
     }, 1000);
   };
 
+  // TODO: Should be CharacterSection internal logic
   const handleToggleLock = () => {
     if (!gsm.getIsLocked()) {
       gsm.setMaxSkill(parseInt(gsm.getSkill()) || null);
@@ -912,13 +901,15 @@ function AppContent({ onLanguageChange }) {
   };
 
   // Consumables handlers
+  // TODO: Move meal consumption logic to GameMaster once implemented
+  // GameMaster should handle: validation, meal decrement, health increase, sound, badges
   const handleConsumeMeal = () => {
     const currentMeals = parseInt(gsm.getMeals()) || 0;
     if (currentMeals > 0) {
       soundManagerRef.current.playEatSound();
 
       gsm.setMeals(String(currentMeals - 1));
-      showFieldBadge('meals', '-1', 'danger');
+      gameShowManagerRef.current.showFieldBadge('meals', '-1', 'danger');
 
       const currentHealth = parseInt(gsm.getHealth()) || 0;
       const newHealth = currentHealth + 4;
@@ -934,7 +925,11 @@ function AppContent({ onLanguageChange }) {
         )
       );
       if (actualIncrease > 0) {
-        showFieldBadge('health', `+${actualIncrease}`, 'success');
+        gameShowManagerRef.current.showFieldBadge(
+          'health',
+          `+${actualIncrease}`,
+          'success'
+        );
       }
     }
   };
@@ -952,7 +947,11 @@ function AppContent({ onLanguageChange }) {
       const difference = gsm.getMaxSkill() - currentSkill;
       gsm.setSkill(String(gsm.getMaxSkill()));
       if (difference > 0) {
-        showFieldBadge('skill', `+${difference}`, 'success');
+        gameShowManagerRef.current.showFieldBadge(
+          'skill',
+          `+${difference}`,
+          'success'
+        );
       }
     } else if (
       gsm.getPotionType() === 'health' &&
@@ -962,14 +961,22 @@ function AppContent({ onLanguageChange }) {
       const difference = gsm.getMaxHealth() - currentHealth;
       gsm.setHealth(String(gsm.getMaxHealth()));
       if (difference > 0) {
-        showFieldBadge('health', `+${difference}`, 'success');
+        gameShowManagerRef.current.showFieldBadge(
+          'health',
+          `+${difference}`,
+          'success'
+        );
       }
     } else if (gsm.getPotionType() === 'luck' && gsm.getMaxLuck() !== null) {
       const currentLuck = parseInt(gsm.getLuck()) || 0;
       const difference = gsm.getMaxLuck() - currentLuck;
       gsm.setLuck(String(gsm.getMaxLuck()));
       if (difference > 0) {
-        showFieldBadge('luck', `+${difference}`, 'success');
+        gameShowManagerRef.current.showFieldBadge(
+          'luck',
+          `+${difference}`,
+          'success'
+        );
       }
     }
 
@@ -1062,12 +1069,16 @@ function AppContent({ onLanguageChange }) {
     if (objectName && cost > 0 && currentCoins >= cost) {
       const newCoins = Math.max(0, currentCoins - cost);
       gsm.setCoins(String(newCoins));
-      showFieldBadge('coins', `-${cost}`, 'danger');
+      gameShowManagerRef.current.showFieldBadge('coins', `-${cost}`, 'danger');
 
       const currentInventory = gsm.getInventory().trim();
       const separator = currentInventory ? '\n' : '';
       gsm.setInventory(`${currentInventory}${separator}${objectName}`);
-      showFieldBadge('inventory', t('consumables.added'), 'success');
+      gameShowManagerRef.current.showFieldBadge(
+        'inventory',
+        t('consumables.added'),
+        'success'
+      );
 
       gsm.setTransactionObject('');
       gsm.setTransactionCost('');
@@ -1153,7 +1164,11 @@ function AppContent({ onLanguageChange }) {
 
         // Show badges from GameMaster result
         result.badges.forEach((badge) => {
-          showFieldBadge(badge.field, badge.value, badge.type);
+          gameShowManagerRef.current.showFieldBadge(
+            badge.field,
+            badge.value,
+            badge.type
+          );
         });
 
         // Set fight result message with translation
@@ -1281,7 +1296,11 @@ function AppContent({ onLanguageChange }) {
 
         // Show badges from GameMaster result
         result.badges.forEach((badge) => {
-          showFieldBadge(badge.field, badge.value, badge.type);
+          gameShowManagerRef.current.showFieldBadge(
+            badge.field,
+            badge.value,
+            badge.type
+          );
         });
 
         // Handle fight end
