@@ -20,6 +20,7 @@ export default function MapSection({
   gsm,
   onDied,
   onCelebrate,
+  onTrailInputChange,
   initialExpanded = true,
   onExpandedChange,
 }) {
@@ -145,6 +146,10 @@ export default function MapSection({
     // Only allow numbers, up to 3 digits
     if (value === '' || /^\d{1,3}$/.test(value)) {
       setTrailInput(value);
+      // Notify parent when user starts typing
+      if (onTrailInputChange && value.length > 0) {
+        onTrailInputChange(value);
+      }
     }
   };
 

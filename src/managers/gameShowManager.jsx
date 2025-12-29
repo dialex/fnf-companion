@@ -221,6 +221,57 @@ export const createGameShowManager = (soundManager, gameStateManager) => {
     return null;
   };
 
+  /**
+   * Resumes pre-battle music - UI reactivity rule
+   * When battle is over, resumes the music that was playing before battle started
+   * @param {string|null} preBattleSound - The sound that was playing before battle ('ambience', 'custom-{id}', or null)
+   * @returns {Object|null} State updates for React, or null if no updates needed
+   */
+  const resumePreBattleMusic = (preBattleSound) => {
+    if (!gameStateManager || !soundManager) return null;
+
+    // Don't resume if all sounds are muted
+    if (gameStateManager.getAllSoundsMuted()) return null;
+
+    if (
+      preBattleSound === 'ambience' &&
+      gameStateManager.getSoundUrls().ambience
+    ) {
+      // Resume ambience music from beginning
+      const player = soundManager.getPlayer('ambience');
+      if (player) {
+        try {
+          player.pauseVideo();
+          player.seekTo(0, true);
+          player.playVideo();
+          return { soundPlaying: { ambience: true } };
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    } else if (preBattleSound && preBattleSound.startsWith('custom-')) {
+      // Extract custom sound ID (remove 'custom-' prefix)
+      const customId = preBattleSound.replace('custom-', '');
+      const customSound = gameStateManager
+        .getCustomSounds()
+        .find((s) => s.id === customId);
+      if (customSound && customSound.url) {
+        // Resume custom sound
+        const customPlayer = soundManager.getPlayer(preBattleSound);
+        if (customPlayer) {
+          try {
+            customPlayer.playVideo();
+            return { customSoundPlaying: { [customId]: true } };
+          } catch (e) {
+            // Ignore errors
+          }
+        }
+      }
+    }
+
+    return null;
+  };
+
   return {
     showDiceRolling,
     showDiceResult,
@@ -230,6 +281,7 @@ export const createGameShowManager = (soundManager, gameStateManager) => {
     celebrate,
     onMonsterNameFocus,
     onMonsterNameChange,
+    resumePreBattleMusic,
     subscribe,
     getDisplayState,
   };

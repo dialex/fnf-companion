@@ -43,6 +43,18 @@ When adding user-facing text:
   - BAD: `describe('play/pause button', () => {`
   - GOOD: `describe('Play/pause button', () => {`
 
+# Architecture Rules
+
+- **App.jsx is an orchestrator, not a logic container**: Before adding any new logic to `App.jsx`, ask yourself: "Should this logic be in a Section component or a Manager instead?"
+  - **GameMaster**: Knows game rules and orchestrates game actions
+  - **GameShowManager**: Handles UI reactivity and visual/audio feedback
+  - **GameStateManager**: Manages state persistence and state updates
+  - **SoundManager**: Manages sound and music playback
+  - **Section components** (MapSection, FightSection, etc.): Own their component-specific logic
+  - **App.jsx**: Only orchestrates - connects components to managers, handles React state synchronization, and coordinates between managers
+  - **Goal**: Empty App.jsx of business logic. It should only contain orchestration code.
+  - **If in doubt**: Ask the user where the logic should go before adding it to `App.jsx`.
+
 # Save File Structure Changes
 
 When modifying the save file structure (adding, removing, or renaming fields):

@@ -788,7 +788,8 @@ function AppContent({ onLanguageChange }) {
       autoPlaySound('battle');
     }
 
-    // If victory theme is playing and creature name changes (user types new name), stop victory and start battle
+    // If victory theme is playing and creature name changes (user types new name), stop victory and resume pre-battle music
+    // (battle is over, so resume what was playing before battle started)
     if (
       soundPlaying.victory &&
       currentHasContent &&
@@ -808,8 +809,26 @@ function AppContent({ onLanguageChange }) {
           // Ignore errors
         }
       }
-      // Start battle theme from beginning
-      autoPlaySound('battle');
+      // Resume the sound that was playing before battle (ambience or custom sound)
+      const preBattleSound = preBattleSoundRef.current;
+      const stateUpdates =
+        gameShowManagerRef.current.resumePreBattleMusic(preBattleSound);
+      if (stateUpdates) {
+        if (stateUpdates.soundPlaying) {
+          setSoundPlaying((prev) => ({
+            ...prev,
+            ...stateUpdates.soundPlaying,
+          }));
+        }
+        if (stateUpdates.customSoundPlaying) {
+          setCustomSoundPlaying((prev) => ({
+            ...prev,
+            ...stateUpdates.customSoundPlaying,
+          }));
+        }
+      }
+      // Reset pre-battle sound reference
+      preBattleSoundRef.current = null;
     }
 
     prevMonsterCreatureRef.current = monsterCreature;
@@ -847,29 +866,20 @@ function AppContent({ onLanguageChange }) {
       }
       // Resume the sound that was playing before battle (ambience or custom sound)
       const preBattleSound = preBattleSoundRef.current;
-      if (preBattleSound === 'ambience' && gsm.getSoundUrls().ambience) {
-        autoPlaySound('ambience');
-      } else if (preBattleSound && preBattleSound.startsWith('custom-')) {
-        // Extract custom sound ID (remove 'custom-' prefix)
-        const customId = preBattleSound.replace('custom-', '');
-        const customSound = gsm
-          .getCustomSounds()
-          .find((s) => s.id === customId);
-        if (customSound && customSound.url) {
-          // Resume custom sound
-          const customPlayer =
-            soundManagerRef.current.getPlayer(preBattleSound);
-          if (customPlayer) {
-            try {
-              customPlayer.playVideo();
-              setCustomSoundPlaying((prev) => ({
-                ...prev,
-                [customId]: true,
-              }));
-            } catch (e) {
-              // Ignore errors
-            }
-          }
+      const stateUpdates =
+        gameShowManagerRef.current.resumePreBattleMusic(preBattleSound);
+      if (stateUpdates) {
+        if (stateUpdates.soundPlaying) {
+          setSoundPlaying((prev) => ({
+            ...prev,
+            ...stateUpdates.soundPlaying,
+          }));
+        }
+        if (stateUpdates.customSoundPlaying) {
+          setCustomSoundPlaying((prev) => ({
+            ...prev,
+            ...stateUpdates.customSoundPlaying,
+          }));
         }
       }
       // Reset pre-battle sound reference
@@ -1581,6 +1591,32 @@ function AppContent({ onLanguageChange }) {
               }}
               onCelebrate={() => {
                 gameShowManagerRef.current.celebrate();
+              }}
+              onTrailInputChange={() => {
+                // If victory theme is playing and user starts typing a new chapter, switch back to pre-battle music
+                if (soundPlaying.victory && !gsm.getAllSoundsMuted()) {
+                  // Stop victory theme
+                  const victoryPlayer =
+                    soundManagerRef.current.getPlayer('victory');
+                  if (victoryPlayer) {
+                    try {
+                      victoryPlayer.pauseVideo();
+                      setSoundPlaying((prev) => ({
+                        ...prev,
+                        victory: false,
+                      }));
+                    } catch (e) {
+                      // Ignore errors
+                    }
+                  }
+                  // Resume the sound that was playing before battle (ambience or custom sound)
+                  const preBattleSound = preBattleSoundRef.current;
+                  gameShowManagerRef.current.resumePreBattleMusic(
+                    preBattleSound
+                  );
+                  // Reset pre-battle sound reference
+                  preBattleSoundRef.current = null;
+                }
               }}
               initialExpanded={gsm.getSectionsExpanded().map}
               onExpandedChange={(expanded) =>
