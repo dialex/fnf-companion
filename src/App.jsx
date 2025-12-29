@@ -1612,7 +1612,19 @@ function AppContent({ onLanguageChange }) {
               isTestingLuck={isTestingLuck}
               diceRollingType={diceRollingType}
               fieldBadges={fieldBadges}
-              onMonsterCreatureChange={gsm.setMonsterCreature}
+              onMonsterCreatureChange={(value) => {
+                // Cancel any pending timeout when user starts typing
+                if (fightCleanupTimeoutRef.current) {
+                  clearTimeout(fightCleanupTimeoutRef.current);
+                  fightCleanupTimeoutRef.current = null;
+                }
+
+                // Handle UI reactivity: clear fight results but preserve what user is typing
+                gameShowManagerRef.current.onMonsterNameChange(value);
+
+                // Update the monster creature name
+                gsm.setMonsterCreature(value);
+              }}
               onMonsterCreatureFocus={() => {
                 gameShowManagerRef.current.onMonsterNameFocus();
               }}

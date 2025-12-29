@@ -180,16 +180,45 @@ export const createGameShowManager = (soundManager, gameStateManager) => {
   /**
    * Handles monster name input focus - UI reactivity rule
    * If fight has ended, clears fight results immediately to improve UX
+   * Only clears if input is empty (to avoid clearing what user is typing)
    */
   const onMonsterNameFocus = () => {
     if (!gameStateManager) return;
 
     const fightEnded = gameStateManager.getFightOutcome() !== null;
+    const currentCreature = gameStateManager.getMonsterCreature() || '';
 
-    // UI reactivity rule: If fight ended and user focuses input, clear fight results immediately
-    if (fightEnded) {
+    // UI reactivity rule: If fight ended and input is empty, clear fight results immediately
+    if (fightEnded && currentCreature.trim().length === 0) {
       gameStateManager.clearFightResults();
     }
+  };
+
+  /**
+   * Handles monster name input change - UI reactivity rule
+   * If fight has ended and user starts typing, clears fight results but preserves the new name
+   * @param {string} newName - The new monster creature name being typed
+   * @returns {Function|null} Function to cancel timeout, or null if no cleanup needed
+   */
+  const onMonsterNameChange = (newName) => {
+    if (!gameStateManager) return null;
+
+    const fightEnded = gameStateManager.getFightOutcome() !== null;
+    const prevName = gameStateManager.getMonsterCreature() || '';
+    const newNameTrimmed = (newName || '').trim();
+    const prevNameTrimmed = prevName.trim();
+
+    // UI reactivity rule: If fight ended and user starts typing, clear fight results
+    // but preserve what they're typing
+    if (fightEnded && newNameTrimmed.length > 0) {
+      gameStateManager.clearFightResults(newName); // Preserve the new name they're typing
+      return () => {
+        // Return a function that can be used to cancel any pending timeout
+        // The caller (App.jsx) should use this to cancel fightCleanupTimeoutRef
+      };
+    }
+
+    return null;
   };
 
   return {
@@ -200,6 +229,7 @@ export const createGameShowManager = (soundManager, gameStateManager) => {
     showFieldBadge,
     celebrate,
     onMonsterNameFocus,
+    onMonsterNameChange,
     subscribe,
     getDisplayState,
   };

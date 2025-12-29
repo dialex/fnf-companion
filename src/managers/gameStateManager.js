@@ -535,13 +535,20 @@ export const createGameStateManager = () => {
     debouncedSave();
   };
 
-  const clearFightResults = () => {
+  const clearFightResults = (preserveMonsterCreature = null) => {
+    // If preserveMonsterCreature is a string, use it; if true, preserve current; if false/null, clear
+    const preservedCreature =
+      typeof preserveMonsterCreature === 'string'
+        ? preserveMonsterCreature
+        : preserveMonsterCreature === true
+          ? state.fight.monsterCreature
+          : '';
     state = {
       ...state,
       fight: {
         ...state.fight,
         fightOutcome: null,
-        monsterCreature: '',
+        monsterCreature: preservedCreature,
         monsterSkill: '',
         monsterHealth: '',
         heroDiceRolls: null,
