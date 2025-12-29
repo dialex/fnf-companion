@@ -1097,9 +1097,12 @@ function AppContent({ onLanguageChange }) {
   // Note: checkFightEnd logic has been moved to GameMaster
 
   const handleFight = () => {
-    const currentSkill = parseInt(skill) || 0;
-    const currentHealth = parseInt(health) || 0;
-    const currentLuck = parseInt(luck) || 0;
+    const currentSkill = parseInt(gsm.getSkill()) || 0;
+    const currentHealth = parseInt(gsm.getHealth()) || 0;
+    const currentLuck = parseInt(gsm.getLuck()) || 0;
+    const monsterCreature = gsm.getMonsterCreature();
+    const monsterSkill = gsm.getMonsterSkill();
+    const monsterHealth = gsm.getMonsterHealth();
 
     if (
       !currentSkill ||
@@ -1110,9 +1113,9 @@ function AppContent({ onLanguageChange }) {
       !monsterHealth ||
       parseInt(monsterSkill) <= 0 ||
       parseInt(monsterHealth) <= 0 ||
-      isFighting ||
+      gsm.getIsFighting() ||
       diceRollingType !== null ||
-      fightOutcome !== null
+      gsm.getFightOutcome() !== null
     ) {
       return;
     }
