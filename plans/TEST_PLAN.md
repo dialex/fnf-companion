@@ -4,10 +4,15 @@
 
 ## Map Section (`src/components/MapSection.jsx`)
 
-- [ ] Trail sequence can be updated
-- [ ] Trail annotations work
-- [ ] Trail is saved to state
-- [ ] All player-facing text is translated
+- There's a field to type a chapter number
+- Chapter number must be a number between 1 and 400
+- Trail always starts with the number 1
+- Trail numbers are displayed using badges, from left to right, one after another. They have a color based on their meaning.
+- Trail numbers can be tagged using a button group with 6 diff meanings: Normal, Choyce, Good, Bad, Important, and Died
+- When the last trail number is clicked it is removed from the trail (this is used when the user added one by mistake)
+- When the died button is clicked it displays a special "YOU DIED" animation
+- If the user submits chapter 400, then it triggers a special "confetti" animation and marks the chapter as Important (yellow)
+- Trail is part of the game state, so it's persisted between refreshes and load games
 
 ## Fight Section (`src/components/FightSection.jsx`)
 
@@ -102,11 +107,11 @@
 
 **Music Volume Control:**
 
-- [ ] Test volume updates for each music track
-- [ ] Volume changes persist across play/pause cycles
-- [ ] Volume respects master mute setting
-- [ ] Volume persists on page refresh
-- [ ] Volume persists on game save and load
+- [x] Volume controls each music track separately
+- [x] Volume changes persist across play/pause cycles
+- [x] Volume respects master mute button
+- [x] Volume persists on page refresh
+- [x] Volume persists on game save and load
 
 ## Last touches
 

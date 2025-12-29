@@ -351,4 +351,121 @@ describe('Music control buttons', () => {
       expect(soundManager.getSoundPlaying().ambience).toBe(false);
     });
   });
+
+  describe('Music volume control', () => {
+    beforeEach(() => {
+      mockPlayer.setVolume = vi.fn();
+      soundManager._setPlayerForTesting('ambience', mockPlayer);
+    });
+
+    it('should control each music track volume separately', () => {
+      const battlePlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+        setVolume: vi.fn(),
+      };
+      const victoryPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+        setVolume: vi.fn(),
+      };
+
+      soundManager._setPlayerForTesting('battle', battlePlayer);
+      soundManager._setPlayerForTesting('victory', victoryPlayer);
+
+      // Set different volumes for each track
+      soundManager.setPlayerVolume('ambience', 30);
+      soundManager.setPlayerVolume('battle', 50);
+      soundManager.setPlayerVolume('victory', 75);
+
+      expect(mockPlayer.setVolume).toHaveBeenCalledWith(30);
+      expect(battlePlayer.setVolume).toHaveBeenCalledWith(50);
+      expect(victoryPlayer.setVolume).toHaveBeenCalledWith(75);
+    });
+
+    it('should persist volume across play and pause cycles', () => {
+      mockPlayer.setVolume = vi.fn();
+
+      // Set initial volume
+      soundManager.setPlayerVolume('ambience', 40);
+      expect(mockPlayer.setVolume).toHaveBeenCalledWith(40);
+      vi.clearAllMocks();
+
+      // Play music
+      soundManager.handleMusicPlayPause('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+      // Volume should not change
+      expect(mockPlayer.setVolume).not.toHaveBeenCalled();
+
+      // Pause music
+      soundManager.handleMusicPlayPause('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(false);
+      // Volume should still not change
+      expect(mockPlayer.setVolume).not.toHaveBeenCalled();
+
+      // Change volume while paused
+      soundManager.setPlayerVolume('ambience', 60);
+      expect(mockPlayer.setVolume).toHaveBeenCalledWith(60);
+      vi.clearAllMocks();
+
+      // Play again - volume should remain at 60
+      soundManager.handleMusicPlayPause('ambience');
+      expect(soundManager.getSoundPlaying().ambience).toBe(true);
+      // Volume should not reset
+      expect(mockPlayer.setVolume).not.toHaveBeenCalled();
+    });
+
+    it('should set volume even when master sound is muted', () => {
+      const mutedManager = createSoundManager({ allSoundsMuted: true });
+      const mutedPlayer = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+        setVolume: vi.fn(),
+      };
+      mutedManager._setPlayerForTesting('ambience', mutedPlayer);
+
+      // Volume should still be settable when muted
+      mutedManager.setPlayerVolume('ambience', 45);
+      expect(mutedPlayer.setVolume).toHaveBeenCalledWith(45);
+
+      // But music should not play when muted
+      mutedManager.handleMusicPlayPause('ambience');
+      expect(mutedPlayer.playVideo).not.toHaveBeenCalled();
+    });
+
+    it('should handle volume changes when player does not exist', () => {
+      const managerWithoutPlayer = createSoundManager();
+
+      // Should not throw error
+      expect(() => {
+        managerWithoutPlayer.setPlayerVolume('ambience', 50);
+      }).not.toThrow();
+    });
+
+    it('should handle volume changes when player has no setVolume method', () => {
+      const playerWithoutSetVolume = {
+        playVideo: vi.fn(),
+        pauseVideo: vi.fn(),
+        stopVideo: vi.fn(),
+        seekTo: vi.fn(),
+        destroy: vi.fn(),
+        // No setVolume method
+      };
+      soundManager._setPlayerForTesting('ambience', playerWithoutSetVolume);
+
+      // Should not throw error
+      expect(() => {
+        soundManager.setPlayerVolume('ambience', 50);
+      }).not.toThrow();
+    });
+  });
 });

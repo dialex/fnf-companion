@@ -317,6 +317,39 @@ describe('GameStateManager', () => {
       expect(manager.getCoins()).toBe('0');
     });
 
+    it('should persist volume settings on page refresh', () => {
+      // Set volumes
+      manager.setSoundVolumes({
+        ambience: 30,
+        battle: 50,
+        victory: 40,
+        defeat: 60,
+      });
+      manager.setCustomSoundVolumes({
+        custom1: 45,
+        custom2: 55,
+      });
+
+      // Advance timer to save
+      vi.advanceTimersByTime(DEBOUNCE_DELAY);
+
+      // Create new manager instance (simulating page refresh)
+      const newManager = createGameStateManager();
+      newManager.loadFromStorage();
+
+      // Volumes should be restored
+      expect(newManager.getSoundVolumes()).toEqual({
+        ambience: 30,
+        battle: 50,
+        victory: 40,
+        defeat: 60,
+      });
+      expect(newManager.getCustomSoundVolumes()).toEqual({
+        custom1: 45,
+        custom2: 55,
+      });
+    });
+
     it('should notify subscribers when loading from storage', () => {
       const listener = vi.fn();
       manager.subscribe(listener);
@@ -421,6 +454,71 @@ describe('GameStateManager', () => {
 
       await manager.loadFromFile();
       expect(listener).toHaveBeenCalled();
+    });
+
+    it('should persist volume settings on game save and load', async () => {
+      // Set volumes
+      manager.setSoundVolumes({
+        ambience: 35,
+        battle: 55,
+        victory: 45,
+        defeat: 65,
+      });
+      manager.setCustomSoundVolumes({
+        custom1: 50,
+        custom2: 70,
+      });
+
+      // Save to file
+      manager.saveToFile('Test Book', 'Hero');
+
+      // Verify volumes are in saved state
+      expect(saveToFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sounds: expect.objectContaining({
+            ambienceVolume: 35,
+            battleVolume: 55,
+            victoryVolume: 45,
+            defeatVolume: 65,
+          }),
+          customSoundVolumes: {
+            custom1: 50,
+            custom2: 70,
+          },
+        }),
+        'Test Book',
+        'Hero'
+      );
+
+      // Load from file
+      const loadedState = {
+        sounds: {
+          ambienceVolume: 35,
+          battleVolume: 55,
+          victoryVolume: 45,
+          defeatVolume: 65,
+        },
+        customSoundVolumes: {
+          custom1: 50,
+          custom2: 70,
+        },
+      };
+      loadFromFile.mockResolvedValue(loadedState);
+
+      const newManager = createGameStateManager();
+      await newManager.loadFromFile();
+
+      // Volumes should be restored
+      expect(newManager.getSoundVolumes()).toEqual({
+        ambience: 35,
+        battle: 55,
+        victory: 45,
+        defeat: 65,
+      });
+      expect(newManager.getCustomSoundVolumes()).toEqual({
+        custom1: 50,
+        custom2: 70,
+      });
     });
   });
 
