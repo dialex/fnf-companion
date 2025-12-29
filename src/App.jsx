@@ -731,10 +731,23 @@ function AppContent({ onLanguageChange }) {
   }, [gsm]);
 
   // Monitor creature name changes to start battle theme
-  const prevMonsterCreatureRef = useRef(gsm.getMonsterCreature());
+  // Track monster creature in React state so useEffect can detect changes
+  const [monsterCreature, setMonsterCreature] = useState(() =>
+    gsm.getMonsterCreature()
+  );
+  const prevMonsterCreatureRef = useRef(monsterCreature);
+
+  // Subscribe to gsm changes for monsterCreature
+  useEffect(() => {
+    const unsubscribe = gsm.subscribe(() => {
+      setMonsterCreature(gsm.getMonsterCreature());
+    });
+    return unsubscribe;
+  }, []);
+
   useEffect(() => {
     const prevCreature = prevMonsterCreatureRef.current;
-    const currentCreature = gsm.getMonsterCreature().trim();
+    const currentCreature = monsterCreature.trim();
     const prevWasEmpty = !prevCreature || prevCreature.length === 0;
     const currentHasContent = currentCreature.length > 0;
 
@@ -781,8 +794,13 @@ function AppContent({ onLanguageChange }) {
       autoPlaySound('battle');
     }
 
-    prevMonsterCreatureRef.current = gsm.getMonsterCreature();
-  }, [gsm, soundPlaying.victory, soundPlaying.ambience, customSoundPlaying]);
+    prevMonsterCreatureRef.current = monsterCreature;
+  }, [
+    monsterCreature,
+    soundPlaying.victory,
+    soundPlaying.ambience,
+    customSoundPlaying,
+  ]);
 
   // Monitor trail sequence changes to stop victory and resume ambience
   const prevTrailSequenceRef = useRef(gsm.getTrailSequence());
