@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MapSection from '../../components/MapSection';
+import { createGameStateManager } from '../../managers/gameStateManager';
 
 // Mock i18nManager
 vi.mock('../../managers/i18nManager', () => ({
@@ -36,6 +37,17 @@ vi.mock('../../utils/trailMapping', () => ({
       number: item.number,
       color: item.annotation ? colorMap[item.annotation] || 'light' : 'light',
     };
+  },
+  convertColorToNote: (color) => {
+    const noteMap = {
+      dark: 'died',
+      info: 'question',
+      success: 'good',
+      danger: 'bad',
+      warning: 'important',
+      light: null,
+    };
+    return noteMap[color] || null;
   },
 }));
 
@@ -98,29 +110,26 @@ global.import = vi.fn((module) => {
 });
 
 describe('Map section', () => {
-  let onTrailInputChange;
-  let onTrailSubmit;
-  let onTrailPillColorChange;
-  let onTrailPillDelete;
   let onExpandedChange;
+  let onDied;
+  let onCelebrate;
+  let gsm;
 
   let defaultProps;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    onTrailInputChange = vi.fn();
-    onTrailSubmit = vi.fn();
-    onTrailPillColorChange = vi.fn();
-    onTrailPillDelete = vi.fn();
     onExpandedChange = vi.fn();
+    onDied = vi.fn();
+    onCelebrate = vi.fn();
+    gsm = createGameStateManager();
+    gsm.setTrailSequence([{ number: 1, annotation: null }]);
 
     defaultProps = {
-      trailSequence: [{ number: 1, annotation: null }],
-      trailInput: '',
-      onTrailInputChange,
-      onTrailSubmit,
-      onTrailPillColorChange,
-      onTrailPillDelete,
+      trailSequence: gsm.getTrailSequence(),
+      gsm,
+      onDied,
+      onCelebrate,
       initialExpanded: true,
       onExpandedChange,
     };
@@ -138,39 +147,40 @@ describe('Map section', () => {
 
     it('should update chapter input when user types valid numbers', async () => {
       const user = userEvent.setup();
-      const { rerender } = render(<MapSection {...defaultProps} />);
+      render(<MapSection {...defaultProps} />);
       const input = screen.getByRole('spinbutton');
 
       // Type first character
       await user.type(input, '4');
-      expect(onTrailInputChange).toHaveBeenCalledWith('4');
-
-      // Update the component with the new value
-      rerender(<MapSection {...defaultProps} trailInput="4" />);
+      expect(input).toHaveValue(4);
 
       // Type second character
       await user.type(input, '2');
-      expect(onTrailInputChange).toHaveBeenCalledWith('42');
+      expect(input).toHaveValue(42);
     });
 
     it('should only allow numeric input up to 3 digits', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} trailInput="123" />);
+      render(<MapSection {...defaultProps} />);
       const input = screen.getByRole('spinbutton');
 
-      // Try to type a 4th digit
+      // Type 3 digits
+      await user.type(input, '123');
+      expect(input).toHaveValue(123);
+
+      // Try to type a 4th digit - should not accept
       await user.type(input, '4');
-      // Should not accept 4 digits
-      expect(onTrailInputChange).not.toHaveBeenCalledWith('1234');
+      expect(input).toHaveValue(123); // Should remain 123
     });
 
     it('should allow empty input', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} trailInput="42" />);
+      render(<MapSection {...defaultProps} />);
       const input = screen.getByRole('spinbutton');
 
+      await user.type(input, '42');
       await user.clear(input);
-      expect(onTrailInputChange).toHaveBeenCalledWith('');
+      expect(input).toHaveValue(null); // Empty number input has null value
     });
 
     it('should prevent non-numeric characters', async () => {
@@ -179,21 +189,31 @@ describe('Map section', () => {
       const input = screen.getByRole('spinbutton');
 
       await user.type(input, 'abc');
-      // Should not accept non-numeric characters
-      expect(onTrailInputChange).not.toHaveBeenCalledWith('a');
+      // Should not accept non-numeric characters - input should be empty or unchanged
+      expect(input.value).toBe('');
     });
 
     it('should submit on Enter key', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} trailInput="42" />);
+      gsm.setTrailSequence([{ number: 1, annotation: null }]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const input = screen.getByRole('spinbutton');
 
-      await user.type(input, '{Enter}');
-      expect(onTrailSubmit).toHaveBeenCalledTimes(1);
+      await user.type(input, '42{Enter}');
+
+      // Wait for GSM update
+      await waitFor(() => {
+        const trail = gsm.getTrailSequence();
+        expect(trail.some((item) => item.number === 42)).toBe(true);
+        expect(input.value).toBe(''); // Input should be cleared
+      });
     });
 
-    it('should disable submit button when input is empty', () => {
-      render(<MapSection {...defaultProps} trailInput="" />);
+    it('should disable submit button when input is empty', async () => {
+      const user = userEvent.setup();
+      render(<MapSection {...defaultProps} />);
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
@@ -201,8 +221,11 @@ describe('Map section', () => {
       expect(submitButton).toBeDisabled();
     });
 
-    it('should disable submit button when input is <1', () => {
-      render(<MapSection {...defaultProps} trailInput="0" />);
+    it('should disable submit button when input is <1', async () => {
+      const user = userEvent.setup();
+      render(<MapSection {...defaultProps} />);
+      const input = screen.getByRole('spinbutton');
+      await user.type(input, '0');
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
@@ -210,8 +233,11 @@ describe('Map section', () => {
       expect(submitButton).toBeDisabled();
     });
 
-    it('should disable submit button when input is >400', () => {
-      render(<MapSection {...defaultProps} trailInput="401" />);
+    it('should disable submit button when input is >400', async () => {
+      const user = userEvent.setup();
+      render(<MapSection {...defaultProps} />);
+      const input = screen.getByRole('spinbutton');
+      await user.type(input, '401');
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
@@ -219,8 +245,11 @@ describe('Map section', () => {
       expect(submitButton).toBeDisabled();
     });
 
-    it('should enable submit button for valid numbers between 1 and 400', () => {
-      render(<MapSection {...defaultProps} trailInput="200" />);
+    it('should enable submit button for valid numbers between 1 and 400', async () => {
+      const user = userEvent.setup();
+      render(<MapSection {...defaultProps} />);
+      const input = screen.getByRole('spinbutton');
+      await user.type(input, '200');
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
@@ -230,27 +259,50 @@ describe('Map section', () => {
 
     it('should add chapter to trail on submit', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} trailInput="42" />);
+      gsm.setTrailSequence([{ number: 1, annotation: null }]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
+      const input = screen.getByRole('spinbutton');
+      await user.type(input, '42');
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
       );
 
       await user.click(submitButton);
-      expect(onTrailSubmit).toHaveBeenCalledTimes(1);
+
+      // Wait for GSM update
+      await waitFor(() => {
+        const trail = gsm.getTrailSequence();
+        expect(trail.some((item) => item.number === 42)).toBe(true);
+        expect(input.value).toBe(''); // Input should be cleared
+      });
     });
 
     it('should automatically mark chapter 400 as important when submitted', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} trailInput="400" />);
+      gsm.setTrailSequence([{ number: 1, annotation: null }]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
+      const input = screen.getByRole('spinbutton');
+      await user.type(input, '400');
       const buttons = screen.getAllByRole('button');
       const submitButton = buttons.find((btn) =>
         btn.className.includes('btn-primary')
       );
 
       await user.click(submitButton);
-      expect(onTrailSubmit).toHaveBeenCalledTimes(1);
-      expect(onTrailPillColorChange).toHaveBeenCalledWith('warning');
+
+      // Wait for GSM update
+      await waitFor(() => {
+        const trail = gsm.getTrailSequence();
+        const chapter400 = trail.find((item) => item.number === 400);
+        expect(chapter400).toBeDefined();
+        expect(chapter400.annotation).toBe('important');
+        expect(onCelebrate).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
@@ -321,67 +373,110 @@ describe('Map section', () => {
 
     it('should mark trail as Normal when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const normalButton = screen.getByTitle('Normal');
 
       await user.click(normalButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('light');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBeNull();
       });
     });
 
     it('should mark trail as Choice when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const choiceButton = screen.getByTitle('Choice');
 
       await user.click(choiceButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('info');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBe('question');
       });
     });
 
     it('should mark trail as Good when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const goodButton = screen.getByTitle('Good');
 
       await user.click(goodButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('success');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBe('good');
       });
     });
 
     it('should mark trail as Bad when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const badButton = screen.getByTitle('Bad');
 
       await user.click(badButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('danger');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBe('bad');
       });
     });
 
     it('should mark trail as Important when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const importantButton = screen.getByTitle('Important');
 
       await user.click(importantButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('warning');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBe('important');
       });
     });
 
     it('should mark trail as Died when its button is clicked', async () => {
       const user = userEvent.setup();
-      render(<MapSection {...defaultProps} />);
+      gsm.setTrailSequence([
+        { number: 1, annotation: null },
+        { number: 2, annotation: null },
+      ]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const diedButton = screen.getByTitle('Died');
 
       await user.click(diedButton);
       await waitFor(() => {
-        expect(onTrailPillColorChange).toHaveBeenCalledWith('dark');
+        const trail = gsm.getTrailSequence();
+        expect(trail[trail.length - 1].annotation).toBe('died');
+        expect(onDied).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -393,7 +488,10 @@ describe('Map section', () => {
         { number: 2, annotation: null },
         { number: 3, annotation: null },
       ];
-      render(<MapSection {...defaultProps} trailSequence={sequence} />);
+      gsm.setTrailSequence(sequence);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const pills = screen.getAllByText(/^\d+$/);
       const lastPill = pills[pills.length - 1];
 
@@ -405,7 +503,10 @@ describe('Map section', () => {
         { number: 1, annotation: null },
         { number: 2, annotation: null },
       ];
-      render(<MapSection {...defaultProps} trailSequence={sequence} />);
+      gsm.setTrailSequence(sequence);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const pills = screen.getAllByText(/^\d+$/);
       const firstPill = pills[0];
 
@@ -419,7 +520,10 @@ describe('Map section', () => {
         { number: 2, annotation: null },
         { number: 3, annotation: null },
       ];
-      render(<MapSection {...defaultProps} trailSequence={sequence} />);
+      gsm.setTrailSequence(sequence);
+      const { rerender } = render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
 
       // Wait for tooltip initialization to complete
       await waitFor(
@@ -443,18 +547,29 @@ describe('Map section', () => {
         tooltipInstances.set(lastPill, mockInstance);
       }
 
+      expect(gsm.getTrailSequence().length).toBe(3);
       await user.click(lastPill);
+
+      // Wait for GSM to update
       await waitFor(
         () => {
-          expect(onTrailPillDelete).toHaveBeenCalledTimes(1);
+          const trail = gsm.getTrailSequence();
+          expect(trail.length).toBe(2);
         },
         { timeout: 3000 }
+      );
+
+      // Re-render with updated trail sequence
+      rerender(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
       );
     });
 
     it('should not allow deletion when there is only one trail number', () => {
-      const sequence = [{ number: 1, annotation: null }];
-      render(<MapSection {...defaultProps} trailSequence={sequence} />);
+      gsm.setTrailSequence([{ number: 1, annotation: null }]);
+      render(
+        <MapSection {...defaultProps} trailSequence={gsm.getTrailSequence()} />
+      );
       const pills = screen.getAllByText(/^\d+$/);
       const onlyPill = pills[0];
 

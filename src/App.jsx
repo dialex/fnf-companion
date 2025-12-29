@@ -81,7 +81,6 @@ function AppContent({ onLanguageChange }) {
   const gsm = gameStateManagerRef.current;
 
   // Trail state - UI-only (input field)
-  const [trailInput, setTrailInput] = useState('');
 
   // Fight state - UI-only (fight started flag, dice rolling UI state)
   const [isFightStarted, setIsFightStarted] = useState(false);
@@ -234,36 +233,13 @@ function AppContent({ onLanguageChange }) {
     }, BADGE_ANIMATION_DURATION_MS);
   };
 
-  // Trail handlers
-  const handleTrailSubmit = () => {
-    const num = parseInt(trailInput);
-    if (isNaN(num) || num < 1 || num > 400) {
-      return;
-    }
-
-    // Add number to sequence with default annotation
-    gsm.setTrailSequence([
-      ...gsm.getTrailSequence(),
-      { number: num, annotation: null },
-    ]);
-    // Clear input
-    setTrailInput('');
-
-    // Celebrate if the game was won
-    if (num === 400) {
-      gameShowManagerRef.current.celebrate();
-    }
-  };
-
-  const handleTrailPillDelete = () => {
-    const current = gsm.getTrailSequence();
-    // Don't delete if there's only one item (the initial 1)
-    if (current.length <= 1) return;
-    // Remove the last item
-    gsm.setTrailSequence(current.slice(0, -1));
-  };
+  // Trail handlers are now handled by MapSection internally
 
   const handleTrailPillColorChange = (color) => {
+    // This is now handled by MapSection internally
+    // Kept for backward compatibility with fight section
+    // When player dies in fight, we need to mark the trail as died
+    const { convertColorToNote } = require('./utils/trailMapping');
     const annotation = convertColorToNote(color);
     const current = gsm.getTrailSequence();
     if (current.length === 0) return;
@@ -1154,7 +1130,7 @@ function AppContent({ onLanguageChange }) {
       const currentTrail = gsm.getTrailSequence();
       if (currentTrail.length === 0) {
         // If no trail entries, add one with the current input or default to 1
-        const num = parseInt(trailInput) || 1;
+        const num = 1; // Default to 1 if no trail exists
         gsm.setTrailSequence([{ number: num, annotation: 'died' }]);
       }
       // Trigger died button in trail (which will play defeat sound)
@@ -1599,11 +1575,14 @@ function AppContent({ onLanguageChange }) {
             <MapSection
               key={`map-${sectionResetKey}`}
               trailSequence={gsm.getTrailSequence()}
-              trailInput={trailInput}
-              onTrailInputChange={setTrailInput}
-              onTrailSubmit={handleTrailSubmit}
-              onTrailPillColorChange={handleTrailPillColorChange}
-              onTrailPillDelete={handleTrailPillDelete}
+              gsm={gsm}
+              onDied={() => {
+                autoPlaySound('defeat');
+                gameShowManagerRef.current.showYouDied();
+              }}
+              onCelebrate={() => {
+                gameShowManagerRef.current.celebrate();
+              }}
               initialExpanded={gsm.getSectionsExpanded().map}
               onExpandedChange={(expanded) =>
                 handleSectionExpandedChange('map', expanded)
