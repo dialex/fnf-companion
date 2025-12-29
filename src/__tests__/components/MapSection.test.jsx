@@ -239,6 +239,19 @@ describe('Map section', () => {
       await user.click(submitButton);
       expect(onTrailSubmit).toHaveBeenCalledTimes(1);
     });
+
+    it('should automatically mark chapter 400 as important when submitted', async () => {
+      const user = userEvent.setup();
+      render(<MapSection {...defaultProps} trailInput="400" />);
+      const buttons = screen.getAllByRole('button');
+      const submitButton = buttons.find((btn) =>
+        btn.className.includes('btn-primary')
+      );
+
+      await user.click(submitButton);
+      expect(onTrailSubmit).toHaveBeenCalledTimes(1);
+      expect(onTrailPillColorChange).toHaveBeenCalledWith('warning');
+    });
   });
 
   describe('Trail display', () => {

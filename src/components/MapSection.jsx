@@ -96,6 +96,21 @@ export default function MapSection({
     };
   }, [displaySequence]);
 
+  const handleSubmit = () => {
+    const num = parseInt(trailInput);
+    if (isNaN(num) || num < 1 || num > 400) {
+      return;
+    }
+
+    // Submit the chapter number
+    onTrailSubmit();
+
+    // Chapter 400 is automatically marked as important
+    if (num === 400 && onTrailPillColorChange) {
+      onTrailPillColorChange('warning');
+    }
+  };
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     // Only allow numbers, up to 3 digits
@@ -108,7 +123,7 @@ export default function MapSection({
     // Handle Enter key to submit
     if (e.key === 'Enter') {
       e.preventDefault();
-      onTrailSubmit();
+      handleSubmit();
       return;
     }
     // Prevent non-numeric keys (except backspace, delete, arrow keys, etc.)
@@ -174,7 +189,7 @@ export default function MapSection({
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={onTrailSubmit}
+                onClick={handleSubmit}
                 disabled={
                   !trailInput ||
                   isNaN(parseInt(trailInput)) ||
