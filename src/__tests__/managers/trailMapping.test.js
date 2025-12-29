@@ -1,31 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
-  convertColorToNote,
   convertNoteToColor,
   convertNoteItemtoColor,
 } from '../../utils/trailMapping';
 
 //TODO: consider if we should have a TrailManager
 describe('Trail mapping utilities', () => {
-  describe('convertColorToNote', () => {
-    it.each([
-      ['dark', 'died'],
-      ['info', 'question'],
-      ['success', 'good'],
-      ['danger', 'bad'],
-      ['warning', 'important'],
-    ])('should convert "%s" to "%s"', (color, expected) => {
-      expect(convertColorToNote(color)).toBe(expected);
-    });
-
-    it.each(['unknown', 'light', '', null, undefined])(
-      'should return null for unknown or invalid color "%s"',
-      (color) => {
-        expect(convertColorToNote(color)).toBe(null);
-      }
-    );
-  });
-
   describe('convertNoteToColor', () => {
     it.each([
       ['died', 'dark'],

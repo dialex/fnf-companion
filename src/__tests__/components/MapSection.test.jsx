@@ -38,17 +38,6 @@ vi.mock('../../utils/trailMapping', () => ({
       color: item.annotation ? colorMap[item.annotation] || 'light' : 'light',
     };
   },
-  convertColorToNote: (color) => {
-    const noteMap = {
-      dark: 'died',
-      info: 'question',
-      success: 'good',
-      danger: 'bad',
-      warning: 'important',
-      light: null,
-    };
-    return noteMap[color] || null;
-  },
 }));
 
 // Mock bootstrap to avoid tooltip initialization errors

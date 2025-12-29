@@ -2,19 +2,6 @@
 
 - [ ] Page loads and there's no console error when the page finished loading
 
-## Map Section (`src/components/MapSection.jsx`)
-
-- [x] There's a field to type a chapter number
-- [x] Chapter number must be a number between 1 and 400
-- [x] Trail always starts with the number 1
-- [x] Trail numbers are displayed using badges, from left to right, one after another. They have a color based on their meaning.
-- [x] Trail numbers can be tagged using a button group with 6 diff meanings: Normal, Choyce, Good, Bad, Important, and Died
-- [x] When the last trail number is clicked it is removed from the trail (this is used when the user added one by mistake)
-- [x] When the died button is clicked it displays a special "YOU DIED" animation (tested in GameShowManager)
-- [x] If the user submits chapter 400, then it triggers a special "confetti" animation and marks the chapter as Important (yellow) (confetti tested in GameShowManager - note: Important marking not yet implemented)
-- [x] Trail is part of the game state, so it's persisted between refreshes and load games (tested in gameStateManager tests)
-- Refactor convertColorToNote: (color)
-
 ## Fight Section (`src/components/FightSection.jsx`)
 
 - All the fight rules are part of the GameMaster
@@ -71,6 +58,7 @@
 
 ## Last touches
 
+- Remove unused code
 - Fix comments like // Kept for backward compatibility
 - Fix todos
 - [ ] Calculate test coverage, to see if we missed any spots

@@ -10,16 +10,6 @@ const mapNoteColor = [
 ];
 
 /**
- * Convert color to annotation
- * @param {string} color - The color value
- * @returns {string|null} - The annotation or null if no annotation
- */
-export const convertColorToNote = (color) => {
-  const pair = mapNoteColor.find((p) => p.color === color);
-  return pair ? pair.note : null;
-};
-
-/**
  * Convert annotation to color
  * @param {string} annotation - The annotation value
  * @returns {string|null} - The color or null if no color
