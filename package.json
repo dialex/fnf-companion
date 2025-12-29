@@ -8,6 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\" \"*.{js,json,html}\" \"*.config.{js,ts}\"",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:check-descriptions": "node scripts/check-test-descriptions.js",
     "prepare": "husky",
     "release": "node src/scripts/release.js patch",
     "release:patch": "node src/scripts/release.js patch",
@@ -32,12 +35,17 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
     "husky": "^9.1.7",
+    "jsdom": "^27.3.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.1.1",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vitest": "^4.0.15"
   }
 }

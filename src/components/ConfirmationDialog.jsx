@@ -1,5 +1,5 @@
 import React from 'react';
-import { t } from '../translations';
+import { i18nManager } from '../managers/i18nManager';
 
 const ConfirmationDialog = ({
   message,
@@ -8,6 +8,7 @@ const ConfirmationDialog = ({
   confirmText,
   cancelText,
 }) => {
+  const t = i18nManager.t.bind(i18nManager);
   return (
     <div
       className="modal fade show"

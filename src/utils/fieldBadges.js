@@ -1,6 +1,9 @@
 /**
  * Utility for managing animated field badges
  */
+
+export const BADGE_ANIMATION_DURATION_MS = 2200; // Matches CSS animation duration of 2.2s
+
 export const createFieldBadgeManager = () => {
   const badges = {};
   const listeners = new Set();
@@ -10,11 +13,11 @@ export const createFieldBadgeManager = () => {
     badges[fieldName] = { value, type, id };
     notifyListeners();
 
-    // Clear badge after animation completes (matches CSS animation duration of 2.2s)
+    // Clear badge after animation completes
     setTimeout(() => {
       delete badges[fieldName];
       notifyListeners();
-    }, 2200);
+    }, BADGE_ANIMATION_DURATION_MS);
   };
 
   const subscribe = (callback) => {

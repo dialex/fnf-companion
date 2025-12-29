@@ -2,84 +2,19 @@
  * State management utilities for saving and loading game state
  */
 
-import { getFromStorage, saveToStorage } from './localStorage';
-import {
-  convertItemColorToAnnotation,
-  annotationToColor,
-} from './trailMapping';
-import { migrateState } from './migrations';
-import { CURRENT_VERSION } from './migrations';
+import { getFromStorage, saveToStorage } from '../utils/localStorage';
+import { saveToFile, loadFromFile } from './fileManager';
+import packageJson from '../../package.json';
+
+const CURRENT_VERSION = packageJson.version;
 
 const STORAGE_KEY = 'fnf-companion-state';
-const DEBOUNCE_DELAY = 1000; // 1 second
+export const DEBOUNCE_DELAY = 1000; // 1 second
 
 /**
  * Get the default/initial state structure
  */
-export const getDefaultState = () => ({
-  metadata: {
-    version: CURRENT_VERSION,
-    savedAt: new Date().toISOString(),
-    bookname: '',
-    theme: 'light',
-    actionSoundsEnabled: true,
-    allSoundsMuted: false,
-  },
-  character: {
-    name: '',
-    skill: '',
-    health: '',
-    luck: '',
-    isLocked: false,
-    maxSkill: null,
-    maxHealth: null,
-    maxLuck: null,
-  },
-  consumables: {
-    coins: '0',
-    meals: '10',
-    transactionObject: '',
-    transactionCost: '',
-    potionType: '',
-    potionUsed: false,
-  },
-  inventory: '',
-  fight: {
-    monsterSkill: '',
-    monsterHealth: '',
-    monsterCreature: '',
-    graveyard: '',
-    showUseLuck: false,
-    luckUsed: false,
-    isFighting: false,
-    fightResult: null,
-    fightOutcome: null,
-    heroDiceRolls: null,
-    monsterDiceRolls: null,
-  },
-  sounds: {
-    ambience: '',
-    battle: 'https://www.youtube.com/watch?v=s5NxP6tjm5o',
-    victory: 'https://www.youtube.com/watch?v=rgUksX6eM0Y',
-    defeat: 'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
-    ambienceVolume: 25,
-    battleVolume: 25,
-    victoryVolume: 25,
-    defeatVolume: 25,
-  },
-  notes: '',
-  trailSequence: [{ number: 1, annotation: null }], // Always starts with 1
-  sectionsExpanded: {
-    game: true,
-    character: true,
-    consumables: true,
-    diceRolls: true,
-    inventory: true,
-    map: true,
-    fight: false,
-    notes: false,
-  },
-});
+export const getDefaultState = () => buildStateObject({});
 
 /**
  * Load state from localStorage
@@ -91,42 +26,36 @@ export const loadState = () => {
     return null;
   }
 
-  // Run migrations first to ensure compatibility
-  const migratedState = migrateState(savedState);
-  if (!migratedState) {
-    return null;
-  }
-
   // Merge with default state to ensure all fields exist
   const defaultState = getDefaultState();
   return {
     ...defaultState,
-    ...migratedState,
+    ...savedState,
     character: {
       ...defaultState.character,
-      ...(migratedState.character || {}),
+      ...(savedState.character || {}),
     },
     consumables: {
       ...defaultState.consumables,
-      ...(migratedState.consumables || {}),
+      ...(savedState.consumables || {}),
     },
     fight: {
       ...defaultState.fight,
-      ...(migratedState.fight || {}),
+      ...(savedState.fight || {}),
     },
     sounds: {
       ...defaultState.sounds,
-      ...(migratedState.sounds || {}),
+      ...(savedState.sounds || {}),
     },
     // Ensure trailSequence is merged correctly, defaulting to [1] if not present
-    trailSequence: migratedState.trailSequence || defaultState.trailSequence,
+    trailSequence: savedState.trailSequence || defaultState.trailSequence,
     sectionsExpanded: {
       ...defaultState.sectionsExpanded,
-      ...(migratedState.sectionsExpanded || {}),
+      ...(savedState.sectionsExpanded || {}),
     },
     metadata: {
       ...defaultState.metadata,
-      ...(migratedState.metadata || {}),
+      ...(savedState.metadata || {}),
     },
   };
 };
@@ -212,9 +141,15 @@ export const buildStateObject = (stateValues) => {
     },
     sounds: {
       ambience: stateValues.soundUrls?.ambience || '',
-      battle: stateValues.soundUrls?.battle || '',
-      victory: stateValues.soundUrls?.victory || '',
-      defeat: stateValues.soundUrls?.defeat || '',
+      battle:
+        stateValues.soundUrls?.battle ||
+        'https://www.youtube.com/watch?v=s5NxP6tjm5o',
+      victory:
+        stateValues.soundUrls?.victory ||
+        'https://www.youtube.com/watch?v=rgUksX6eM0Y',
+      defeat:
+        stateValues.soundUrls?.defeat ||
+        'https://www.youtube.com/watch?v=-ZGlaAxB7nI',
       ambienceVolume:
         typeof stateValues.soundVolumes?.ambience === 'number'
           ? stateValues.soundVolumes.ambience
@@ -234,7 +169,7 @@ export const buildStateObject = (stateValues) => {
     },
     notes: stateValues.notes || '',
     trailSequence: stateValues.trailSequence || [
-      { number: 1, color: 'primary-1' },
+      { number: 1, annotation: null },
     ],
     sectionsExpanded: stateValues.sectionsExpanded || {
       game: true,
@@ -278,21 +213,6 @@ export const applyLoadedState = (savedState, setters) => {
     ) {
       setters.setAllSoundsMuted(savedState.metadata.allSoundsMuted);
     }
-  }
-  // Legacy support: also check top-level for actionSoundsEnabled and allSoundsMuted
-  if (
-    savedState.actionSoundsEnabled !== undefined &&
-    setters.setActionSoundsEnabled &&
-    savedState.metadata?.actionSoundsEnabled === undefined
-  ) {
-    setters.setActionSoundsEnabled(savedState.actionSoundsEnabled);
-  }
-  if (
-    savedState.allSoundsMuted !== undefined &&
-    setters.setAllSoundsMuted &&
-    savedState.metadata?.allSoundsMuted === undefined
-  ) {
-    setters.setAllSoundsMuted(savedState.allSoundsMuted);
   }
 
   // Restore character state
@@ -360,7 +280,6 @@ export const applyLoadedState = (savedState, setters) => {
         defeat: sounds.defeat || '',
       });
     }
-    // Restore sound volumes from sounds object (new structure)
     if (setters.setSoundVolumes) {
       setters.setSoundVolumes({
         ambience: sounds.ambienceVolume ?? 25,
@@ -370,15 +289,6 @@ export const applyLoadedState = (savedState, setters) => {
       });
     }
   }
-  // Legacy support: also check old soundVolumes structure
-  else if (savedState.soundVolumes && setters.setSoundVolumes) {
-    setters.setSoundVolumes({
-      ambience: savedState.soundVolumes.ambience ?? 25,
-      battle: savedState.soundVolumes.battle ?? 25,
-      victory: savedState.soundVolumes.victory ?? 25,
-      defeat: savedState.soundVolumes.defeat ?? 25,
-    });
-  }
   // Restore notes
   if (savedState.notes !== undefined) setters.setNotes(savedState.notes);
 
@@ -387,7 +297,7 @@ export const applyLoadedState = (savedState, setters) => {
     if (setters.setCustomSounds) {
       setters.setCustomSounds(savedState.customSounds);
     }
-    // Restore volumes, initializing missing ones with default (50)
+    // Restore volumes, initializing missing ones with default
     if (setters.setCustomSoundVolumes) {
       const defaultState = getDefaultState();
       const defaultVolume = defaultState.sounds.ambienceVolume;
@@ -404,28 +314,13 @@ export const applyLoadedState = (savedState, setters) => {
   if (savedState.trailSequence !== undefined) {
     // Ensure sequence always starts with 1
     const sequence = savedState.trailSequence;
-    // Handle migration from old format (just numbers or color-based) to new format (annotation-based)
-    const normalizedSequence = sequence.map((item) => {
-      if (typeof item === 'number') {
-        return {
-          number: item,
-          annotation: null,
-        };
-      }
-      // If item has 'color', convert to 'annotation'
-      if (item.color !== undefined) {
-        return convertItemColorToAnnotation(item);
-      }
-      // If item already has 'annotation', use it as-is
-      return item;
-    });
-    if (normalizedSequence.length === 0 || normalizedSequence[0].number !== 1) {
+    if (sequence.length === 0 || sequence[0].number !== 1) {
       setters.setTrailSequence([
         { number: 1, annotation: null },
-        ...normalizedSequence.filter((item) => item.number !== 1),
+        ...sequence.filter((item) => item.number !== 1),
       ]);
     } else {
-      setters.setTrailSequence(normalizedSequence);
+      setters.setTrailSequence(sequence);
     }
   }
 
@@ -434,16 +329,28 @@ export const applyLoadedState = (savedState, setters) => {
     setters.setSectionsExpanded(savedState.sectionsExpanded);
   }
 
-  // Restore theme from metadata (new structure)
+  // Restore theme from metadata
   // Note: Theme utility's localStorage takes precedence over saved state
   // This ensures user's manual theme selection is preserved
-  const themeToRestore = savedState.metadata?.theme || savedState.theme;
-  if (
-    themeToRestore !== undefined &&
-    setters.setTheme &&
-    setters.getCurrentTheme
-  ) {
-    // Restore theme from saved state
-    setters.setTheme(themeToRestore);
+  if (savedState.metadata?.theme !== undefined && setters.setTheme) {
+    setters.setTheme(savedState.metadata.theme);
   }
+};
+
+/**
+ * Save state to YAML file
+ * @param {Object} state - Game state object to save
+ * @param {string} bookName - Book name for filename
+ * @param {string} characterName - Character name for filename
+ */
+export const saveStateToFile = (state, bookName, characterName) => {
+  saveToFile(state, bookName, characterName);
+};
+
+/**
+ * Load state from YAML file
+ * @returns {Promise<Object|null>} Loaded state object or null if cancelled/invalid
+ */
+export const loadStateFromFile = () => {
+  return loadFromFile();
 };

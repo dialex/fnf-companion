@@ -12,25 +12,23 @@ import {
   mdiChevronDown,
   mdiChevronUp,
 } from '@mdi/js';
-import { t } from '../translations';
-import {
-  convertItemAnnotationToColor,
-  annotationToColor,
-} from '../utils/trailMapping';
+import { i18nManager } from '../managers/i18nManager';
+import { convertNoteItemtoColor } from '../utils/trailMapping';
 
 export default function MapSection({
   trailSequence,
-  trailInput,
+  gsm,
+  onDied,
+  onCelebrate,
   onTrailInputChange,
-  onTrailSubmit,
-  onTrailPillColorChange,
-  onTrailPillDelete,
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = i18nManager.t.bind(i18nManager);
   const [selectedButton, setSelectedButton] = useState(null);
   const pillRefs = useRef({});
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
+  const [trailInput, setTrailInput] = useState('');
 
   useEffect(() => {
     setIsExpanded(initialExpanded);
@@ -46,7 +44,7 @@ export default function MapSection({
 
   // Convert annotations to colors for display
   const displaySequence = trailSequence.map((item) =>
-    convertItemAnnotationToColor(item)
+    convertNoteItemtoColor(item)
   );
 
   // Ensure sequence always starts with 1
@@ -98,19 +96,78 @@ export default function MapSection({
     };
   }, [displaySequence]);
 
+  const handlePillNoteChange = (note) => {
+    if (!gsm) return;
+
+    const current = gsm.getTrailSequence();
+    if (current.length === 0) return;
+
+    const newSequence = [...current];
+    const lastIndex = newSequence.length - 1;
+    newSequence[lastIndex] = {
+      ...newSequence[lastIndex],
+      annotation: note,
+    };
+    gsm.setTrailSequence(newSequence);
+
+    // Auto-play defeat sound and show "You Died" animation when died button is clicked
+    if (note === 'died' && onDied) {
+      onDied();
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!gsm) return;
+
+    const num = parseInt(trailInput);
+    if (isNaN(num) || num < 1 || num > 400) {
+      return;
+    }
+
+    // Add number to sequence with default annotation
+    gsm.setTrailSequence([
+      ...gsm.getTrailSequence(),
+      { number: num, annotation: null },
+    ]);
+
+    // Clear input
+    setTrailInput('');
+
+    // Chapter 400 is automatically marked as important
+    if (num === 400) {
+      handlePillNoteChange('important');
+      // Celebrate if the game was won
+      onCelebrate();
+    }
+  };
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     // Only allow numbers, up to 3 digits
     if (value === '' || /^\d{1,3}$/.test(value)) {
-      onTrailInputChange(value);
+      setTrailInput(value);
+      // Notify parent when user starts typing
+      if (onTrailInputChange && value.length > 0) {
+        onTrailInputChange(value);
+      }
     }
+  };
+
+  const handlePillDelete = () => {
+    if (!gsm) return;
+
+    const current = gsm.getTrailSequence();
+    // Don't delete if there's only one item (the initial 1)
+    if (current.length <= 1) return;
+    // Remove the last item
+    gsm.setTrailSequence(current.slice(0, -1));
   };
 
   const handleKeyDown = (e) => {
     // Handle Enter key to submit
     if (e.key === 'Enter') {
       e.preventDefault();
-      onTrailSubmit();
+      handleSubmit();
       return;
     }
     // Prevent non-numeric keys (except backspace, delete, arrow keys, etc.)
@@ -176,7 +233,7 @@ export default function MapSection({
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={onTrailSubmit}
+                onClick={handleSubmit}
                 disabled={
                   !trailInput ||
                   isNaN(parseInt(trailInput)) ||
@@ -198,7 +255,7 @@ export default function MapSection({
                 className={`btn btn-light btn-sm ${selectedButton === 'default' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('default');
-                  onTrailPillColorChange('light');
+                  handlePillNoteChange(null);
                 }}
                 title={t('trail.default')}
               >
@@ -209,7 +266,7 @@ export default function MapSection({
                 className={`btn btn-info btn-sm text-white ${selectedButton === 'question' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('question');
-                  onTrailPillColorChange('info');
+                  handlePillNoteChange('question');
                 }}
                 title={t('trail.question')}
               >
@@ -220,7 +277,7 @@ export default function MapSection({
                 className={`btn btn-success btn-sm text-white ${selectedButton === 'good' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('good');
-                  onTrailPillColorChange('success');
+                  handlePillNoteChange('good');
                 }}
                 title={t('trail.good')}
               >
@@ -231,7 +288,7 @@ export default function MapSection({
                 className={`btn btn-danger btn-sm text-white ${selectedButton === 'bad' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('bad');
-                  onTrailPillColorChange('danger');
+                  handlePillNoteChange('bad');
                 }}
                 title={t('trail.bad')}
               >
@@ -242,7 +299,7 @@ export default function MapSection({
                 className={`btn btn-warning btn-sm text-white ${selectedButton === 'star' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('star');
-                  onTrailPillColorChange('warning');
+                  handlePillNoteChange('important');
                 }}
                 title={t('trail.important')}
               >
@@ -253,7 +310,7 @@ export default function MapSection({
                 className={`btn btn-dark btn-sm text-white ${selectedButton === 'died' ? 'active' : ''}`}
                 onClick={() => {
                   setSelectedButton('died');
-                  onTrailPillColorChange('dark');
+                  handlePillNoteChange('died');
                 }}
                 title={t('trail.died')}
               >
@@ -348,7 +405,7 @@ export default function MapSection({
                 isLastPill && normalizedDisplaySequence.length > 1;
 
               const handlePillClick = async () => {
-                if (canDelete && onTrailPillDelete) {
+                if (canDelete) {
                   // Dispose tooltip before deleting the pill
                   const element = pillRefs.current[pillId];
                   if (element) {
@@ -359,7 +416,7 @@ export default function MapSection({
                       tooltip.dispose(); // Dispose tooltip instance
                     }
                   }
-                  onTrailPillDelete();
+                  handlePillDelete();
                 }
               };
 

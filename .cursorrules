@@ -19,6 +19,42 @@ When adding user-facing text:
 - Use the `t()` function from `./translations` to display translated text in components
 - Never hardcode user-facing strings directly in components
 
+# Testing Requirements
+
+- We should follow the TDD methodology and write the test first and use it to guide the structure of our code. That improves the testability of the code.
+- When adding a new feature, we should add at least one test, at the lowest layer (unit > integration > UI), that confirms that feature works
+- When fixing a bug, first create a test that reproduces the issue, then change just enough code to make the test pass. That test becomes a regression test, in the regressions test folder.
+- **REGRESSION TEST RULE**: One test per regression bug. Each regression test file should contain exactly one test that reproduces the specific bug that was fixed. This ensures we can quickly identify which bug has regressed if the test fails.
+- Test descriptions must focus on behavior and business rules, not implementation details.
+  - BAD: "should call i18nManager.setLanguage when clicked"
+  - BAD: "should call onNameChange when name is changed"
+  - GOOD: "should change the language when a language option is clicked"
+  - GOOD: "should save character name when name input is changed"
+  - Test descriptions should read as non-technical requirements that a product manager could understand.
+  - **CRITICAL**: NEVER use function names, method names, or "call" in test descriptions. Always describe what the user experiences or what the system does, not how it's implemented.
+  - **MANDATORY TEST DESCRIPTION REVIEW**: Before writing ANY test description, check for these forbidden words: "call", "should call", function names (onXxx, handleXxx, setXxx, getXxx), method names. If found, rewrite to describe user-visible behavior instead.
+  - **Before finalizing any test**: Review the test description and ask "Does this describe what the user sees/experiences, or does it describe code implementation?" If it describes implementation, rewrite it.
+  - **VALIDATION**: After writing tests, run `npm run test:check-descriptions` to validate all test descriptions follow these rules.
+- Tests must verify real behavior, not mocked behavior. After writing a test, verify it catches real failures by temporarily breaking the code and confirming the test fails.
+- Prefer using real code over mocks. Only mock when necessary (e.g., external APIs, timers, or when testing in isolation is required).
+- Avoid "dummy tests" that would pass even if the code is broken. Tests should assert actual behavior, not just that functions were called.
+- Test describe blocks must use Title case (only the first letter is uppercased).
+  - BAD: `describe('PLAY/PAUSE BUTTON', () => {`
+  - BAD: `describe('play/pause button', () => {`
+  - GOOD: `describe('Play/pause button', () => {`
+
+# Architecture Rules
+
+- **App.jsx is an orchestrator, not a logic container**: Before adding any new logic to `App.jsx`, ask yourself: "Should this logic be in a Section component or a Manager instead?"
+  - **GameMaster**: Knows game rules and orchestrates game actions
+  - **GameShowManager**: Handles UI reactivity and visual/audio feedback
+  - **GameStateManager**: Manages state persistence and state updates
+  - **SoundManager**: Manages sound and music playback
+  - **Section components** (MapSection, FightSection, etc.): Own their component-specific logic
+  - **App.jsx**: Only orchestrates - connects components to managers, handles React state synchronization, and coordinates between managers
+  - **Goal**: Empty App.jsx of business logic. It should only contain orchestration code.
+  - **If in doubt**: Ask the user where the logic should go before adding it to `App.jsx`.
+
 # Save File Structure Changes
 
 When modifying the save file structure (adding, removing, or renaming fields):

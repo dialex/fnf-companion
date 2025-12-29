@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiBagPersonal, mdiChevronDown, mdiChevronUp } from '@mdi/js';
-import { t } from '../translations';
+import { i18nManager } from '../managers/i18nManager';
 
 export default function InventorySection({
   inventory,
@@ -10,6 +10,7 @@ export default function InventorySection({
   initialExpanded = true,
   onExpandedChange,
 }) {
+  const t = i18nManager.t.bind(i18nManager);
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   useEffect(() => {
