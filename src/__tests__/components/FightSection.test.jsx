@@ -515,6 +515,17 @@ describe('FightSection', () => {
       });
       expect(useLuckButton).toBeDisabled();
     });
+
+    it('should disable use luck button when fight is over', () => {
+      render(
+        <FightSection {...defaultProps} showUseLuck={true} fightOutcome="won" />
+      );
+
+      const useLuckButton = screen.getByRole('button', {
+        name: /fight.useLuck/i,
+      });
+      expect(useLuckButton).toBeDisabled();
+    });
   });
 
   describe('Section collapse', () => {

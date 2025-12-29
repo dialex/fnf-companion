@@ -287,7 +287,8 @@ export default function FightSection({
                         !luck ||
                         parseInt(luck) <= 0 ||
                         diceRollingType !== null ||
-                        isTestingLuck
+                        isTestingLuck ||
+                        fightOutcome !== null
                       }
                       onClick={onUseLuck}
                     >
