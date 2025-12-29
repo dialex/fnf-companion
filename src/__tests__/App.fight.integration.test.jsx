@@ -35,7 +35,7 @@ describe('App handleFight integration', () => {
     gameStateManager = createGameStateManager();
     diceRoller = createDiceRoller();
     soundManager = createSoundManager();
-    gameShowManager = createGameShowManager(soundManager);
+    gameShowManager = createGameShowManager(soundManager, gameStateManager);
     gameMaster = createGameMaster({
       diceRoller,
       gameStateManager,

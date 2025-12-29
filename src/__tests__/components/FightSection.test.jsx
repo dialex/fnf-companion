@@ -50,6 +50,7 @@ describe('FightSection', () => {
     fieldBadges: {},
     // Callbacks
     onMonsterCreatureChange: vi.fn(),
+    onMonsterCreatureFocus: vi.fn(),
     onMonsterSkillChange: vi.fn(),
     onMonsterHealthChange: vi.fn(),
     onFight: vi.fn(),

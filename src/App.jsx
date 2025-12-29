@@ -96,6 +96,7 @@ function AppContent({ onLanguageChange }) {
   const fightAnimationIdRef = useRef(null);
   const fightTimeoutRef = useRef(null);
   const safetyTimeoutRef = useRef(null);
+  const fightCleanupTimeoutRef = useRef(null);
 
   // Field badges
   const [fieldBadges, setFieldBadges] = useState({});
@@ -109,7 +110,7 @@ function AppContent({ onLanguageChange }) {
     })
   );
   const gameShowManagerRef = useRef(
-    createGameShowManager(soundManagerRef.current)
+    createGameShowManager(soundManagerRef.current, gsm)
   );
   const gameMasterRef = useRef(
     createGameMaster({
@@ -737,6 +738,23 @@ function AppContent({ onLanguageChange }) {
   );
   const prevMonsterCreatureRef = useRef(monsterCreature);
 
+  // Helper function to clear fight results (game state + UI state)
+  const clearFightResults = () => {
+    // Cancel any pending cleanup timeout
+    if (fightCleanupTimeoutRef.current) {
+      clearTimeout(fightCleanupTimeoutRef.current);
+      fightCleanupTimeoutRef.current = null;
+    }
+
+    // Clear game state via GSM
+    gsm.clearFightResults();
+
+    // Clear UI state
+    setTestLuckResult(null);
+    setIsFightStarted(false);
+    setDiceRollingType(null);
+  };
+
   // Subscribe to gsm changes for monsterCreature
   useEffect(() => {
     const unsubscribe = gsm.subscribe(() => {
@@ -1221,18 +1239,13 @@ function AppContent({ onLanguageChange }) {
           }
           setIsFightStarted(false);
           setDiceRollingType(null);
-          // Cleanup after 5 seconds
-          setTimeout(() => {
-            gsm.setFightOutcome(null);
-            gsm.setMonsterCreature('');
-            gsm.setMonsterSkill('');
-            gsm.setMonsterHealth('');
-            gsm.setHeroDiceRolls(null);
-            gsm.setMonsterDiceRolls(null);
-            gsm.setFightResult(null);
-            setTestLuckResult(null);
-            gsm.setShowUseLuck(false);
-            gsm.setLuckUsed(false);
+          // Cleanup after 5 seconds (can be cancelled if user types new monster name)
+          if (fightCleanupTimeoutRef.current) {
+            clearTimeout(fightCleanupTimeoutRef.current);
+          }
+          fightCleanupTimeoutRef.current = setTimeout(() => {
+            clearFightResults();
+            fightCleanupTimeoutRef.current = null;
           }, 5000);
         } else if (result.fightEnded === 'lost') {
           // Ensure there's a trail entry, then trigger died button (which will play defeat sound)
@@ -1250,18 +1263,13 @@ function AppContent({ onLanguageChange }) {
           );
           setIsFightStarted(false);
           setDiceRollingType(null);
-          // Cleanup after 5 seconds
-          setTimeout(() => {
-            gsm.setFightOutcome(null);
-            gsm.setMonsterCreature('');
-            gsm.setMonsterSkill('');
-            gsm.setMonsterHealth('');
-            gsm.setHeroDiceRolls(null);
-            gsm.setMonsterDiceRolls(null);
-            gsm.setFightResult(null);
-            setTestLuckResult(null);
-            gsm.setShowUseLuck(false);
-            gsm.setLuckUsed(false);
+          // Cleanup after 5 seconds (can be cancelled if user types new monster name)
+          if (fightCleanupTimeoutRef.current) {
+            clearTimeout(fightCleanupTimeoutRef.current);
+          }
+          fightCleanupTimeoutRef.current = setTimeout(() => {
+            clearFightResults();
+            fightCleanupTimeoutRef.current = null;
           }, 5000);
         } else {
           // Fight continues
@@ -1336,18 +1344,13 @@ function AppContent({ onLanguageChange }) {
           }
           setIsTestingLuck(false);
           setDiceRollingType(null);
-          // Cleanup after 5 seconds
-          setTimeout(() => {
-            gsm.setFightOutcome(null);
-            gsm.setMonsterCreature('');
-            gsm.setMonsterSkill('');
-            gsm.setMonsterHealth('');
-            gsm.setHeroDiceRolls(null);
-            gsm.setMonsterDiceRolls(null);
-            gsm.setFightResult(null);
-            setTestLuckResult(null);
-            gsm.setShowUseLuck(false);
-            gsm.setLuckUsed(false);
+          // Cleanup after 5 seconds (can be cancelled if user types new monster name)
+          if (fightCleanupTimeoutRef.current) {
+            clearTimeout(fightCleanupTimeoutRef.current);
+          }
+          fightCleanupTimeoutRef.current = setTimeout(() => {
+            clearFightResults();
+            fightCleanupTimeoutRef.current = null;
           }, 5000);
           return;
         } else if (result.fightEnded === 'lost') {
@@ -1366,18 +1369,13 @@ function AppContent({ onLanguageChange }) {
           );
           setIsTestingLuck(false);
           setDiceRollingType(null);
-          // Cleanup after 5 seconds
-          setTimeout(() => {
-            gsm.setFightOutcome(null);
-            gsm.setMonsterCreature('');
-            gsm.setMonsterSkill('');
-            gsm.setMonsterHealth('');
-            gsm.setHeroDiceRolls(null);
-            gsm.setMonsterDiceRolls(null);
-            gsm.setFightResult(null);
-            setTestLuckResult(null);
-            gsm.setShowUseLuck(false);
-            gsm.setLuckUsed(false);
+          // Cleanup after 5 seconds (can be cancelled if user types new monster name)
+          if (fightCleanupTimeoutRef.current) {
+            clearTimeout(fightCleanupTimeoutRef.current);
+          }
+          fightCleanupTimeoutRef.current = setTimeout(() => {
+            clearFightResults();
+            fightCleanupTimeoutRef.current = null;
           }, 5000);
           return;
         }
@@ -1615,6 +1613,9 @@ function AppContent({ onLanguageChange }) {
               diceRollingType={diceRollingType}
               fieldBadges={fieldBadges}
               onMonsterCreatureChange={gsm.setMonsterCreature}
+              onMonsterCreatureFocus={() => {
+                gameShowManagerRef.current.onMonsterNameFocus();
+              }}
               onMonsterSkillChange={gsm.setMonsterSkill}
               onMonsterHealthChange={gsm.setMonsterHealth}
               onFight={handleFight}

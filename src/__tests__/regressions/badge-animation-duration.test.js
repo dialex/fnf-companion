@@ -19,7 +19,11 @@ describe('Regression: Badge animation duration', () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     soundManager = createSoundManager();
-    gameShowManager = createGameShowManager(soundManager);
+    const gameStateManager = {
+      getFightOutcome: vi.fn(() => null),
+      clearFightResults: vi.fn(),
+    };
+    gameShowManager = createGameShowManager(soundManager, gameStateManager);
   });
 
   afterEach(() => {

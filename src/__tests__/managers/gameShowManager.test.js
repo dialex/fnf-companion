@@ -13,7 +13,14 @@ describe('GameShowManager', () => {
       playLuckySound: vi.fn(),
     };
     i18nManager = createI18nManager();
-    gameShowManager = createGameShowManager(mockSoundManager, i18nManager);
+    const mockGameStateManager = {
+      getFightOutcome: vi.fn(() => null),
+      clearFightResults: vi.fn(),
+    };
+    gameShowManager = createGameShowManager(
+      mockSoundManager,
+      mockGameStateManager
+    );
   });
 
   afterEach(() => {

@@ -37,6 +37,7 @@ export default function FightSection({
   fieldBadges,
   // Callbacks
   onMonsterCreatureChange,
+  onMonsterCreatureFocus,
   onMonsterSkillChange,
   onMonsterHealthChange,
   onFight,
@@ -196,6 +197,11 @@ export default function FightSection({
                       placeholder={t('fight.creaturePlaceholder')}
                       value={monsterCreature}
                       onChange={(e) => onMonsterCreatureChange(e.target.value)}
+                      onFocus={() => {
+                        if (onMonsterCreatureFocus) {
+                          onMonsterCreatureFocus();
+                        }
+                      }}
                     />
                   </div>
                   <div className="field-group">

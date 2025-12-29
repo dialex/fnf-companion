@@ -31,7 +31,11 @@ describe('DiceRollsSection', () => {
 
     const soundManager = createSoundManager();
     const i18nManager = createI18nManager();
-    gameShowManager = createGameShowManager(soundManager, i18nManager);
+    const gameStateManager = {
+      getFightOutcome: vi.fn(() => null),
+      clearFightResults: vi.fn(),
+    };
+    gameShowManager = createGameShowManager(soundManager, gameStateManager);
   });
 
   afterEach(() => {

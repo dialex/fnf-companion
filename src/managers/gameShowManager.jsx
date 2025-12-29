@@ -10,9 +10,10 @@ import { createFieldBadgeManager } from '../utils/fieldBadges';
 /**
  * Creates a GameShowManager instance
  * @param {Object} soundManager - SoundManager instance for playing sounds
+ * @param {Object} gameStateManager - GameStateManager instance for checking state
  * @returns {Object} GameShowManager with methods to show feedback
  */
-export const createGameShowManager = (soundManager) => {
+export const createGameShowManager = (soundManager, gameStateManager) => {
   const t = i18nManager.t.bind(i18nManager);
   const fieldBadgeManager = createFieldBadgeManager();
   let displayState = {
@@ -176,6 +177,21 @@ export const createGameShowManager = (soundManager) => {
    */
   const getDisplayState = () => ({ ...displayState });
 
+  /**
+   * Handles monster name input focus - UI reactivity rule
+   * If fight has ended, clears fight results immediately to improve UX
+   */
+  const onMonsterNameFocus = () => {
+    if (!gameStateManager) return;
+
+    const fightEnded = gameStateManager.getFightOutcome() !== null;
+
+    // UI reactivity rule: If fight ended and user focuses input, clear fight results immediately
+    if (fightEnded) {
+      gameStateManager.clearFightResults();
+    }
+  };
+
   return {
     showDiceRolling,
     showDiceResult,
@@ -183,6 +199,7 @@ export const createGameShowManager = (soundManager) => {
     showYouDied,
     showFieldBadge,
     celebrate,
+    onMonsterNameFocus,
     subscribe,
     getDisplayState,
   };

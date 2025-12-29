@@ -28,7 +28,7 @@ describe('GameMaster', () => {
     diceRoller = createDiceRoller();
     gameStateManager = createGameStateManager();
     soundManager = createSoundManager();
-    gameShowManager = createGameShowManager(soundManager);
+    gameShowManager = createGameShowManager(soundManager, gameStateManager);
     gameMaster = createGameMaster({
       diceRoller,
       gameStateManager,

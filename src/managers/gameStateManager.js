@@ -535,6 +535,27 @@ export const createGameStateManager = () => {
     debouncedSave();
   };
 
+  const clearFightResults = () => {
+    state = {
+      ...state,
+      fight: {
+        ...state.fight,
+        fightOutcome: null,
+        monsterCreature: '',
+        monsterSkill: '',
+        monsterHealth: '',
+        heroDiceRolls: null,
+        monsterDiceRolls: null,
+        fightResult: null,
+        showUseLuck: false,
+        luckUsed: false,
+        isFighting: false,
+      },
+    };
+    notifyListeners();
+    debouncedSave();
+  };
+
   const setGraveyard = (value) => {
     state = {
       ...state,
@@ -747,6 +768,7 @@ export const createGameStateManager = () => {
     setMonsterSkill,
     setMonsterHealth,
     setMonsterCreature,
+    clearFightResults,
     setGraveyard,
     setShowUseLuck,
     setLuckUsed,
