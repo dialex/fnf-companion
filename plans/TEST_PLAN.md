@@ -10,8 +10,8 @@
 - [x] Trail numbers are displayed using badges, from left to right, one after another. They have a color based on their meaning.
 - [x] Trail numbers can be tagged using a button group with 6 diff meanings: Normal, Choyce, Good, Bad, Important, and Died
 - [x] When the last trail number is clicked it is removed from the trail (this is used when the user added one by mistake)
-- [ ] When the died button is clicked it displays a special "YOU DIED" animation (integration test in App.jsx)
-- [ ] If the user submits chapter 400, then it triggers a special "confetti" animation and marks the chapter as Important (yellow) (integration test in App.jsx - note: Important marking not yet implemented)
+- [x] When the died button is clicked it displays a special "YOU DIED" animation (tested in GameShowManager)
+- [x] If the user submits chapter 400, then it triggers a special "confetti" animation and marks the chapter as Important (yellow) (confetti tested in GameShowManager - note: Important marking not yet implemented)
 - [x] Trail is part of the game state, so it's persisted between refreshes and load games (tested in gameStateManager tests)
 
 ## Fight Section (`src/components/FightSection.jsx`)
@@ -70,6 +70,8 @@
 
 ## Last touches
 
+- [ ] Calculate test coverage, to see if we missed any spots
+- [ ] Run other code quality metrics, maybe complexity?, to look for refactor opportunities
 - [ ] Run tests as part of the GitHub pipeline
 
 ## 📝 Notes

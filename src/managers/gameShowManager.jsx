@@ -17,6 +17,7 @@ export const createGameShowManager = (soundManager) => {
     diceRolling: null, // 1 or 2 (number of dice rolling), or null
     diceResult: null, // number, array, or null
     luckTestMessage: null, // JSX element or null
+    youDiedOverlay: null, // JSX element or null - YOU DIED animation overlay
   };
 
   const listeners = new Set();
@@ -74,6 +75,73 @@ export const createGameShowManager = (soundManager) => {
   };
 
   /**
+   * Shows YOU DIED animation
+   * Automatically hides after 9 seconds
+   */
+  const showYouDied = () => {
+    displayState.youDiedOverlay = (
+      <div className="you-died-overlay">
+        <div className="you-died-text">{t('fight.youDied')}</div>
+      </div>
+    );
+    notifyListeners();
+
+    // Auto-hide after 9 seconds
+    setTimeout(() => {
+      displayState.youDiedOverlay = null;
+      notifyListeners();
+    }, 9000);
+  };
+
+  /**
+   * Triggers confetti celebration animation
+   * Used when player reaches chapter 400
+   */
+  const celebrate = () => {
+    // Dynamically import confetti to avoid bundling it if not used
+    import('canvas-confetti').then((confettiModule) => {
+      const confetti = confettiModule.default;
+      // Create a confetti cannon effect with custom colors
+      const colors = ['#FF0000', '#FFD700', '#FFFFFF'];
+      const duration = 1000 * 15; // 15 seconds
+      const animationEnd = Date.now() + duration;
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 200,
+        zIndex: 0,
+        colors: colors,
+      };
+
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+
+        // Launch confetti from multiple positions
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        });
+      }, 250);
+    });
+  };
+
+  /**
    * Subscribe to display state changes
    * @param {Function} callback - Called with display state whenever it changes
    * @returns {Function} Unsubscribe function
@@ -93,6 +161,8 @@ export const createGameShowManager = (soundManager) => {
     showDiceRolling,
     showDiceResult,
     showLuckTestResult,
+    showYouDied,
+    celebrate,
     subscribe,
     getDisplayState,
   };

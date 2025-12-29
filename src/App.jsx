@@ -8,7 +8,6 @@ import { createDiceRoller } from './managers/diceRoller';
 import { rollDie, rollTwoDice } from './utils/dice';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
-import confetti from 'canvas-confetti';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -165,7 +164,16 @@ function AppContent({ onLanguageChange }) {
     });
     return unsubscribe;
   }, []);
-  const [showYouDied, setShowYouDied] = useState(false);
+  // Subscribe to GameShowManager for visual feedback (YOU DIED, etc.)
+  const [gameShowState, setGameShowState] = useState(() =>
+    gameShowManagerRef.current.getDisplayState()
+  );
+  useEffect(() => {
+    const unsubscribe = gameShowManagerRef.current.subscribe((state) => {
+      setGameShowState(state);
+    });
+    return unsubscribe;
+  }, []);
 
   // State management
   const isInitialMountRef = useRef(true);
@@ -226,46 +234,6 @@ function AppContent({ onLanguageChange }) {
     }, BADGE_ANIMATION_DURATION_MS);
   };
 
-  const celebrate = () => {
-    // Create a confetti cannon effect with custom colors
-    const colors = ['#FF0000', '#FFD700', '#FFFFFF'];
-    const duration = 1000 * 15; // seconds
-    const animationEnd = Date.now() + duration;
-    const defaults = {
-      startVelocity: 30,
-      spread: 360,
-      ticks: 200,
-      zIndex: 0,
-      colors: colors,
-    };
-
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-
-      // Launch confetti from multiple positions
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-      });
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-      });
-    }, 250);
-  };
-
   // Trail handlers
   const handleTrailSubmit = () => {
     const num = parseInt(trailInput);
@@ -283,7 +251,7 @@ function AppContent({ onLanguageChange }) {
 
     // Celebrate if the game was won
     if (num === 400) {
-      celebrate();
+      gameShowManagerRef.current.celebrate();
     }
   };
 
@@ -309,10 +277,7 @@ function AppContent({ onLanguageChange }) {
     // Auto-play defeat sound and show "You Died" animation when died button is clicked
     if (annotation === 'died') {
       autoPlaySound('defeat');
-      setShowYouDied(true);
-      setTimeout(() => {
-        setShowYouDied(false);
-      }, 9000);
+      gameShowManagerRef.current.showYouDied();
     }
   };
 
@@ -1480,11 +1445,7 @@ function AppContent({ onLanguageChange }) {
 
   return (
     <div className="min-vh-100 bg-beige d-flex flex-column">
-      {showYouDied && (
-        <div className="you-died-overlay">
-          <div className="you-died-text">{t('fight.youDied')}</div>
-        </div>
-      )}
+      {gameShowState.youDiedOverlay}
       <Header
         onLanguageChange={handleLanguageChange}
         onThemeChange={handleThemeChange}
