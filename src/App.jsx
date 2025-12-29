@@ -7,6 +7,7 @@ import { createDiceRoller } from './managers/diceRoller';
 import { rollDie, rollTwoDice } from './utils/dice';
 import { createSoundManager } from './managers/soundManager';
 import { createGameShowManager } from './managers/gameShowManager';
+import { createGameMaster } from './managers/gameMaster';
 import './styles/variables.css';
 import './styles/animations.css';
 import './styles/components.css';
@@ -109,6 +110,14 @@ function AppContent({ onLanguageChange }) {
   );
   const gameShowManagerRef = useRef(
     createGameShowManager(soundManagerRef.current)
+  );
+  const gameMasterRef = useRef(
+    createGameMaster({
+      diceRoller: diceRollerRef.current,
+      gameStateManager: gsm,
+      gameShowManager: gameShowManagerRef.current,
+      soundManager: soundManagerRef.current,
+    })
   );
 
   // Sync SoundManager with GameStateManager when mute/action sounds change
@@ -1085,77 +1094,7 @@ function AppContent({ onLanguageChange }) {
   };
 
   // Fight handlers
-  const checkFightEnd = (heroHealthValue = null, monsterHealthValue = null) => {
-    const currentHealth =
-      heroHealthValue !== null
-        ? heroHealthValue
-        : parseInt(gsm.getHealth()) || 0;
-    const currentMonsterHealth =
-      monsterHealthValue !== null
-        ? monsterHealthValue
-        : parseInt(monsterHealth) || 0;
-    const creatureName = gsm.getMonsterCreature().trim();
-
-    if (currentMonsterHealth <= 0 && creatureName) {
-      gsm.setFightOutcome('won');
-      // Auto-play victory sound
-      autoPlaySound('victory');
-      const currentGraveyard = gsm.getGraveyard().trim();
-      const separator = currentGraveyard ? '\n' : '';
-      gsm.setGraveyard(
-        `${currentGraveyard}${separator}${t('fight.defeatCreature')} ${creatureName}`
-      );
-      gsm.setIsFighting(false);
-      setIsFightStarted(false);
-      setDiceRollingType(null);
-      setTimeout(() => {
-        gsm.setFightOutcome(null);
-        gsm.setMonsterCreature('');
-        gsm.setMonsterSkill('');
-        gsm.setMonsterHealth('');
-        gsm.setHeroDiceRolls(null);
-        gsm.setMonsterDiceRolls(null);
-        gsm.setFightResult(null);
-        setTestLuckResult(null);
-        gsm.setShowUseLuck(false);
-        gsm.setLuckUsed(false);
-      }, 5000);
-      return true;
-    } else if (currentHealth <= 0) {
-      gsm.setFightOutcome('lost');
-      // Ensure there's a trail entry, then trigger died button (which will play defeat sound)
-      const currentTrail = gsm.getTrailSequence();
-      if (currentTrail.length === 0) {
-        // If no trail entries, add one with the current input or default to 1
-        const num = 1; // Default to 1 if no trail exists
-        gsm.setTrailSequence([{ number: num, annotation: 'died' }]);
-      }
-      // Trigger died button in trail (which will play defeat sound)
-      handleTrailPillNoteChange('died');
-      const currentGraveyard = gsm.getGraveyard().trim();
-      const separator = currentGraveyard ? '\n' : '';
-      gsm.setGraveyard(
-        `${currentGraveyard}${separator}${t('fight.defeatedBy')} ${creatureName}`
-      );
-      gsm.setIsFighting(false);
-      setIsFightStarted(false);
-      setDiceRollingType(null);
-      setTimeout(() => {
-        gsm.setFightOutcome(null);
-        gsm.setMonsterCreature('');
-        gsm.setMonsterSkill('');
-        gsm.setMonsterHealth('');
-        gsm.setHeroDiceRolls(null);
-        gsm.setMonsterDiceRolls(null);
-        gsm.setFightResult(null);
-        setTestLuckResult(null);
-        gsm.setShowUseLuck(false);
-        gsm.setLuckUsed(false);
-      }, 5000);
-      return true;
-    }
-    return false;
-  };
+  // Note: checkFightEnd logic has been moved to GameMaster
 
   const handleFight = () => {
     const currentSkill = parseInt(skill) || 0;
@@ -1206,91 +1145,95 @@ function AppContent({ onLanguageChange }) {
       }
 
       try {
-        // Roll dice for both hero and monster using DiceRoller
-        const heroRolls = diceRollerRef.current.rollDiceTwo();
-        const heroRoll1 = heroRolls.roll1;
-        const heroRoll2 = heroRolls.roll2;
-        const heroDiceSum = heroRolls.sum;
+        // Delegate fight logic to GameMaster
+        const result = gameMasterRef.current.actionFight();
 
-        const monsterRolls = diceRollerRef.current.rollDiceTwo();
-        const monsterRoll1 = monsterRolls.roll1;
-        const monsterRoll2 = monsterRolls.roll2;
-        const monsterDiceSum = monsterRolls.sum;
-
-        const heroSkill = parseInt(gsm.getSkill()) || 0;
-        const monsterSkillValue = parseInt(gsm.getMonsterSkill()) || 0;
-        const heroTotal = heroDiceSum + heroSkill;
-        const monsterTotal = monsterDiceSum + monsterSkillValue;
-
-        const currentHealth = parseInt(gsm.getHealth()) || 0;
-        const currentMonsterHealth = parseInt(gsm.getMonsterHealth()) || 0;
-
-        let resultType = '';
-        let resultMessage = '';
-        let newHealth = currentHealth;
-        let newMonsterHealth = currentMonsterHealth;
-        let shouldShowUseLuck = false;
-        let fightEnded = false;
-
-        if (heroTotal === monsterTotal) {
-          resultType = 'tie';
-          resultMessage = t('fight.attackTie');
-        } else if (heroTotal > monsterTotal) {
-          resultType = 'heroWins';
-          resultMessage = t('fight.attackWin');
-          newMonsterHealth = Math.max(0, currentMonsterHealth - 2);
-        } else {
-          resultType = 'monsterWins';
-          resultMessage = t('fight.attackLoss');
-          newHealth = Math.max(0, currentHealth - 2);
-        }
-
-        // Update health values first, before checking if fight ended
-        gsm.setHeroDiceRolls([heroRoll1, heroRoll2]);
-        gsm.setMonsterDiceRolls([monsterRoll1, monsterRoll2]);
-
-        if (newHealth !== currentHealth) {
-          gsm.setHealth(String(newHealth));
-          showFieldBadge('heroHealth', '-2', 'danger');
-          // Play hurt sound when hero takes damage
-          soundManagerRef.current.playPlayerDamageSound();
-        }
-        if (newMonsterHealth !== currentMonsterHealth) {
-          gsm.setMonsterHealth(String(newMonsterHealth));
-          showFieldBadge('monsterHealth', '-2', 'danger');
-          // Play hit sound when monster takes damage
-          soundManagerRef.current.playMonsterDamageSound();
-        }
-
-        // Now check if fight ended with the updated health values
-        fightEnded = checkFightEnd(newHealth, newMonsterHealth);
-
-        if (fightEnded) {
-          gsm.setIsFighting(false);
-          setDiceRollingType(null);
-          return;
-        }
-
-        // Show use luck after every attack with a winner (not on ties, and fight didn't end)
-        if (resultType === 'heroWins' || resultType === 'monsterWins') {
-          shouldShowUseLuck = true;
-        }
-
-        gsm.setFightResult({
-          type: resultType,
-          message: resultMessage,
-          heroTotal,
-          monsterTotal,
+        // Show badges from GameMaster result
+        result.badges.forEach((badge) => {
+          showFieldBadge(badge.field, badge.value, badge.type);
         });
 
-        if (shouldShowUseLuck) {
-          gsm.setShowUseLuck(true);
+        // Set fight result message with translation
+        const fightResult = gsm.getFightResult();
+        if (fightResult) {
+          let message = '';
+          if (result.type === 'tie') {
+            message = t('fight.attackTie');
+          } else if (result.type === 'heroWins') {
+            message = t('fight.attackWin');
+          } else if (result.type === 'monsterWins') {
+            message = t('fight.attackLoss');
+          }
+          gsm.setFightResult({
+            ...fightResult,
+            message,
+          });
         }
 
-        if (fightAnimationIdRef.current === animationId) {
-          gsm.setIsFighting(false);
+        // Handle fight end
+        if (result.fightEnded === 'won') {
+          // Auto-play victory sound
+          autoPlaySound('victory');
+          // Update graveyard with translation
+          const creatureName = gsm.getMonsterCreature().trim();
+          if (creatureName) {
+            const currentGraveyard = gsm.getGraveyard().trim();
+            const separator = currentGraveyard ? '\n' : '';
+            gsm.setGraveyard(
+              `${currentGraveyard}${separator}${t('fight.defeatCreature')} ${creatureName}`
+            );
+          }
+          setIsFightStarted(false);
           setDiceRollingType(null);
-          fightAnimationIdRef.current = null;
+          // Cleanup after 5 seconds
+          setTimeout(() => {
+            gsm.setFightOutcome(null);
+            gsm.setMonsterCreature('');
+            gsm.setMonsterSkill('');
+            gsm.setMonsterHealth('');
+            gsm.setHeroDiceRolls(null);
+            gsm.setMonsterDiceRolls(null);
+            gsm.setFightResult(null);
+            setTestLuckResult(null);
+            gsm.setShowUseLuck(false);
+            gsm.setLuckUsed(false);
+          }, 5000);
+        } else if (result.fightEnded === 'lost') {
+          // Ensure there's a trail entry, then trigger died button (which will play defeat sound)
+          const currentTrail = gsm.getTrailSequence();
+          if (currentTrail.length === 0) {
+            const num = 1; // Default to 1 if no trail exists
+            gsm.setTrailSequence([{ number: num, annotation: 'died' }]);
+          }
+          // Trigger died button in trail (which will play defeat sound)
+          handleTrailPillNoteChange('died');
+          const currentGraveyard = gsm.getGraveyard().trim();
+          const separator = currentGraveyard ? '\n' : '';
+          gsm.setGraveyard(
+            `${currentGraveyard}${separator}${t('fight.youDied')}`
+          );
+          setIsFightStarted(false);
+          setDiceRollingType(null);
+          // Cleanup after 5 seconds
+          setTimeout(() => {
+            gsm.setFightOutcome(null);
+            gsm.setMonsterCreature('');
+            gsm.setMonsterSkill('');
+            gsm.setMonsterHealth('');
+            gsm.setHeroDiceRolls(null);
+            gsm.setMonsterDiceRolls(null);
+            gsm.setFightResult(null);
+            setTestLuckResult(null);
+            gsm.setShowUseLuck(false);
+            gsm.setLuckUsed(false);
+          }, 5000);
+        } else {
+          // Fight continues
+          if (fightAnimationIdRef.current === animationId) {
+            gsm.setIsFighting(false);
+            setDiceRollingType(null);
+            fightAnimationIdRef.current = null;
+          }
         }
       } catch (error) {
         console.error('Error in fight calculation:', error);
@@ -1326,71 +1269,92 @@ function AppContent({ onLanguageChange }) {
     setIsTestingLuck(true);
     setDiceRollingType('useLuck');
     setTestLuckResult(null);
-    gsm.setLuckUsed(true);
+    // Note: luckUsed will be set by GameMaster.actionUseLuck()
 
     setTimeout(() => {
-      const rolls = diceRollerRef.current.rollDiceTwo();
-      const roll1 = rolls.roll1;
-      const roll2 = rolls.roll2;
-      const sum = rolls.sum;
-      const isLucky = sum <= currentLuck; //TODO: move this logic to GameMaster
+      try {
+        // Delegate use luck logic to GameMaster
+        const result = gameMasterRef.current.actionUseLuck();
 
-      gameShowManagerRef.current.showLuckTestResult(isLucky);
+        // Show badges from GameMaster result
+        result.badges.forEach((badge) => {
+          showFieldBadge(badge.field, badge.value, badge.type);
+        });
 
-      const heroWonLastFight = gsm.getFightResult().type === 'heroWins';
-      const currentHealth = parseInt(gsm.getHealth()) || 0;
-      const currentMonsterHealth = parseInt(gsm.getMonsterHealth()) || 0;
-      let newHealth = currentHealth;
-      let newMonsterHealth = currentMonsterHealth;
-
-      if (heroWonLastFight) {
-        if (isLucky) {
-          newMonsterHealth = Math.max(0, currentMonsterHealth - 1);
-          gsm.setMonsterHealth(String(newMonsterHealth));
-          showFieldBadge('monsterHealth', '-1', 'danger');
-          // Play hit sound when monster takes extra damage
-          soundManagerRef.current.playMonsterDamageSound();
-        } else {
-          newMonsterHealth = currentMonsterHealth + 1;
-          gsm.setMonsterHealth(String(newMonsterHealth));
-          showFieldBadge('monsterHealth', '+1', 'success');
-        }
-      } else {
-        if (isLucky) {
-          const maxHealthValue =
-            gsm.getMaxHealth() !== null ? parseInt(gsm.getMaxHealth()) : null;
-          newHealth =
-            maxHealthValue !== null
-              ? Math.min(currentHealth + 1, maxHealthValue)
-              : currentHealth + 1;
-          const actualIncrease = newHealth - currentHealth;
-          gsm.setHealth(String(newHealth));
-          if (actualIncrease > 0) {
-            showFieldBadge('heroHealth', '+1', 'success');
+        // Handle fight end
+        if (result.fightEnded === 'won') {
+          // Auto-play victory sound
+          autoPlaySound('victory');
+          // Update graveyard with translation
+          const creatureName = gsm.getMonsterCreature().trim();
+          if (creatureName) {
+            const currentGraveyard = gsm.getGraveyard().trim();
+            const separator = currentGraveyard ? '\n' : '';
+            gsm.setGraveyard(
+              `${currentGraveyard}${separator}${t('fight.defeatCreature')} ${creatureName}`
+            );
           }
-        } else {
-          newHealth = Math.max(0, currentHealth - 1);
-          gsm.setHealth(String(newHealth));
-          showFieldBadge('heroHealth', '-1', 'danger');
-          // Play hurt sound when hero takes extra damage
-          soundManagerRef.current.playPlayerDamageSound();
+          setIsTestingLuck(false);
+          setDiceRollingType(null);
+          // Cleanup after 5 seconds
+          setTimeout(() => {
+            gsm.setFightOutcome(null);
+            gsm.setMonsterCreature('');
+            gsm.setMonsterSkill('');
+            gsm.setMonsterHealth('');
+            gsm.setHeroDiceRolls(null);
+            gsm.setMonsterDiceRolls(null);
+            gsm.setFightResult(null);
+            setTestLuckResult(null);
+            gsm.setShowUseLuck(false);
+            gsm.setLuckUsed(false);
+          }, 5000);
+          return;
+        } else if (result.fightEnded === 'lost') {
+          // Ensure there's a trail entry, then trigger died button (which will play defeat sound)
+          const currentTrail = gsm.getTrailSequence();
+          if (currentTrail.length === 0) {
+            const num = 1; // Default to 1 if no trail exists
+            gsm.setTrailSequence([{ number: num, annotation: 'died' }]);
+          }
+          // Trigger died button in trail (which will play defeat sound)
+          handleTrailPillNoteChange('died');
+          const currentGraveyard = gsm.getGraveyard().trim();
+          const separator = currentGraveyard ? '\n' : '';
+          gsm.setGraveyard(
+            `${currentGraveyard}${separator}${t('fight.youDied')}`
+          );
+          setIsTestingLuck(false);
+          setDiceRollingType(null);
+          // Cleanup after 5 seconds
+          setTimeout(() => {
+            gsm.setFightOutcome(null);
+            gsm.setMonsterCreature('');
+            gsm.setMonsterSkill('');
+            gsm.setMonsterHealth('');
+            gsm.setHeroDiceRolls(null);
+            gsm.setMonsterDiceRolls(null);
+            gsm.setFightResult(null);
+            setTestLuckResult(null);
+            gsm.setShowUseLuck(false);
+            gsm.setLuckUsed(false);
+          }, 5000);
+          return;
         }
-      }
 
-      const newLuck = Math.max(0, currentLuck - 1);
-      gsm.setLuck(String(newLuck));
-
-      const fightEnded = checkFightEnd(newHealth, newMonsterHealth);
-
-      if (fightEnded) {
+        // Fight continues - show luck test result
+        setTestLuckResult({
+          roll1: result.roll1,
+          roll2: result.roll2,
+          isLucky: result.isLucky,
+        });
         setIsTestingLuck(false);
         setDiceRollingType(null);
-        return;
+      } catch (error) {
+        console.error('Error in use luck calculation:', error);
+        setIsTestingLuck(false);
+        setDiceRollingType(null);
       }
-
-      setTestLuckResult({ roll1, roll2, isLucky });
-      setIsTestingLuck(false);
-      setDiceRollingType(null);
     }, 1000);
   };
 
